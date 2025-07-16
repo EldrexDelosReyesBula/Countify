@@ -1,27 +1,28 @@
 {
   "name": "Countify+",
   "short_name": "Countify",
-"description": "Advanced writing analytics tool providing word count, character count, reading time estimates, sentence and paragraph counts, plus more insights to improve your writing."
-  "start_url": "/",
+  "description": "Advanced writing analytics tool providing word count, character count, reading time estimates, sentence and paragraph counts, plus more insights to improve your writing.",
+  "start_url": "/Counting-/index.html",
+  "scope": "/Counting-/",
   "display": "standalone",
   "theme_color": "#7c3aed",
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/countify.svg",
+      "src": "/Counting-/countify.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/countify.svg",
+      "src": "/Counting-/countify-192.png",
       "sizes": "192x192",
-      "type": "image/svg"
+      "type": "image/png"
     },
     {
-      "src": "/countify.svg",
+      "src": "/Counting-/countify-512.png",
       "sizes": "512x512",
-      "type": "image/svg"
+      "type": "image/png"
     }
   ]
 }
