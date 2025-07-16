@@ -271,6 +271,10 @@
         <span class="material-icons drawer-item-icon">info</span>
         Version 2.0.1.25
     </div>
+ <div class="drawer-item">
+        <span class="material-icons drawer-item-icon">info</span>
+      © landecs 2025
+    </div>
 </div>
                 `;
             }
