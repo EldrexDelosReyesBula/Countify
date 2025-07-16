@@ -40,31 +40,42 @@
     <!-- Your JS -->
     <script src="main.js"></script>
 <script>
-// Add to home screen functionality
-let deferredPrompt;
-const downloadButton = document.getElementById('downloadSwButton');
+document.addEventListener('DOMContentLoaded', () => {
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/Counting-/sw.js', { 
+      scope: '/Counting-/' 
+    }).then(reg => console.log('SW registered:', reg))
+      .catch(err => console.log('SW registration failed:', err));
+  }
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent the mini-infobar from appearing on mobile
-  e.preventDefault();
-  // Stash the event so it can be triggered later
-  deferredPrompt = e;
-  // Show your custom install button
-  downloadButton.style.display = 'flex';
-});
+  // PWA Installation Logic
+  let deferredPrompt;
+  const installButton = document.getElementById('downloadSwButton');
 
-downloadButton.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    // Show the install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installButton.style.display = 'flex'; // Show install button
+  });
+
+  installButton.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    
     deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-    // Optionally, send analytics event with outcome of user choice
-    console.log(`User response to the install prompt: ${outcome}`);
-    // We've used the prompt, and can't use it again, throw it away
+    
+    if (outcome === 'accepted') {
+      console.log('User accepted install');
+      installButton.style.display = 'none';
+    }
     deferredPrompt = null;
-    // Hide the install button
-    downloadButton.style.display = 'none';
+  });
+
+  // Check if running as PWA
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    console.log('Running as PWA');
+    installButton.style.display = 'none';
   }
 });
 </script>
