@@ -245,10 +245,6 @@
                                 <option value="system" ${this.state.theme === 'system' ? 'selected' : ''}>System</option>
                             </select>
                         </div>
-        <div class="drawer-item" id="downloadSwButton" style="background: #925DFF; font-weight: bold; color: white;">
-            <span class="material-icons drawer-item-icon">download</span>
-            Download App
-        </div>
                     </div>
 
 
