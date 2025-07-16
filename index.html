@@ -40,45 +40,32 @@
     <!-- Your JS -->
     <script src="main.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful');
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-  }
+// Add to home screen functionality
+let deferredPrompt;
+const downloadButton = document.getElementById('downloadSwButton');
 
-  // Check if app is launched as PWA
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('Launched as PWA');
-  }
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later
+  deferredPrompt = e;
+  // Show your custom install button
+  downloadButton.style.display = 'flex';
+});
 
-  // Add download button event listener
-  const downloadButton = document.getElementById('downloadSwButton');
-  if (downloadButton) {
-    downloadButton.addEventListener('click', () => {
-      downloadSwFile();
-    });
+downloadButton.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    // Optionally, send analytics event with outcome of user choice
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    deferredPrompt = null;
+    // Hide the install button
+    downloadButton.style.display = 'none';
   }
-
-  // Define the download function
-  function downloadSwFile() {
-    const link = document.createElement('a');
-    link.href = 'https://eldrexdelosreyesbula.github.io/Counting-/sw.js';
-    link.download = 'https://eldrexdelosreyesbula.github.io/Counting-/sw.js';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-
-  // Initialize your app
-  console.log('Countify+ initialized');
 });
 </script>
 </body>
