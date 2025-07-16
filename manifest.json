@@ -1,7 +1,7 @@
 {
   "name": "Countify+",
   "short_name": "Countify",
-  "description": "Advanced writing analytics tool providing word count, character count, reading time estimates, sentence and paragraph counts, plus more insights to improve your writing.",
+  "description": "Advanced writing analytics tool...",
   "start_url": "/Counting-/index.html",
   "scope": "/Counting-/",
   "display": "standalone",
@@ -9,14 +9,8 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "countify.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "countify.svg",
-      "sizes": "512x512",
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify.svg",
+      "sizes": "192x192 512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
