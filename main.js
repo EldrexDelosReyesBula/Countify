@@ -252,17 +252,17 @@
 <div class="drawer-section" style="text-decoration: none;">
     <div class="drawer-section-title">ABOUT</div>
 
-    <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="https://yourdomain.com/help" target="_blank" rel="noopener noreferrer">
+    <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="help.html" target="_blank" rel="noopener noreferrer">
         <span class="material-icons drawer-item-icon">error</span>
         Help & Support Center
     </a>
 
-    <a style="text-decoration: none; color: var(--text-secondary); " class="drawer-item" href="https://yourdomain.com/privacy" target="_blank" rel="noopener noreferrer">
+    <a style="text-decoration: none; color: var(--text-secondary); " class="drawer-item" href="privacy.html" target="_blank" rel="noopener noreferrer">
         <span class="material-icons drawer-item-icon">lock</span>
         Privacy Policy
     </a>
 
-    <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="https://yourdomain.com/terms" target="_blank" rel="noopener noreferrer">
+    <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="terms.html" target="_blank" rel="noopener noreferrer">
         <span class="material-icons drawer-item-icon">description</span>
         Terms of Service
     </a>
