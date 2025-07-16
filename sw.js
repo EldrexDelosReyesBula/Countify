@@ -1,14 +1,14 @@
 const CACHE_NAME = 'countify-lite-v2';
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
-  '/main.css',
-  '/main.js',
-  '/countify.svg',
-  '/manifest.json',
+  'https://eldrexdelosreyesbula.github.io/Counting-/index.html',
+  'https://eldrexdelosreyesbula.github.io/Counting-/main.css',
+  'https://eldrexdelosreyesbula.github.io/Counting-/main.js',
+  'https://eldrexdelosreyesbula.github.io/Counting-/countify.svg',
+  'https://eldrexdelosreyesbula.github.io/Counting-/manifest.json',
 
-  '/fonts/MaterialIcons-Regular.woff2',
-  '/fonts/MaterialIcons-Regular.woff'
+  'https://eldrexdelosreyesbula.github.io/Counting-/fonts/MaterialIcons-Regular.woff2',
+  'https://eldrexdelosreyesbula.github.io/Counting-/fonts/MaterialIcons-Regular.woff'
 ];
 
 self.addEventListener('install', (event) => {
