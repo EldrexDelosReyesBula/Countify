@@ -1,89 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#7c3aed" />
     <meta name="description" content="Countify Lite - Advanced writing analytics tool with word count, character count, reading time and more" />
     <title>Countify+</title>
+    
+    <!-- Manifest and PWA meta tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="apple-touch-icon" href="countify.svg">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Fonts and Styles -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-<link rel="icon" href="countify.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="https://eldrexdelosreyesbula.github.io/Counting-/mdui.css">
-    <link rel="stylesheet" href="https://eldrexdelosreyesbula.github.io/Counting-/mdui.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="main.css" />
-
-<link rel="manifest" href="/Counting-/manifest.json" crossorigin="use-credentials">
-<meta name="theme-color" content="#7c3aed">
-<link rel="apple-touch-icon" href="/Counting-/countify.svg">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-capable" content="yes">
-
-<style>
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url('fonts/MaterialIcons-Regular.woff2') format('woff2'),
-       url('fonts/MaterialIcons-Regular.woff') format('woff');
-}
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  display: inline-block;
-}
-</style>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="countify.svg" type="image/svg+xml">
+    
+    <style>
+    @font-face {
+      font-family: 'Material Icons';
+      font-style: normal;
+      font-weight: 400;
+      src: url('fonts/MaterialIcons-Regular.woff2') format('woff2'),
+           url('fonts/MaterialIcons-Regular.woff') format('woff');
+    }
+    .material-icons {
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      display: inline-block;
+    }
+    </style>
 </head>
 <body>
     <div class="app">
+        <!-- Add your install button here -->
+        <div class="drawer-item" id="downloadSwButton" style="background: #925DFF; font-weight: bold; color: white; display: none;">
+            <span class="material-icons drawer-item-icon">download</span>
+            Install App
+        </div>
     </div>
 
-    <!-- Your JS -->
     <script src="main.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/Counting-/sw.js', { 
-      scope: '/Counting-/' 
-    }).then(reg => console.log('SW registered:', reg))
-      .catch(err => console.log('SW registration failed:', err));
-  }
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('SW registered:', reg))
+          .catch(err => console.log('SW registration failed:', err));
+      }
 
-  // PWA Installation Logic
-  let deferredPrompt;
-  const installButton = document.getElementById('downloadSwButton');
+      // PWA Installation Logic
+      let deferredPrompt;
+      const installButton = document.getElementById('downloadSwButton');
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installButton.style.display = 'flex'; // Show install button
-  });
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'flex';
+        
+        // Optional: Track install prompt event
+        console.log('PWA install prompt available');
+      });
 
-  installButton.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted install');
-      installButton.style.display = 'none';
-    }
-    deferredPrompt = null;
-  });
+      installButton.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        console.log(`User ${outcome} the install prompt`);
+        deferredPrompt = null;
+        installButton.style.display = 'none';
+      });
 
-  // Check if running as PWA
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('Running as PWA');
-    installButton.style.display = 'none';
-  }
-});
-</script>
+      // Check if running as PWA
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('Running as PWA');
+        installButton.style.display = 'none';
+      }
+      
+      // Optional: Track successful PWA launches
+      window.addEventListener('appinstalled', () => {
+        console.log('PWA was successfully installed');
+      });
+    });
+    </script>
 </body>
-
 </html>
