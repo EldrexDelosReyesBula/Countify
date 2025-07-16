@@ -245,7 +245,13 @@
                                 <option value="system" ${this.state.theme === 'system' ? 'selected' : ''}>System</option>
                             </select>
                         </div>
+        <div class="drawer-item" id="downloadSwButton" style="background: #925DFF; font-weight: bold; color: white;">
+            <span class="material-icons drawer-item-icon">download</span>
+            Download App
+        </div>
                     </div>
+
+
 
 <div class="drawer-section" style="text-decoration: none;">
     <div class="drawer-section-title">ABOUT</div>
@@ -1716,26 +1722,3 @@
         document.addEventListener('DOMContentLoaded', () => {
             const app = new CountifyApp();
         });
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('https://eldrexdelosreyesbula.github.io/Counting-/sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful');
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-  }
-
-  // Check if app is launched as PWA
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    console.log('Launched as PWA');
-  }
-
-  // Initialize your app here
-  console.log('Countify+ initialized');
-});
