@@ -1,17 +1,103 @@
 {
   "name": "Countify+",
   "short_name": "Countify",
-  "start_url": "index.html",
+  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more",
+  "start_url": "/Counting-/index.html",
   "scope": "/Counting-/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#7c3aed",
-  "background_color": "#7c3aed",
+  "background_color": "#ffffff",
+  "categories": ["productivity", "writing", "tools"],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "countify.svg",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "https://eldrexdelosreyesbula.github.io/Counting-/screenshot2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Activity",
+      "short_name": "New",
+      "description": "Create a new writing activity",
+      "url": "/Counting-/index.html#new",
+      "icons": [
+        {
+          "src": "https://eldrexdelosreyesbula.github.io/Counting-/icon-add.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Stats",
+      "description": "View your writing statistics",
+      "url": "/Counting-/index.html#dashboard",
+      "icons": [
+        {
+          "src": "https://eldrexdelosreyesbula.github.io/Counting-/icon-stats.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/Counting-/index.html",
+      "accept": {
+        "text/plain": [".txt"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/Counting-/index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "files": [
+        {
+          "name": "text",
+          "accept": ["text/plain"]
+        }
+      ]
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+countify",
+      "url": "/Counting-/index.html?url=%s"
     }
   ]
 }
