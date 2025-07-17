@@ -2,7 +2,7 @@
   "name": "Countify+",
   "short_name": "Countify",
   "description": "Advanced writing analytics tool...",
-  "start_url": "/Counting-/index.html",
+  "start_url": "index.html",
   "scope": "/Counting-/",
   "display": "standalone",
   "theme_color": "#7c3aed",
