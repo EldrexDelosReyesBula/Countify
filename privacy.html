@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Countify+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    :root {
+        --primary-50: #f5f3ff;
+        --primary-100: #ede9fe;
+        --primary-200: #ddd6fe;
+        --primary-300: #c4b5fd;
+        --primary-400: #a78bfa;
+        --primary-500: #8b5cf6;
+        --primary-600: #7c3aed;
+        --primary-700: #6d28d9;
+        --primary-800: #5b21b6;
+        --primary-900: #4c1d95;
+
+        --secondary-50: #ecfdf5;
+        --secondary-100: #d1fae5;
+        --secondary-200: #a7f3d0;
+        --secondary-300: #6ee7b7;
+        --secondary-400: #34d399;
+        --secondary-500: #10b981;
+        --secondary-600: #059669;
+        --secondary-700: #047857;
+        --secondary-800: #065f46;
+        --secondary-900: #064e3b;
+
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+
+        --red-500: #ef4444;
+        --amber-500: #f59e0b;
+        --emerald-500: #10b981;
+        --indigo-500: #6366f1;
+        --violet-500: #8b5cf6;
+
+        --text-primary: var(--gray-900);
+        --text-secondary: var(--gray-600);
+        --text-tertiary: var(--gray-400);
+        --background: var(--gray-50);
+        --surface: #ffffff;
+        --error: var(--red-500);
+        --success: var(--emerald-500);
+        --warning: var(--amber-500);
+        --border-radius: 12px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] {
+        --text-primary: var(--gray-100);
+        --text-secondary: var(--gray-300);
+        --text-tertiary: var(--gray-500);
+        --background: var(--gray-900);
+        --surface: var(--gray-800);
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: var(--background);
+        color: var(--text-primary);
+        line-height: 1.6;
+        transition: var(--transition);
+        min-height: 100vh;
+        display: flex;
+margin: 20px;
+        flex-direction: column;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        width: 100%;
+    }
+
+
+.header {
+    position: sticky;
+    top: 1rem;
+    margin-top: 1rem;
+    z-index: 100;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+
+    background: rgba(255, 255, 255, 0.14); /* reduced opacity */
+    backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+}
+    .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .logo-icon {
+        color: var(--primary-600);
+        font-size: 1.75rem;
+    }
+
+    .theme-toggle {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.90rem;
+        border-radius: 50%;
+
+        transition: var(--transition);
+    }
+
+/* Hero Section */
+.hero {
+    padding: 4rem 0 2rem;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 1.75rem; /* Match .section-title */
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #8b5cf6, #9D46FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    line-height: 1.3;
+    text-align: center;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem; /* Match .section-subtitle */
+    font-weight: 500;
+    margin-bottom: 2rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    text-align: center;
+}
+
+/* Privacy Content */
+.privacy-content {
+    padding: 3rem 0;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--primary-600);
+    line-height: 1.3;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 2rem 0 1rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.privacy-text {
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+    .highlight {
+        background-color: var(--primary-100);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        color: var(--primary-700);
+        font-weight: 500;
+    }
+
+    [data-theme="dark"] .highlight {
+        background-color: var(--primary-900);
+        color: var(--primary-200);
+    }
+
+    /* List styles */
+    .privacy-list {
+        margin: 1.5rem 0 1.5rem 2rem;
+    }
+
+    .privacy-list li {
+        margin-bottom: 0.75rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+
+    /* Footer */
+    .footer {
+        background-color: var(--surface);
+        padding: 2rem 0;
+        margin-top: auto;
+    }
+
+    .footer-content {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .footer-text {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .footer-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition);
+        font-size: 0.875rem;
+    }
+
+    .footer-link:hover {
+        color: var(--primary-600);
+    }
+
+
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  z-index: 99;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+    background: rgba(255, 255, 255, 0.14); /* reduced opacity */
+    backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+  border: 1px solid var(--glass-border);
+
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.07);
+
+  color: var(--glass-text);
+  font-size: 1.25rem;
+
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-5px) scale(1.05);
+    background: rgba(255, 255, 255, 0.14); /* reduced opacity */
+    backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+}
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1.5rem;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 0 1rem;
+        }
+
+        .hero {
+            padding: 3rem 0 1.5rem;
+        }
+
+        .hero-title {
+            font-size: 1.75rem;
+        }
+
+        .privacy-content {
+            padding: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.375rem;
+        }
+
+        .privacy-list {
+            margin-left: 1.5rem;
+        }
+    }
+</style>
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <a href="/" class="logo" style="margin-left: -20px;">
+                <span>Countify+</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" >
+                <span class="material-icons" id="themeIcon" style="margin-right: -30px;">dark_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Privacy Policy</h1>
+            <p class="hero-subtitle">Last updated: July 16, 2025</p>
+        </div>
+    </section>
+
+<main class="container">
+    <div class="privacy-content">
+<p class="privacy-text">
+    Countify+ is committed to upholding the highest standards of privacy and data protection. This Privacy Policy outlines our practices regarding the handling of personal information, ensuring compliance with applicable laws and maintaining full transparency. Designed as a local-first application, Countify+ processes all data exclusively on the user’s device. No personal content is collected, transmitted, or stored on external servers. All writing activities and analytical results remain entirely private and under your sole control.
+</p>
+
+<h2 class="section-title">1. Information Collected</h2>
+<p class="privacy-text">
+    Countify+ is engineered to operate fully offline and with a strict local-data processing architecture. The application does not collect, transmit, or store any personally identifiable information (PII), nor does it rely on any form of internet-based data collection. All functionality is designed to keep your content private, secure, and entirely within the boundaries of your own device.
+</p>
+
+<h3 class="section-subtitle">1.1 Locally Processed User Content</h3>
+<p class="privacy-text">
+    All user-generated content — including but not limited to written text, word and character counts, reading time estimations, and analytics results — is processed <span class="highlight">exclusively within your device’s local environment</span>. No content is uploaded, backed up, or synchronized with any external server, cloud provider, or third-party service. Your writing remains fully private, and Countify+ staff, partners, or systems have no access to it whatsoever.
+</p>
+
+<h3 class="section-subtitle">1.2 No Internet or Background Data Activity</h3>
+<p class="privacy-text">
+    Countify+ does not perform background syncing, telemetry reporting, or any form of network communication. It does not require an internet connection for its core features and deliberately avoids any integration with analytics services, advertising networks, crash-reporting tools, or third-party software development kits (SDKs). This ensures your data remains fully insulated from unauthorized access, surveillance, or commercial tracking.
+</p>
+
+
+<h2 class="section-title">2. Use of Data</h2>
+<p class="privacy-text">
+    Countify+ utilizes data exclusively within the confines of your local device to enable essential in-app features. No personal or usage data is transmitted to external systems, stored remotely, or used for profiling, advertising, or analytics. All processing occurs in real time and is isolated to your private environment.
+</p>
+<p class="privacy-text">
+    The limited data that exists within the app is used solely for the following purposes:
+</p>
+<ul class="privacy-list">
+    <li>Performing local calculations such as word, character, and paragraph counts</li>
+    <li>Generating real-time productivity insights based on your writing behavior</li>
+    <li>Providing offline summaries, time estimations, and text analysis without requiring an internet connection</li>
+</ul>
+<p class="privacy-text">
+    No data is retained, shared, or accessible by Countify+ developers or any third party. You retain complete ownership and control over all content created or analyzed within the application.
+</p>
+
+<h2 class="section-title">3. Data Security</h2>
+<p class="privacy-text">
+    Countify+ is designed with a local-first architecture to minimize security risks and protect your personal data. Because all processing and storage occur directly on your device, you retain full control over your content at all times. No data is transmitted over networks, eliminating common vulnerabilities associated with cloud-based applications.
+</p>
+<p class="privacy-text">
+    The following safeguards support the secure handling of your information:
+</p>
+<ul class="privacy-list">
+    <li><span class="highlight">Local-only storage:</span> All data is stored exclusively within your device's internal environment. No content is ever uploaded or synced externally.</li>
+    <li><span class="highlight">Device-level encryption:</span> Countify+ leverages your operating system's built-in encryption and security protocols, allowing you to protect your data using your device’s native security settings.</li>
+    <li><span class="highlight">No remote access or third-party integration:</span> The app does not include any background services, APIs, SDKs, or external communication tools that could expose your data to outside systems.</li>
+</ul>
+<p class="privacy-text">
+    While we implement industry-recommended practices to ensure local data protection, the ultimate responsibility for securing your content lies with your device’s configuration and your usage practices.
+</p>
+<h2 class="section-title">3. Data Security</h2>
+<p class="privacy-text">
+    Data security is inherent to the architecture of Countify+. Since no data is ever transmitted, stored externally, or processed via remote servers, you retain full and exclusive control over all content. To reinforce this privacy-first model, the application incorporates the following security measures:
+</p>
+<ul class="privacy-list">
+    <li><span class="highlight">Local-only storage</span> of all writing content, metrics, and analytical data within your device</li>
+    <li>Reliance on your device's native security features, such as biometric locks or OS-level encryption</li>
+    <li>Absence of any background syncing, silent data transmission, or unauthorized external access</li>
+</ul>
+<p class="privacy-text">
+    Users are encouraged to use device-level safeguards (e.g., passcodes, encryption, secure backups) to further protect their data. Countify+ does not have access to your files and cannot recover, view, or share any content under any circumstances.
+</p>
+
+<h2 class="section-title">4. Absence of Third-Party Services</h2>
+<p class="privacy-text">
+    Countify+ operates with complete independence from third-party technologies and services. No external vendors, platforms, or software development kits (SDKs) are integrated into the application. Specifically, this means:
+</p>
+<ul class="privacy-list">
+    <li><strong>No analytics platforms</strong> (e.g., Google Analytics, Firebase Analytics)</li>
+    <li><strong>No crash reporting or telemetry systems</strong> (e.g., Crashlytics, Sentry)</li>
+    <li><strong>No advertising networks, data brokers, or external SDKs</strong></li>
+</ul>
+<p class="privacy-text">
+    All features and functionalities of Countify+ are self-contained and processed within your device. Your activity is not monitored, tracked, profiled, or shared in any way — ensuring a fully private and offline experience.
+</p>
+<h2 class="section-title">5. Your Data Rights</h2>
+<p class="privacy-text">
+    As the exclusive owner of your data, you retain full rights and control over all content created and stored within Countify+. The application is designed to operate without collecting or storing any personally identifiable information, which ensures that your rights remain enforceable and respected at all times. Specifically, you are entitled to:
+</p>
+<ul class="privacy-list">
+    <li>Access, review, and manage all content locally stored on your device</li>
+    <li>Permanently delete any or all content from your device, with no remote backups or recoveries involved</li>
+    <li>Use the application without any requirement to register, sign in, or disclose personal information</li>
+</ul>
+<p class="privacy-text">
+    Countify+ does not maintain user accounts, remote identifiers, or centralized data storage. All rights are exercised directly by you through the device on which the app is installed, ensuring complete autonomy and data sovereignty.
+</p>
+
+
+<h2 class="section-title">6. Changes to This Privacy Policy</h2>
+<p class="privacy-text">
+    This Privacy Policy may be amended from time to time to reflect changes in legal requirements, improvements in application functionality, or updates to our internal privacy practices. Any such modifications will be clearly communicated within the application, and the “Last Updated” date at the top of this document will be revised accordingly.
+</p>
+<p class="privacy-text">
+    Notwithstanding future updates, Countify+ will continue to uphold its foundational principles of local-only data processing, zero tracking, and complete user control. No changes will ever compromise your privacy by introducing cloud storage, third-party integrations, or remote data access without your explicit consent.
+</p>
+
+<h2 class="section-title">7. Contact Information</h2>
+<p class="privacy-text">
+    For any questions, concerns, or requests related to this Privacy Policy or the handling of your data within Countify+, you may contact us at the address below. We are committed to responding promptly and transparently to all privacy-related inquiries.
+</p>
+<p class="privacy-text">
+    <span class="highlight">privacy@countify.landecs.com</span>
+</p>
+    </div>
+</main>
+
+    <!-- Footer -->
+    <footer class="footer" style="border-radius: 40px;">
+        <div class="container">
+            <p class="footer-text" style="text-align: center;">© 2025 Countify+</p>
+            <div class="footer-links">
+                <a href="/terms.html" class="footer-link">Terms of Service</a>
+                <a href="/privacy.html" class="footer-link">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <div class="back-to-top" id="backToTop">
+        <span class="material-icons">arrow_upward</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        // Set initial theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = 'light_mode';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeIcon.textContent = 'dark_mode';
+        }
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Ripple effect
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('.btn, .theme-toggle, .back-to-top');
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                target.appendChild(ripple);
+
+                ripple.addEventListener('animationend', () => {
+                    ripple.remove();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
