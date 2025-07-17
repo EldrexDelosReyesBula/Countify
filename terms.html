@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | Countify+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-50: #f5f3ff;
+            --primary-100: #ede9fe;
+            --primary-200: #ddd6fe;
+            --primary-300: #c4b5fd;
+            --primary-400: #a78bfa;
+            --primary-500: #8b5cf6;
+            --primary-600: #7c3aed;
+            --primary-700: #6d28d9;
+            --primary-800: #5b21b6;
+            --primary-900: #4c1d95;
+
+            --secondary-50: #ecfdf5;
+            --secondary-100: #d1fae5;
+            --secondary-200: #a7f3d0;
+            --secondary-300: #6ee7b7;
+            --secondary-400: #34d399;
+            --secondary-500: #10b981;
+            --secondary-600: #059669;
+            --secondary-700: #047857;
+            --secondary-800: #065f46;
+            --secondary-900: #064e3b;
+
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            --red-500: #ef4444;
+            --amber-500: #f59e0b;
+            --emerald-500: #10b981;
+            --indigo-500: #6366f1;
+            --violet-500: #8b5cf6;
+
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --text-tertiary: var(--gray-400);
+            --background: var(--gray-50);
+            --surface: #ffffff;
+            --error: var(--red-500);
+            --success: var(--emerald-500);
+            --warning: var(--amber-500);
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --text-primary: var(--gray-100);
+            --text-secondary: var(--gray-300);
+            --text-tertiary: var(--gray-500);
+            --background: var(--gray-900);
+            --surface: var(--gray-800);
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+            display: flex;
+            margin: 20px;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+
+        .header {
+            position: sticky;
+            top: 1rem;
+            margin-top: 1rem;
+            z-index: 100;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+
+            background: rgba(255, 255, 255, 0.14);
+            /* reduced opacity */
+            backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            color: var(--primary-600);
+            font-size: 1.75rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.90rem;
+            border-radius: 50%;
+
+            transition: var(--transition);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 0 2rem;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 1.75rem;
+            /* Match .section-title */
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #8b5cf6, #9D46FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            /* Match .section-subtitle */
+            font-weight: 500;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            text-align: center;
+        }
+
+        /* Privacy Content */
+        .privacy-content {
+            padding: 3rem 0;
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-600);
+            line-height: 1.3;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .privacy-text {
+            margin-bottom: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .highlight {
+            background-color: var(--primary-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            color: var(--primary-700);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .highlight {
+            background-color: var(--primary-900);
+            color: var(--primary-200);
+        }
+
+        /* List styles */
+        .privacy-list {
+            margin: 1.5rem 0 1.5rem 2rem;
+        }
+
+        .privacy-list li {
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--surface);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .footer-link:hover {
+            color: var(--primary-600);
+        }
+
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            z-index: 99;
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255, 255, 255, 0.14);
+            /* reduced opacity */
+            backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+            border: 1px solid var(--glass-border);
+
+            box-shadow:
+                0 6px 12px rgba(0, 0, 0, 0.12),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.07);
+
+            color: var(--glass-text);
+            font-size: 1.25rem;
+
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255, 255, 255, 0.14);
+            /* reduced opacity */
+            backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(200%) contrast(120%);
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-subtitle {
+                font-size: 1.125rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero {
+                padding: 3rem 0 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .privacy-content {
+                padding: 2rem 0;
+            }
+
+            .section-title {
+                font-size: 1.375rem;
+            }
+
+            .privacy-list {
+                margin-left: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <a href="/" class="logo" style="margin-left: -20px;">
+                <span>Countify+</span>
+            </a>
+            <button class="theme-toggle" id="themeToggle">
+                <span class="material-icons" id="themeIcon" style="margin-right: -30px;">dark_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Terms of Services</h1>
+            <p class="hero-subtitle">Last updated: July 16, 2025</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="privacy-content">
+
+            <h2 class="section-title">1. Introduction</h2>
+
+            <h3 class="section-subtitle">1.1 Overview</h3>
+            <p class="privacy-text">
+                Countify+ is a local-first, offline writing analytics application developed by Landecs, designed to assist users in tracking productivity, word usage, and writing performance in a privacy-respecting environment. These Terms of Service (“Terms”) govern your access to and use of the application and related services.
+            </p>
+
+            <h3 class="section-subtitle">1.2 Acceptance of Terms</h3>
+            <p class="privacy-text">
+                By downloading, accessing, or using Countify+, you agree to be legally bound by these Terms, along with our Privacy Policy. If you do not agree with any part of these Terms, you must refrain from using the application.
+            </p>
+            <h3 class="section-subtitle">1.3 Eligibility</h3>
+            <p class="privacy-text">
+                Use of Countify+ is intended for individuals who are at least thirteen (13) years of age or the minimum age of digital consent in your jurisdiction, whichever is higher. By using the service, you represent and warrant that you meet these eligibility requirements and are legally capable of entering into binding agreements.
+            </p>
+            <h3 class="section-subtitle">1.4 Modifications to Terms</h3>
+            <p class="privacy-text">
+                We reserve the right to modify, update, or revise these Terms at any time. Any changes will be effective upon publication within the application or on our official website. It is your responsibility to periodically review these Terms. Continued use of the service after such updates constitutes your acceptance of the revised Terms.
+            </p>
+
+            <h2 class="section-title">2. Description of Service</h2>
+            <h3 class="section-subtitle">2.1 Functionality</h3>
+            <p class="privacy-text">
+                Countify+ provides a suite of offline writing tools, including word and character counting, estimated reading time, text analysis, and productivity insights. All features are designed to function entirely within the user’s device, without requiring an internet connection. Data processing is performed locally, ensuring that no user-generated content is transmitted to or stored on external servers.
+            </p>
+
+            <h3 class="section-subtitle">2.2 Limitations of the Service</h3>
+            <p class="privacy-text">
+                Countify+ does not offer cloud-based functionality, remote data storage, or automatic backups. The application does not include online sync features, account registration, or any form of server-side content retrieval. Users should be aware that loss of local device data may result in permanent loss of content, as no copies are retained or accessible by the developer.
+            </p>
+            <h3 class="section-subtitle">2.3 User Responsibility</h3>
+            <p class="privacy-text">
+                You are solely responsible for the content you create, store, or manage within Countify+. This includes maintaining appropriate backups, safeguarding your device, and ensuring the privacy of your own data. The developer assumes no liability for data loss, device failure, or user error resulting in the deletion or corruption of locally stored content.
+            </p>
+
+            <h2 class="section-title">3. User Obligations</h2>
+            <h3 class="section-subtitle">3.1 Acceptable Use</h3>
+            <p class="privacy-text">
+                You agree to use Countify+ only for lawful purposes and in accordance with these Terms. You must not use the application to:
+            </p>
+            <ul class="privacy-list">
+                <li>Create, upload, or distribute unlawful, defamatory, or harmful content;</li>
+                <li>Harass, abuse, or threaten other individuals;</li>
+                <li>Attempt to reverse engineer, decompile, or tamper with any part of the application’s source code or functionality;</li>
+                <li>Use the application in any way that could impair, disrupt, or damage its operation or that of other users.</li>
+            </ul>
+            <p class="privacy-text">
+                Any misuse of Countify+ in violation of this Acceptable Use Policy may result in immediate suspension or termination of your access to future services, if applicable.
+            </p>
+
+            <h3 class="section-subtitle">3.2 Legal Compliance</h3>
+            <p class="privacy-text">
+                You agree to comply with all applicable local, national, and international laws, rules, and regulations in connection with your use of Countify+. You are solely responsible for ensuring that your use of the application does not violate any laws or third-party rights in your jurisdiction.
+            </p>
+
+
+
+            <h2 class="section-title">4. Intellectual Property</h2>
+            <h3 class="section-subtitle">4.1 Ownership of Countify+</h3>
+            <p class="privacy-text">
+                All intellectual property rights in and to Countify+, including but not limited to its software code, user interface, visual design, logos, trademarks, and branding elements, are and shall remain the exclusive property of Landecs or its licensors. Nothing in these Terms shall be interpreted as transferring ownership of any part of the application to the user.
+            </p>
+            <h3 class="section-subtitle">4.2 User-Generated Content</h3>
+            <p class="privacy-text">
+                You retain full ownership and intellectual property rights to all content you create, input, or store within Countify+. The application does not claim any rights, title, or interest over your text, documents, or other materials processed locally on your device.
+            </p>
+            <h3 class="section-subtitle">4.3 Limited License Grant to Countify+</h3>
+            <p class="privacy-text">
+                Countify+ does not access or transmit your content. However, to the extent that any future features may require limited interaction (e.g., export functions or optional backups), you grant Countify+ a non-exclusive, non-transferable, revocable license to use, process, and display your content solely for the purpose of providing the requested service. This license does not grant Countify+ any ownership or distribution rights and will terminate immediately upon your deletion of the content or discontinuation of use.
+            </p>
+            <h2 class="section-title">5. Privacy & Data Handling</h2>
+            <h3 class="section-subtitle">5.1 Privacy Policy</h3>
+            <p class="privacy-text">
+                Your use of Countify+ is also governed by our Privacy Policy, which outlines in detail how data is handled, stored, and protected. By using the application, you acknowledge and agree to the terms set forth in the Privacy Policy. We encourage you to review it carefully at
+                <a href="https://countify-black.vercel.app/privacy.html" target="_blank">privacy policy</a>.
+            </p>
+            <h3 class="section-subtitle">5.2 Local Data Processing</h3>
+            <p class="privacy-text">
+                Countify+ is built on a local-first architecture. All content, including text, usage metrics, and analytical outputs, is processed exclusively on your device. No data is collected, transmitted, stored, or analyzed by Countify+ or any third-party services. This approach ensures complete user control, full data ownership, and maximum privacy by design and by default.
+            </p>
+
+
+            <h2 class="section-title">6. Disclaimers & Limitations of Liability</h2>
+            <h3 class="section-subtitle">6.1 Service Provided "As-Is"</h3>
+            <p class="privacy-text">
+                Countify+ is offered as-is, without any form of warranty or guarantee. While we aim to deliver a reliable, accurate, and efficient experience, we do not warrant that the application will meet every user’s expectations, be error-free, or operate without interruption. We do not guarantee the accuracy of word counts, character analytics, or any computed outputs, especially when used in edge-case scenarios.
+            </p>
+            <h3 class="section-subtitle">6.2 No Liability for Damages or Data Loss</h3>
+            <p class="privacy-text">
+                To the maximum extent allowed by law, Landecs and its affiliates shall not be liable for any direct, indirect, incidental, special, or consequential damages, including but not limited to loss of data, productivity, device issues, or software conflicts, even if we have been advised of the possibility of such damages. Since Countify+ operates entirely on your local device, we do not store your content and are therefore not responsible for any accidental loss, corruption, or deletion of your files or writing data.
+            </p>
+            <h3 class="section-subtitle">6.3 Regional and Legal Limitations</h3>
+            <p class="privacy-text">
+                Some regions or jurisdictions may not permit the exclusion of certain warranties or limitations of liability. In such cases, portions of this section may not apply to you, and Countify+ shall be held to the minimum legal obligations required under local law.
+            </p>
+
+            <h2 class="section-title">7. Termination</h2>
+            <h3 class="section-subtitle">7.1 User’s Right to Stop Using the Service</h3>
+            <p class="privacy-text">
+                You may cease using Countify+ at any time, without notifying us. The app does not require an account or login, meaning there is no formal termination process. Simply uninstalling or closing the application ends your use of the service.
+            </p>
+            <h3 class="section-subtitle">7.2 Termination by Countify+*</h3>
+            <p class="privacy-text">
+                Although Countify+ is an offline tool, we reserve the right to disable, restrict, or limit future versions of the app for users who violate the Terms — such as by attempting to reverse-engineer the software, distributing modified versions, or engaging in harmful use of the platform.
+            </p>
+            <h3 class="section-subtitle">7.3 Data After Termination</h3>
+            <p class="privacy-text">
+                All content created within Countify+ is stored locally on your device. We do not collect, back up, or sync your data to any server or cloud. As a result, termination of service has no effect on your stored files. It is entirely your responsibility to manage, export, or delete your data from your device.
+            </p>
+
+            <h2 class="section-title">8. Third-Party Services</h2>
+            <h3 class="section-subtitle">8.1 No Integration With External Platforms</h3>
+            <p class="privacy-text">
+                Countify+ was built from the ground up with a no-cloud, no-tracking, no-surveillance philosophy. The app does not integrate with any third-party platforms, analytics services, or SDKs. Your interactions remain private and confined to your own device.
+            </p>
+            <p class="privacy-text">
+                In the unlikely event that future versions include optional links to external resources (such as writing guides or font downloads), those third-party services are not owned or controlled by us. We are not responsible for their content, data policies, or availability. Users interact with such services at their own discretion and risk.
+            </p>
+
+            <h2 class="section-title">9. Dispute Resolution</h2>
+            <h3 class="section-subtitle">9.1 Governing Law</h3>
+            <p class="privacy-text">
+                These Terms of Service are governed by the laws of the Republic of the Philippines, where Countify+ is developed and managed. Any legal interpretation or enforcement will be handled in accordance with these laws, regardless of the user’s local laws or conflicts.
+            </p>
+            <h3 class="section-subtitle">9.2 Arbitration Clause</h3>
+            <p class="privacy-text">
+                Where allowed by local law, any disputes or claims arising out of your use of Countify+ will be resolved through binding arbitration, not in court. Arbitration is a faster, private, and less formal process, and you agree to waive the right to a public court hearing unless otherwise prohibited by your jurisdiction.
+            </p>
+            <h3 class="section-subtitle">9.3 Class Action Waiver</h3>
+            <p class="privacy-text">
+                By using Countify+, you agree that any dispute resolution will occur on an individual basis. You expressly waive any right to participate in a class-action lawsuit or class-wide arbitration. This ensures fair, personal, and direct resolution between the user and Landecs.
+            </p>
+
+            <h2 class="section-title">10. General Provisions</h2>
+            <h3 class="section-subtitle">10.1 Severability</h3>
+            <p class="privacy-text">
+                If any part of these Terms is found to be invalid, illegal, or unenforceable by a court, the remaining sections will continue to apply in full force. The invalidity of one provision does not affect the validity of the rest.
+            </p>
+            <h3 class="section-subtitle">10.2 Force Majeure</h3>
+            <p class="privacy-text">
+                Landecs shall not be held liable for failure or delay in performance due to circumstances beyond our reasonable control. This includes events such as natural disasters, acts of government, system failures, internet outages, or any unforeseen event that disrupts normal operation.
+            </p>
+            <h3 class="section-subtitle">10.3 No Waiver of Rights</h3>
+            <p class="privacy-text">
+                Failure by Landecs to enforce any part of these Terms shall not be considered a waiver of our rights. Even if we do not immediately take action on a violation, we still reserve the right to do so in the future.
+            </p>
+
+            <h2 class="section-title">11. Contact Information</h2>
+            <p class="privacy-text">
+                For any questions, concerns, or requests related to this Privacy Policy or the handling of your data within Countify+, you may contact us at the address below. We are committed to responding promptly and transparently to all privacy-related inquiries.
+            </p>
+            <p class="privacy-text">
+                <span class="highlight">landecs.org@gmail.com</span>
+            </p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" style="border-radius: 40px;">
+        <div class="container">
+            <p class="footer-text" style="text-align: center;">© 2025 Countify+</p>
+            <div class="footer-links">
+                <a href="/terms.html" class="footer-link">Terms of Service</a>
+                <a href="/privacy.html" class="footer-link">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <div class="back-to-top" id="backToTop">
+        <span class="material-icons">arrow_upward</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Set initial theme
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = 'light_mode';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeIcon.textContent = 'dark_mode';
+        }
+
+        // Toggle theme
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Ripple effect
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('.btn, .theme-toggle, .back-to-top');
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                target.appendChild(ripple);
+
+                ripple.addEventListener('animationend', () => {
+                    ripple.remove();
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
