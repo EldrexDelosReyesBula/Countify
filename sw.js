@@ -1,13 +1,13 @@
 const CACHE_NAME = 'countify-lite-v3';
 const ASSETS_TO_CACHE = [
   '/Counting-/',
-  '/Counting-/index.html',
-  '/Counting-/main.css',
-  '/Counting-/main.js',
-  '/Counting-/countify.svg',
-  '/Counting-/manifest.json',
-  '/Counting-/fonts/MaterialIcons-Regular.woff2',
-  '/Counting-/fonts/MaterialIcons-Regular.woff'
+  '/index.html',
+  '/main.css',
+  '/main.js',
+  '/countify.svg',
+  '/manifest.json',
+  '/fonts/MaterialIcons-Regular.woff2',
+  '/fonts/MaterialIcons-Regular.woff'
 ];
 
 self.addEventListener('install', (event) => {
