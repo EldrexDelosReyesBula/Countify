@@ -2,8 +2,8 @@
   "name": "Countify+",
   "short_name": "Countify",
   "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more",
-  "start_url": "/Counting-/index.html",
-  "scope": "/Counting-/",
+  "start_url": "index.html",
+  "scope": "/Countify/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#7c3aed",
@@ -13,19 +13,19 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify-192.png",
+      "src": "https://countify-black.versel.app/countify.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify-512.png",
+      "src": "https://countify-black.versel.app/countify.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://eldrexdelosreyesbula.github.io/Counting-/countify.svg",
+      "src": "https://countify-black.versel.app/countify.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "monochrome"
@@ -39,7 +39,7 @@
       "form_factor": "wide"
     },
     {
-      "src": "https://eldrexdelosreyesbula.github.io/Counting-/screenshot2.png",
+      "src": ""https://countify-black.versel.app/screenshot2.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow"
@@ -50,10 +50,10 @@
       "name": "New Activity",
       "short_name": "New",
       "description": "Create a new writing activity",
-      "url": "/Counting-/index.html#new",
+      "url": "index.html#new",
       "icons": [
         {
-          "src": "https://eldrexdelosreyesbula.github.io/Counting-/icon-add.png",
+          "src": ""https://countify-black.versel.app/icon-add.png",
           "sizes": "96x96"
         }
       ]
@@ -62,10 +62,10 @@
       "name": "Dashboard",
       "short_name": "Stats",
       "description": "View your writing statistics",
-      "url": "/Counting-/index.html#dashboard",
+      "url": "index.html#dashboard",
       "icons": [
         {
-          "src": "https://eldrexdelosreyesbula.github.io/Counting-/icon-stats.png",
+          "src": "https://countify-black.versel.app/Countify/icon-stats.png",
           "sizes": "96x96"
         }
       ]
@@ -73,14 +73,14 @@
   ],
   "file_handlers": [
     {
-      "action": "/Counting-/index.html",
+      "action": "index.html",
       "accept": {
         "text/plain": [".txt"]
       }
     }
   ],
   "share_target": {
-    "action": "/Counting-/index.html",
+    "action": "index.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
@@ -97,7 +97,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+countify",
-      "url": "/Counting-/index.html?url=%s"
+      "url": "index.html?url=%s"
     }
   ]
 }
