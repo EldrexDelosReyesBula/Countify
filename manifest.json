@@ -2,8 +2,8 @@
   "name": "Countify+",
   "short_name": "Countify",
   "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more",
-  "start_url": "index.html",
-  "scope": "/Countify/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#7c3aed",
@@ -13,36 +13,10 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "https://countify-black.versel.app/countify.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://countify-black.versel.app/countify.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://countify-black.versel.app/countify.svg",
+      "src": "/countify.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "monochrome"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "https://eldrexdelosreyesbula.github.io/Counting-/screenshot1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": ""https://countify-black.versel.app/screenshot2.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "purpose": "any"
     }
   ],
   "shortcuts": [
@@ -50,37 +24,25 @@
       "name": "New Activity",
       "short_name": "New",
       "description": "Create a new writing activity",
-      "url": "index.html#new",
-      "icons": [
-        {
-          "src": ""https://countify-black.versel.app/icon-add.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/#new"
     },
     {
       "name": "Dashboard",
       "short_name": "Stats",
       "description": "View your writing statistics",
-      "url": "index.html#dashboard",
-      "icons": [
-        {
-          "src": "https://countify-black.versel.app/Countify/icon-stats.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/#dashboard"
     }
   ],
   "file_handlers": [
     {
-      "action": "index.html",
+      "action": "/",
       "accept": {
         "text/plain": [".txt"]
       }
     }
   ],
   "share_target": {
-    "action": "index.html",
+    "action": "/",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
@@ -97,7 +59,7 @@
   "protocol_handlers": [
     {
       "protocol": "web+countify",
-      "url": "index.html?url=%s"
+      "url": "/?url=%s"
     }
   ]
 }
