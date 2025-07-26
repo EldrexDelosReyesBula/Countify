@@ -1253,70 +1253,65 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <!-- CSP Nonce for scripts -->
-    <script nonce="YOUR_CSP_NONCE_VALUE">
-        // API Configuration
-        const API_CONFIG = {
-            BASE_URL: 'https://api.agos.ph/v1',
-            ENDPOINTS: {
+    <script>
+        // Application Configuration
+        const AppConfig = {
+            // API Configuration
+            API_BASE_URL: 'https://api.agos.ph/v1',
+            API_ENDPOINTS: {
                 FLOOD_DATA: '/flood-data',
                 RAINFALL: '/rainfall',
                 PREDICTIONS: '/predictions',
                 ROADS: '/affected-roads',
                 EVACUATION: '/evacuation-centers',
-                GEOLOCATION: '/geolocation',
+                GEOLOCATION: '/geocode',
                 ALERTS: '/alerts',
                 SENSORS: '/sensors'
             },
-            API_KEY: '9b4314ca106bd5835f4d1953724cfe5b', // Replace with actual API key
+            API_KEY: 'agos_public_key_2023', // Public API key
             CACHE_TTL: 300000, // 5 minutes cache time
             MAX_RETRIES: 3,
-            TIMEOUT: 10000 // 10 seconds
-        };
-
-        // Flood Risk Configuration
-        const FLOOD_RISK_LEVELS = {
-            LOW: {
-                threshold: 30,
-                color: '#4CAF50',
-                label: 'Low Risk'
+            TIMEOUT: 10000, // 10 seconds
+            
+            // Flood Risk Levels
+            RISK_LEVELS: {
+                LOW: { threshold: 30, color: '#4CAF50', label: 'Low Risk' },
+                MODERATE: { threshold: 60, color: '#FFC107', label: 'Moderate Risk' },
+                HIGH: { threshold: 100, color: '#F44336', label: 'High Risk' },
+                EXTREME: { threshold: Infinity, color: '#9C27B0', label: 'Extreme Risk' }
             },
-            MODERATE: {
-                threshold: 60,
-                color: '#FFC107',
-                label: 'Moderate Risk'
+            
+            // Map Configuration
+            MAP_CONFIG: {
+                DEFAULT_CENTER: [12.8797, 121.7740], // Philippines coordinates
+                DEFAULT_ZOOM: 6,
+                MIN_ZOOM: 5,
+                MAX_ZOOM: 18,
+                TILE_LAYER: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                ATTRIBUTION: '&copy; OpenStreetMap contributors',
+                FLOOD_LAYER_OPACITY: 0.6,
+                USER_MARKER_RADIUS: 8,
+                USER_MARKER_COLOR: '#4285F4',
+                EVAC_MARKER_COLOR: '#4CAF50'
             },
-            HIGH: {
-                threshold: 100,
-                color: '#F44336',
-                label: 'High Risk'
-            },
-            EXTREME: {
-                threshold: Infinity,
-                color: '#9C27B0',
-                label: 'Extreme Risk'
-            }
-        };
-
-        // Map Configuration
-        const MAP_CONFIG = {
-            DEFAULT_CENTER: [12.8797, 121.7740], // Philippines coordinates
-            DEFAULT_ZOOM: 6,
-            MIN_ZOOM: 5,
-            MAX_ZOOM: 18,
-            TILE_LAYER: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            ATTRIBUTION: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            FLOOD_LAYER_OPACITY: 0.6,
-            FLOOD_LAYER_WEIGHT: 2,
-            USER_MARKER_RADIUS: 8,
-            USER_MARKER_COLOR: '#4285F4',
-            EVAC_MARKER_ICON: 'place',
-            EVAC_MARKER_COLOR: '#4CAF50'
+            
+            // Emergency Contacts
+            EMERGENCY_CONTACTS: [
+                { name: "National Emergency Hotline", number: "911" },
+                { name: "NDRRMC", number: "(02) 8911-6606" },
+                { name: "Red Cross", number: "143" },
+                { name: "MMDA", number: "136" },
+                { name: "PNP", number: "117" }
+            ]
         };
 
         // Application State
-        const appState = {
+        const AppState = {
             // Map components
             map: null,
             floodLayer: null,
@@ -1338,7 +1333,7 @@
             // UI state
             lastUpdate: null,
             offlineMode: false,
-            dataStatus: 'loading', // 'loading', 'live', 'cached', 'error'
+            dataStatus: 'loading',
             
             // User preferences
             preferences: {
@@ -1357,22 +1352,20 @@
             
             // PWA state
             deferredPrompt: null,
-            
-            // Service worker registration
             serviceWorkerRegistration: null
         };
 
-        // Initialize the application
+        // Initialize the application when DOM is loaded
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                // Initialize UI components first
+                // Initialize UI components
                 initTheme();
                 initMap();
                 initCharts();
                 initEventListeners();
                 
                 // Register service worker
-                await initServiceWorker();
+                await registerServiceWorker();
                 
                 // Check connectivity
                 checkConnectivity();
@@ -1389,7 +1382,7 @@
                 await loadInitialData();
                 
                 // Set up periodic data refresh
-                setInterval(loadData, API_CONFIG.CACHE_TTL);
+                setInterval(loadData, AppConfig.CACHE_TTL);
                 
             } catch (error) {
                 console.error('Initialization error:', error);
@@ -1397,248 +1390,193 @@
             }
         });
 
-        // Initialize theme based on user preference
+        // Theme Management
         function initTheme() {
-            if (appState.preferences.theme === 'dark' ||
-                (appState.preferences.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
                 document.body.classList.add('dark-mode');
                 document.getElementById('theme-toggle').querySelector('span').textContent = 'Light';
+                AppState.preferences.theme = 'dark';
             } else {
                 document.body.classList.remove('dark-mode');
                 document.getElementById('theme-toggle').querySelector('span').textContent = 'Dark';
+                AppState.preferences.theme = 'light';
             }
         }
 
-        // Toggle between light and dark theme
         function toggleTheme() {
             const isDark = document.body.classList.toggle('dark-mode');
             const themeToggle = document.getElementById('theme-toggle').querySelector('span');
 
             if (isDark) {
                 themeToggle.textContent = 'Light';
-                appState.preferences.theme = 'dark';
+                AppState.preferences.theme = 'dark';
             } else {
                 themeToggle.textContent = 'Dark';
-                appState.preferences.theme = 'light';
+                AppState.preferences.theme = 'light';
             }
             
-            localStorage.setItem('theme', appState.preferences.theme);
+            localStorage.setItem('theme', AppState.preferences.theme);
+            if (AppState.map) AppState.map.invalidateSize();
             
-            // Update map if it exists
-            if (appState.map) {
-                appState.map.invalidateSize();
-            }
-            
-            logEvent('theme_toggled', {
-                theme: appState.preferences.theme
-            });
+            logEvent('theme_toggled', { theme: AppState.preferences.theme });
         }
 
-        // Toggle between languages
+        // Language Management
         function toggleLanguage() {
             const languageToggle = document.getElementById('language-toggle').querySelector('span');
-            const currentLang = languageToggle.textContent;
-            const newLang = currentLang === 'EN' ? 'TL' : 'EN';
-
+            const newLang = languageToggle.textContent === 'EN' ? 'TL' : 'EN';
+            
             languageToggle.textContent = newLang;
-            appState.preferences.language = newLang.toLowerCase();
+            AppState.preferences.language = newLang.toLowerCase();
             localStorage.setItem('language', newLang.toLowerCase());
-
-            // In a real implementation, we would update all text content here
-            logEvent('language_toggled', {
-                language: newLang
-            });
+            
+            // In production, we would update all text content here
+            logEvent('language_toggled', { language: newLang });
         }
 
-        // Initialize service worker
-        async function initServiceWorker() {
+        // Service Worker Registration
+        async function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 try {
-                    appState.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
+                    AppState.serviceWorkerRegistration = await navigator.serviceWorker.register('/sw.js', {
                         scope: '/',
                         updateViaCache: 'none'
                     });
                     
-                    console.log('ServiceWorker registered:', appState.serviceWorkerRegistration);
+                    console.log('Service Worker registered');
                     
                     // Check for updates periodically
                     setInterval(() => {
-                        appState.serviceWorkerRegistration.update().catch(err => {
-                            console.error('ServiceWorker update failed:', err);
-                        });
-                    }, 3600000); // Check every hour
+                        AppState.serviceWorkerRegistration.update().catch(console.error);
+                    }, 3600000); // Every hour
                     
                 } catch (error) {
-                    console.error('ServiceWorker registration failed:', error);
-                    throw error;
+                    console.error('Service Worker registration failed:', error);
                 }
             }
         }
 
-        // Initialize the flood map with Leaflet
+        // Map Initialization
         function initMap() {
             // Create map instance
-            appState.map = L.map('flood-map', {
+            AppState.map = L.map('flood-map', {
                 preferCanvas: true,
                 zoomControl: false,
                 attributionControl: false,
-                minZoom: MAP_CONFIG.MIN_ZOOM,
-                maxZoom: MAP_CONFIG.MAX_ZOOM
-            }).setView(MAP_CONFIG.DEFAULT_CENTER, MAP_CONFIG.DEFAULT_ZOOM);
+                minZoom: AppConfig.MAP_CONFIG.MIN_ZOOM,
+                maxZoom: AppConfig.MAP_CONFIG.MAX_ZOOM
+            }).setView(AppConfig.MAP_CONFIG.DEFAULT_CENTER, AppConfig.MAP_CONFIG.DEFAULT_ZOOM);
 
             // Add base map layer
-            L.tileLayer(MAP_CONFIG.TILE_LAYER, {
-                attribution: MAP_CONFIG.ATTRIBUTION
-            }).addTo(appState.map);
+            L.tileLayer(AppConfig.MAP_CONFIG.TILE_LAYER, {
+                attribution: AppConfig.MAP_CONFIG.ATTRIBUTION
+            }).addTo(AppState.map);
 
-            // Add flood risk layer (initially empty)
-            appState.floodLayer = L.layerGroup().addTo(appState.map);
+            // Add flood risk layer
+            AppState.floodLayer = L.layerGroup().addTo(AppState.map);
 
             // Add evacuation centers layer
-            appState.evacuationLayer = L.layerGroup().addTo(appState.map);
+            AppState.evacuationLayer = L.layerGroup().addTo(AppState.map);
 
-            // Initialize user location marker (hidden by default)
-            appState.userMarker = L.circleMarker([0, 0], {
-                radius: MAP_CONFIG.USER_MARKER_RADIUS,
-                fillColor: MAP_CONFIG.USER_MARKER_COLOR,
+            // Initialize user location marker
+            AppState.userMarker = L.circleMarker([0, 0], {
+                radius: AppConfig.MAP_CONFIG.USER_MARKER_RADIUS,
+                fillColor: AppConfig.MAP_CONFIG.USER_MARKER_COLOR,
                 color: "#FFFFFF",
                 weight: 2,
                 opacity: 1,
                 fillOpacity: 0.8
             });
 
-            // Initialize zoom controls
-            L.control.zoom({
-                position: 'topright'
-            }).addTo(appState.map);
-
-            // Add scale control
-            L.control.scale({
-                imperial: false,
-                position: 'bottomright'
-            }).addTo(appState.map);
-
-            // Add attribution
+            // Add map controls
+            L.control.zoom({ position: 'topright' }).addTo(AppState.map);
+            L.control.scale({ imperial: false, position: 'bottomright' }).addTo(AppState.map);
             L.control.attribution({
                 position: 'bottomleft',
                 prefix: '<a href="https://agos.ph">Agos PH</a> | <a href="https://openstreetmap.org">OSM</a>'
-            }).addTo(appState.map);
+            }).addTo(AppState.map);
         }
 
-        // Initialize charts
+        // Charts Initialization
         function initCharts() {
             // Rainfall chart
             const rainfallCtx = document.getElementById('rainfall-chart').getContext('2d');
-            appState.charts.rainfallChart = new Chart(rainfallCtx, {
+            AppState.charts.rainfallChart = new Chart(rainfallCtx, {
                 type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Rainfall (mm)',
-                        data: [],
-                        backgroundColor: '#1976D2',
-                        borderColor: '#1565C0',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'mm'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
+                data: { labels: [], datasets: [{
+                    label: 'Rainfall (mm)',
+                    data: [],
+                    backgroundColor: '#1976D2',
+                    borderColor: '#1565C0',
+                    borderWidth: 1
+                }]},
+                options: getChartOptions('mm')
             });
 
             // Forecast chart
             const forecastCtx = document.getElementById('forecast-chart').getContext('2d');
-            appState.charts.forecastChart = new Chart(forecastCtx, {
+            AppState.charts.forecastChart = new Chart(forecastCtx, {
                 type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Water Level (cm)',
-                        data: [],
-                        fill: false,
-                        backgroundColor: '#1976D2',
-                        borderColor: '#1976D2',
-                        tension: 0.4,
-                        borderWidth: 3
-                    }]
-                },
-                options: {
+                data: { labels: [], datasets: [{
+                    label: 'Water Level (cm)',
+                    data: [],
+                    fill: false,
+                    backgroundColor: '#1976D2',
+                    borderColor: '#1976D2',
+                    tension: 0.4,
+                    borderWidth: 3
+                }]},
+                options: getChartOptions('cm')
+            });
+
+            function getChartOptions(unit) {
+                return {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'cm'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
+                    scales: { y: { beginAtZero: true, title: { display: true, text: unit } } },
+                    plugins: { legend: { display: false } }
+                };
+            }
         }
 
-        // Initialize event listeners
+        // Event Listeners
         function initEventListeners() {
-            // Theme toggle
+            // Theme and language toggles
             document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-
-            // Language toggle
             document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
 
             // Search functionality
             document.getElementById('search-btn').addEventListener('click', handleSearch);
-            document.getElementById('location-search').addEventListener('keypress', function(e) {
+            document.getElementById('location-search').addEventListener('keypress', e => {
                 if (e.key === 'Enter') handleSearch();
             });
 
             // Map controls
             document.getElementById('locate-me').addEventListener('click', locateUser);
-            document.getElementById('zoom-in').addEventListener('click', () => appState.map.zoomIn());
-            document.getElementById('zoom-out').addEventListener('click', () => appState.map.zoomOut());
+            document.getElementById('zoom-in').addEventListener('click', () => AppState.map.zoomIn());
+            document.getElementById('zoom-out').addEventListener('click', () => AppState.map.zoomOut());
 
             // Emergency actions
             document.getElementById('view-evac-routes').addEventListener('click', showEvacuationRoutes);
             document.getElementById('call-emergency').addEventListener('click', showEmergencyContacts);
 
             // Install prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
+            window.addEventListener('beforeinstallprompt', e => {
                 e.preventDefault();
-                appState.deferredPrompt = e;
+                AppState.deferredPrompt = e;
                 showInstallPrompt();
             });
 
             document.getElementById('install-btn').addEventListener('click', () => {
                 hideInstallPrompt();
-                if (appState.deferredPrompt) {
-                    appState.deferredPrompt.prompt();
-                    appState.deferredPrompt.userChoice.then((choiceResult) => {
-                        if (choiceResult.outcome === 'accepted') {
-                            logEvent('install_accepted');
-                        } else {
-                            logEvent('install_declined');
-                        }
-                        appState.deferredPrompt = null;
+                if (AppState.deferredPrompt) {
+                    AppState.deferredPrompt.prompt();
+                    AppState.deferredPrompt.userChoice.then(choiceResult => {
+                        logEvent(choiceResult.outcome === 'accepted' ? 'install_accepted' : 'install_declined');
+                        AppState.deferredPrompt = null;
                     });
                 }
             });
@@ -1655,19 +1593,15 @@
                 logEvent('notifications_dismissed');
             });
 
-            // Emergency modal
+            // Modal controls
             document.getElementById('emergency-modal-close').addEventListener('click', hideEmergencyModal);
             document.getElementById('emergency-modal-confirm').addEventListener('click', hideEmergencyModal);
-
-            // Bottom sheet
             document.getElementById('bottom-sheet-close').addEventListener('click', hideBottomSheet);
             document.getElementById('bottom-sheet-overlay').addEventListener('click', hideBottomSheet);
 
             // Permission dialogs
             document.getElementById('grant-location').addEventListener('click', grantLocationPermission);
             document.getElementById('deny-location').addEventListener('click', denyLocationPermission);
-
-            // Tracking dialog
             document.getElementById('tracking-confirm').addEventListener('click', saveTrackingPreferences);
             document.getElementById('tracking-cancel').addEventListener('click', hideTrackingDialog);
 
@@ -1676,87 +1610,84 @@
             window.addEventListener('offline', handleOnlineStatusChange);
         }
 
-        // Request necessary permissions
+        // Permission Management
         async function requestPermissions() {
-            // Request location permission if not already granted
-            if (appState.preferences.locationPermission === 'unset') {
+            if (AppState.preferences.locationPermission === 'unset') {
                 await showLocationPermissionDialog();
             }
 
-            // Request notification permission if not already set
-            if (appState.preferences.notifications === 'unset' &&
+            if (AppState.preferences.notifications === 'unset' && 
                 !['denied', 'granted'].includes(Notification.permission)) {
                 showNotificationPrompt();
             }
         }
 
-        // Show location permission dialog
-        function showLocationPermissionDialog() {
-            return new Promise((resolve) => {
-                document.getElementById('location-permission-dialog').style.display = 'block';
-
-                const grantBtn = document.getElementById('grant-location');
-                const denyBtn = document.getElementById('deny-location');
+        async function showLocationPermissionDialog() {
+            return new Promise(resolve => {
+                const dialog = document.getElementById('location-permission-dialog');
+                dialog.style.display = 'block';
 
                 const cleanup = () => {
-                    grantBtn.removeEventListener('click', onGrant);
-                    denyBtn.removeEventListener('click', onDeny);
+                    document.getElementById('grant-location').removeEventListener('click', onGrant);
+                    document.getElementById('deny-location').removeEventListener('click', onDeny);
                 };
 
-                const onGrant = () => {
+                const onGrant = async () => {
                     cleanup();
-                    document.getElementById('location-permission-dialog').style.display = 'none';
+                    dialog.style.display = 'none';
+                    await grantLocationPermission();
                     resolve(true);
                 };
 
                 const onDeny = () => {
                     cleanup();
-                    document.getElementById('location-permission-dialog').style.display = 'none';
+                    dialog.style.display = 'none';
+                    denyLocationPermission();
                     resolve(false);
                 };
 
-                grantBtn.addEventListener('click', onGrant);
-                denyBtn.addEventListener('click', onDeny);
+                document.getElementById('grant-location').addEventListener('click', onGrant);
+                document.getElementById('deny-location').addEventListener('click', onDeny);
             });
         }
 
-        // Grant location permission
         async function grantLocationPermission() {
             try {
                 const position = await getCurrentPosition();
-                appState.preferences.locationPermission = 'granted';
+                AppState.preferences.locationPermission = 'granted';
                 localStorage.setItem('locationPermission', 'granted');
-                document.getElementById('location-permission-dialog').style.display = 'none';
 
                 // Update UI with user's location
-                appState.currentLocation = {
+                AppState.currentLocation = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                     name: 'Your Location'
                 };
 
                 // Center map on user's location
-                appState.map.setView([position.coords.latitude, position.coords.longitude], 14);
+                AppState.map.setView([position.coords.latitude, position.coords.longitude], 14);
+                updateUserMarker(position.coords.latitude, position.coords.longitude);
+                updateLocationInfo();
 
                 logEvent('location_permission_granted');
             } catch (error) {
                 console.error('Error getting location:', error);
-                appState.preferences.locationPermission = 'denied';
+                AppState.preferences.locationPermission = 'denied';
                 localStorage.setItem('locationPermission', 'denied');
-                document.getElementById('location-permission-dialog').style.display = 'none';
                 logEvent('location_permission_denied');
             }
         }
 
-        // Deny location permission
         function denyLocationPermission() {
-            appState.preferences.locationPermission = 'denied';
+            AppState.preferences.locationPermission = 'denied';
             localStorage.setItem('locationPermission', 'denied');
-            document.getElementById('location-permission-dialog').style.display = 'none';
             logEvent('location_permission_denied');
         }
 
-        // Get current position with timeout
+        function updateUserMarker(lat, lng) {
+            AppState.userMarker.setLatLng([lat, lng]).addTo(AppState.map);
+        }
+
         function getCurrentPosition(timeout = 10000) {
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) {
@@ -1764,90 +1695,69 @@
                     return;
                 }
 
-                const options = {
-                    enableHighAccuracy: true,
-                    timeout: timeout,
-                    maximumAge: 0
-                };
-
-                const success = (position) => resolve(position);
-                const error = (err) => reject(err);
-
-                navigator.geolocation.getCurrentPosition(success, error, options);
+                navigator.geolocation.getCurrentPosition(
+                    resolve,
+                    reject,
+                    { enableHighAccuracy: true, timeout, maximumAge: 0 }
+                );
             });
         }
 
-        // Show tracking transparency dialog
+        // Tracking Preferences
         function showTrackingDialog() {
             document.getElementById('tracking-dialog').style.display = 'block';
         }
 
-        // Hide tracking transparency dialog
         function hideTrackingDialog() {
             document.getElementById('tracking-dialog').style.display = 'none';
         }
 
-        // Save tracking preferences
         function saveTrackingPreferences() {
             const selectedOption = document.querySelector('input[name="tracking"]:checked').value;
-            appState.preferences.tracking = selectedOption;
+            AppState.preferences.tracking = selectedOption;
             localStorage.setItem('tracking', selectedOption);
             localStorage.setItem('trackingSet', 'true');
             hideTrackingDialog();
-            logEvent('tracking_preferences_saved', {
-                preference: selectedOption
-            });
+            logEvent('tracking_preferences_saved', { preference: selectedOption });
         }
 
-        // Show install prompt
-        function showInstallPrompt() {
-            document.getElementById('install-prompt').style.display = 'flex';
-        }
-
-        // Hide install prompt
-        function hideInstallPrompt() {
-            document.getElementById('install-prompt').style.display = 'none';
-        }
-
-        // Show notification prompt
+        // Notification Management
         function showNotificationPrompt() {
             document.getElementById('notification-prompt').style.display = 'flex';
         }
 
-        // Hide notification prompt
         function hideNotificationPrompt() {
             document.getElementById('notification-prompt').style.display = 'none';
         }
 
-        // Enable notifications
         function enableNotifications() {
             Notification.requestPermission().then(permission => {
-                appState.preferences.notifications = permission;
+                AppState.preferences.notifications = permission;
                 localStorage.setItem('notifications', permission);
                 hideNotificationPrompt();
-
-                if (permission === 'granted') {
-                    logEvent('notifications_enabled');
-                    // In a real implementation, we would subscribe to push notifications
-                } else {
-                    logEvent('notifications_denied');
-                }
+                logEvent(permission === 'granted' ? 'notifications_enabled' : 'notifications_denied');
             });
         }
 
-        // Show emergency modal
+        // UI Components
+        function showInstallPrompt() {
+            document.getElementById('install-prompt').style.display = 'flex';
+        }
+
+        function hideInstallPrompt() {
+            document.getElementById('install-prompt').style.display = 'none';
+        }
+
         function showEmergencyModal(title, content) {
             document.getElementById('emergency-modal-title').textContent = title;
             document.getElementById('emergency-modal-body').innerHTML = content;
             document.getElementById('emergency-modal').style.display = 'flex';
         }
 
-        // Hide emergency modal
         function hideEmergencyModal() {
             document.getElementById('emergency-modal').style.display = 'none';
         }
 
-        // Show bottom sheet
         function showBottomSheet(title, content) {
             document.getElementById('bottom-sheet-title').textContent = title;
             document.getElementById('bottom-sheet-content').innerHTML = content;
@@ -1855,39 +1765,44 @@
             document.getElementById('bottom-sheet-overlay').style.display = 'block';
         }
 
-        // Hide bottom sheet
         function hideBottomSheet() {
             document.getElementById('bottom-sheet').classList.remove('active');
             document.getElementById('bottom-sheet-overlay').style.display = 'none';
         }
 
-        // Handle online/offline status changes
-        function handleOnlineStatusChange() {
-            const isOnline = navigator.onLine;
-            appState.offlineMode = !isOnline;
-
-            if (isOnline) {
-                document.getElementById('offline-indicator').style.display = 'none';
-                // Try to refresh data when coming back online
-                loadData();
-            } else {
-                document.getElementById('offline-indicator').style.display = 'block';
-            }
-
-            logEvent('connection_change', {
-                online: isOnline
-            });
+        function showLoading(show) {
+            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        // Check connectivity
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'road-alert';
+            errorDiv.innerHTML = `
+                <i class="material-icons">error</i>
+                <div>
+                    <div class="road-name">Error</div>
+                    <div class="road-status">${message}</div>
+                </div>
+            `;
+            document.querySelector('.dashboard')?.prepend(errorDiv);
+        }
+
+        // Network Status
+        function handleOnlineStatusChange() {
+            AppState.offlineMode = !navigator.onLine;
+            document.getElementById('offline-indicator').style.display = AppState.offlineMode ? 'block' : 'none';
+            
+            if (navigator.onLine) loadData();
+            logEvent('connection_change', { online: navigator.onLine });
+        }
+
         function checkConnectivity() {
             handleOnlineStatusChange();
         }
 
-        // Load initial data
+        // Data Management
         async function loadInitialData() {
             showLoading(true);
-
             try {
                 // Check for cached data first
                 const cachedData = getCachedData();
@@ -1906,53 +1821,39 @@
             }
         }
 
-        // Main data loading function
         async function loadData() {
-            if (appState.offlineMode) {
-                console.log('Offline mode - using cached data');
-                return;
-            }
+            if (AppState.offlineMode) return;
 
             showLoading(true);
-
             try {
-                // Load all data in parallel
                 const [floodData, rainfallData, predictions, roads, evacuation, sensors] = await Promise.all([
-                    fetchFloodData(),
-                    fetchRainfallData(),
-                    fetchPredictions(),
-                    fetchAffectedRoads(),
-                    fetchEvacuationCenters(),
-                    fetchSensorData()
+                    fetchData(AppConfig.API_ENDPOINTS.FLOOD_DATA, processFloodData),
+                    fetchData(AppConfig.API_ENDPOINTS.RAINFALL, processRainfallData),
+                    fetchData(AppConfig.API_ENDPOINTS.PREDICTIONS, processPredictions),
+                    fetchData(AppConfig.API_ENDPOINTS.ROADS, processRoadData),
+                    fetchData(AppConfig.API_ENDPOINTS.EVACUATION, processEvacuationData),
+                    fetchData(AppConfig.API_ENDPOINTS.SENSORS, processSensorData)
                 ]);
 
-                // Process and validate all data
                 const processedData = {
-                    floodData: processFloodData(floodData),
-                    rainfallData: processRainfallData(rainfallData),
-                    predictions: processPredictions(predictions),
-                    affectedRoads: processRoadData(roads),
-                    evacuationCenters: processEvacuationData(evacuation),
-                    sensorData: processSensorData(sensors),
+                    floodData,
+                    rainfallData,
+                    predictions,
+                    affectedRoads: roads,
+                    evacuationCenters: evacuation,
+                    sensorData: sensors,
                     lastUpdate: new Date(),
                     dataStatus: 'live'
                 };
 
-                // Update app state and UI
                 updateAppState(processedData);
                 updateUI();
-                
-                // Cache the data
                 cacheData(processedData);
-                
-                // Check for emergency conditions
                 checkForEmergencies();
-                
                 return true;
-                
             } catch (error) {
                 console.error('Error loading data:', error);
-                appState.dataStatus = 'error';
+                AppState.dataStatus = 'error';
                 showError('Failed to load latest data. Using cached data if available.');
                 return false;
             } finally {
@@ -1960,76 +1861,29 @@
             }
         }
 
-        // Fetch flood data from API
-        async function fetchFloodData() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FLOOD_DATA}`;
+        async function fetchData(endpoint, processor) {
+            const url = `${AppConfig.API_BASE_URL}${endpoint}`;
             const response = await fetchWithRetry(url);
-            return response.json();
+            const data = await response.json();
+            return processor(data);
         }
 
-        // Fetch rainfall data from API
-        async function fetchRainfallData() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.RAINFALL}`;
-            const response = await fetchWithRetry(url);
-            return response.json();
-        }
-
-        // Fetch predictions from API
-        async function fetchPredictions() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PREDICTIONS}`;
-            const response = await fetchWithRetry(url);
-            return response.json();
-        }
-
-        // Fetch affected roads from API
-        async function fetchAffectedRoads() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ROADS}`;
-            const response = await fetchWithRetry(url);
-            return response.json();
-        }
-
-        // Fetch evacuation centers from API
-        async function fetchEvacuationCenters() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVACUATION}`;
-            const response = await fetchWithRetry(url);
-            return response.json();
-        }
-
-        // Fetch sensor data from API
-        async function fetchSensorData() {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SENSORS}`;
-            const response = await fetchWithRetry(url);
-            return response.json();
-        }
-
-        // Fetch with retry logic
-        async function fetchWithRetry(url, options = {}, retries = API_CONFIG.MAX_RETRIES) {
+        async function fetchWithRetry(url, options = {}, retries = AppConfig.MAX_RETRIES) {
             try {
                 const response = await fetchWithTimeout(url, options);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return response;
-                
             } catch (error) {
                 if (retries > 0) {
-                    console.log(`Retrying fetch (${API_CONFIG.MAX_RETRIES - retries + 1}/${API_CONFIG.MAX_RETRIES})`);
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     return fetchWithRetry(url, options, retries - 1);
-                } else {
-                    throw error;
                 }
+                throw error;
             }
         }
 
-        // Fetch with timeout
         async function fetchWithTimeout(resource, options = {}) {
-            const {
-                timeout = API_CONFIG.TIMEOUT
-            } = options;
-
+            const { timeout = AppConfig.TIMEOUT } = options;
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
 
@@ -2038,136 +1892,86 @@
                 signal: controller.signal,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${API_CONFIG.API_KEY}`
+                    'Authorization': `Bearer ${AppConfig.API_KEY}`
                 }
             });
 
             clearTimeout(id);
-
             return response;
         }
 
-        // Process flood data
+        // Data Processing
         function processFloodData(data) {
-            if (!data || !Array.isArray(data.locations)) {
-                throw new Error('Invalid flood data format');
-            }
-
+            if (!data?.locations) throw new Error('Invalid flood data format');
             return {
                 locations: data.locations.map(location => ({
-                    id: location.id,
-                    name: location.name,
+                    ...location,
                     coordinates: location.coordinates,
-                    waterLevel: location.waterLevel,
-                    rainfall: location.rainfall,
-                    trend: location.trend,
                     riskLevel: calculateRiskLevel(location.waterLevel),
-                    lastUpdated: new Date(location.lastUpdated),
-                    sensors: location.sensors || []
+                    lastUpdated: new Date(location.lastUpdated)
                 })),
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Process rainfall data
         function processRainfallData(data) {
-            if (!data || !Array.isArray(data.daily) || !Array.isArray(data.hourly)) {
-                throw new Error('Invalid rainfall data format');
-            }
-
+            if (!data?.daily || !data?.hourly) throw new Error('Invalid rainfall data format');
             return {
-                daily: data.daily.map(day => ({
-                    day: day.day,
-                    rainfall: day.rainfall
-                })),
-                hourly: data.hourly.map(hour => ({
-                    hour: hour.hour,
-                    level: hour.level
-                })),
+                daily: data.daily,
+                hourly: data.hourly,
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Process predictions
         function processPredictions(data) {
-            if (!data || typeof data.timeToFlood !== 'string' || typeof data.riskLevel !== 'string') {
-                throw new Error('Invalid predictions data format');
-            }
-
+            if (!data?.timeToFlood || !data?.riskLevel) throw new Error('Invalid predictions format');
             return {
-                timeToFlood: data.timeToFlood,
-                riskLevel: data.riskLevel,
-                confidence: data.confidence,
+                ...data,
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Process road data
         function processRoadData(data) {
-            if (!data || !Array.isArray(data.roads)) {
-                throw new Error('Invalid road data format');
-            }
-
+            if (!data?.roads) throw new Error('Invalid road data format');
             return {
                 roads: data.roads.map(road => ({
-                    id: road.id,
-                    name: road.name,
-                    status: road.status,
-                    coordinates: road.coordinates,
+                    ...road,
                     lastUpdated: new Date(road.lastUpdated)
                 })),
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Process evacuation data
         function processEvacuationData(data) {
-            if (!data || !Array.isArray(data.centers)) {
-                throw new Error('Invalid evacuation data format');
-            }
-
+            if (!data?.centers) throw new Error('Invalid evacuation data format');
             return {
                 centers: data.centers.map(center => ({
-                    id: center.id,
-                    name: center.name,
-                    coordinates: center.coordinates,
-                    capacity: center.capacity,
-                    currentOccupancy: center.currentOccupancy,
-                    distance: center.distance,
+                    ...center,
                     lastUpdated: new Date(center.lastUpdated)
                 })),
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Process sensor data
         function processSensorData(data) {
-            if (!data || !Array.isArray(data.sensors)) {
-                throw new Error('Invalid sensor data format');
-            }
-
+            if (!data?.sensors) throw new Error('Invalid sensor data format');
             return {
                 sensors: data.sensors.map(sensor => ({
-                    id: sensor.id,
-                    type: sensor.type,
-                    value: sensor.value,
-                    unit: sensor.unit,
-                    trend: sensor.trend,
+                    ...sensor,
                     lastUpdated: new Date(sensor.lastUpdated)
                 })),
                 lastUpdated: new Date(data.lastUpdated)
             };
         }
 
-        // Calculate risk level
         function calculateRiskLevel(waterLevel) {
-            if (waterLevel >= FLOOD_RISK_LEVELS.EXTREME.threshold) return 'extreme';
-            if (waterLevel >= FLOOD_RISK_LEVELS.HIGH.threshold) return 'high';
-            if (waterLevel >= FLOOD_RISK_LEVELS.MODERATE.threshold) return 'moderate';
+            if (waterLevel >= AppConfig.RISK_LEVELS.EXTREME.threshold) return 'extreme';
+            if (waterLevel >= AppConfig.RISK_LEVELS.HIGH.threshold) return 'high';
+            if (waterLevel >= AppConfig.RISK_LEVELS.MODERATE.threshold) return 'moderate';
             return 'low';
         }
 
-        // Get cached data
+        // Data Caching
         function getCachedData() {
             const cachedData = localStorage.getItem('floodDataCache');
             if (!cachedData) return null;
@@ -2175,12 +1979,10 @@
             try {
                 const parsedData = JSON.parse(cachedData);
                 const cacheAge = new Date() - new Date(parsedData.lastUpdate);
-
-                if (cacheAge > API_CONFIG.CACHE_TTL) {
+                if (cacheAge > AppConfig.CACHE_TTL) {
                     localStorage.removeItem('floodDataCache');
                     return null;
                 }
-
                 return parsedData;
             } catch (e) {
                 console.error('Error parsing cached data:', e);
@@ -2188,7 +1990,6 @@
             }
         }
 
-        // Cache data
         function cacheData(data) {
             try {
                 localStorage.setItem('floodDataCache', JSON.stringify(data));
@@ -2197,19 +1998,19 @@
             }
         }
 
-        // Update app state
+        // State Management
         function updateAppState(newState) {
-            appState.floodData = newState.floodData || appState.floodData;
-            appState.rainfallData = newState.rainfallData || appState.rainfallData;
-            appState.predictions = newState.predictions || appState.predictions;
-            appState.affectedRoads = newState.affectedRoads || appState.affectedRoads;
-            appState.evacuationCenters = newState.evacuationCenters || appState.evacuationCenters;
-            appState.sensorData = newState.sensorData || appState.sensorData;
-            appState.lastUpdate = newState.lastUpdate || appState.lastUpdate;
-            appState.dataStatus = newState.dataStatus || appState.dataStatus;
+            AppState.floodData = newState.floodData || AppState.floodData;
+            AppState.rainfallData = newState.rainfallData || AppState.rainfallData;
+            AppState.predictions = newState.predictions || AppState.predictions;
+            AppState.affectedRoads = newState.affectedRoads || AppState.affectedRoads;
+            AppState.evacuationCenters = newState.evacuationCenters || AppState.evacuationCenters;
+            AppState.sensorData = newState.sensorData || AppState.sensorData;
+            AppState.lastUpdate = newState.lastUpdate || AppState.lastUpdate;
+            AppState.dataStatus = newState.dataStatus || AppState.dataStatus;
         }
 
-        // Update UI
+        // UI Updates
         function updateUI() {
             updateLocationInfo();
             updateFloodLayer();
@@ -2223,24 +2024,22 @@
             updateLastUpdated();
         }
 
-        // Update location info
         function updateLocationInfo() {
-            if (!appState.currentLocation) {
-                // Default to map center if no location selected
-                const center = appState.map.getCenter();
-                appState.currentLocation = {
+            if (!AppState.currentLocation) {
+                const center = AppState.map.getCenter();
+                AppState.currentLocation = {
                     lat: center.lat,
                     lng: center.lng,
                     name: 'Current View'
                 };
             }
 
-            // Find nearest flood data point
-            const nearestLocation = findNearestLocation(appState.currentLocation);
-
+            const nearestLocation = findNearestLocation(AppState.currentLocation);
             if (nearestLocation) {
-                appState.selectedLocation = nearestLocation;
+                AppState.selectedLocation = nearestLocation;
                 
+                const locationInfo = document.getElementById('location-info');
+                locationInfo.style.display = 'block';
                 document.getElementById('selected-location').textContent = nearestLocation.name;
                 document.getElementById('current-risk').textContent = nearestLocation.riskLevel.toUpperCase();
                 document.getElementById('current-risk').className = `data-value ${nearestLocation.riskLevel}-risk`;
@@ -2248,13 +2047,9 @@
                 document.getElementById('water-level').textContent = `${nearestLocation.waterLevel} cm`;
                 document.getElementById('flood-depth').textContent = getFloodDepthDescription(nearestLocation.waterLevel);
                 document.getElementById('location-updated').textContent = `Updated: ${formatTime(nearestLocation.lastUpdated)}`;
-
-                // Show location info panel
-                document.getElementById('location-info').style.display = 'block';
             }
         }
 
-        // Get flood depth description
         function getFloodDepthDescription(waterLevel) {
             if (waterLevel >= 100) return 'Dangerously Deep (100cm+)';
             if (waterLevel >= 60) return 'Waist-high (60-100cm)';
@@ -2263,16 +2058,13 @@
             return 'Minimal (<15cm)';
         }
 
-        // Find nearest location to coordinates
         function findNearestLocation(coords) {
-            if (!appState.floodData || !appState.floodData.locations || !appState.floodData.locations.length) {
-                return null;
-            }
+            if (!AppState.floodData?.locations) return null;
 
             let nearest = null;
             let minDistance = Infinity;
 
-            appState.floodData.locations.forEach(location => {
+            AppState.floodData.locations.forEach(location => {
                 if (!location.coordinates) return;
 
                 const center = getPolygonCenter(location.coordinates);
@@ -2290,9 +2082,8 @@
             return nearest;
         }
 
-        // Calculate distance between two points in km
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radius of the earth in km
+            const R = 6371; // Earth radius in km
             const dLat = deg2rad(lat2 - lat1);
             const dLon = deg2rad(lon2 - lon1);
             const a = 
@@ -2300,19 +2091,15 @@
                 Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
                 Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // Distance in km
+            return R * c;
         }
 
         function deg2rad(deg) {
             return deg * (Math.PI/180);
         }
 
-        // Get center of polygon
         function getPolygonCenter(coordinates) {
-            let latSum = 0;
-            let lngSum = 0;
-            let count = 0;
-
+            let latSum = 0, lngSum = 0, count = 0;
             coordinates.forEach(point => {
                 if (Array.isArray(point[0])) {
                     point.forEach(p => {
@@ -2326,32 +2113,23 @@
                     count++;
                 }
             });
-
-            return {
-                lat: latSum / count,
-                lng: lngSum / count
-            };
+            return { lat: latSum / count, lng: lngSum / count };
         }
 
-        // Update flood layer on map
         function updateFloodLayer() {
-            if (!appState.floodData || !appState.map) return;
+            if (!AppState.floodData || !AppState.map) return;
 
-            // Clear previous layers
-            appState.floodLayer.clearLayers();
-
-            // Add new flood polygons
-            appState.floodData.locations.forEach(location => {
+            AppState.floodLayer.clearLayers();
+            AppState.floodData.locations.forEach(location => {
                 if (!location.coordinates) return;
 
-                const color = FLOOD_RISK_LEVELS[location.riskLevel]?.color || '#1976D2';
+                const color = AppConfig.RISK_LEVELS[location.riskLevel]?.color || '#1976D2';
                 const polygon = L.polygon(location.coordinates, {
-                    color: color,
-                    fillOpacity: MAP_CONFIG.FLOOD_LAYER_OPACITY,
-                    weight: MAP_CONFIG.FLOOD_LAYER_WEIGHT
-                }).addTo(appState.floodLayer);
+                    color,
+                    fillOpacity: AppConfig.MAP_CONFIG.FLOOD_LAYER_OPACITY,
+                    weight: 2
+                }).addTo(AppState.floodLayer);
 
-                // Add popup with location info
                 polygon.bindPopup(`
                     <h4>${location.name}</h4>
                     <p>Water Level: ${location.waterLevel} cm</p>
@@ -2362,29 +2140,21 @@
             });
         }
 
-        // Update evacuation layer
         function updateEvacuationLayer() {
-            if (!appState.evacuationCenters || !appState.map) return;
+            if (!AppState.evacuationCenters || !AppState.map) return;
 
-            // Clear previous layers
-            appState.evacuationLayer.clearLayers();
-
-            // Add new evacuation centers
-            appState.evacuationCenters.centers.forEach(center => {
+            AppState.evacuationLayer.clearLayers();
+            AppState.evacuationCenters.centers.forEach(center => {
                 if (!center.coordinates) return;
 
                 const icon = L.divIcon({
                     className: 'evacuation-icon',
-                    html: `<i class="material-icons" style="color: ${MAP_CONFIG.EVAC_MARKER_COLOR}; font-size: 24px;">${MAP_CONFIG.EVAC_MARKER_ICON}</i>`,
+                    html: `<i class="material-icons" style="color: ${AppConfig.MAP_CONFIG.EVAC_MARKER_COLOR}; font-size: 24px;">place</i>`,
                     iconSize: [24, 24],
                     iconAnchor: [12, 24]
                 });
 
-                const marker = L.marker(center.coordinates, {
-                    icon
-                }).addTo(appState.evacuationLayer);
-
-                // Add popup with center info
+                const marker = L.marker(center.coordinates, { icon }).addTo(AppState.evacuationLayer);
                 marker.bindPopup(`
                     <h4>${center.name}</h4>
                     <p>Capacity: ${center.capacity} people</p>
@@ -2394,29 +2164,27 @@
             });
         }
 
-        // Update charts
         function updateCharts() {
-            if (!appState.rainfallData) return;
+            if (!AppState.rainfallData) return;
 
-            // Update rainfall chart
-            appState.charts.rainfallChart.data.labels = appState.rainfallData.daily.map(d => d.day);
-            appState.charts.rainfallChart.data.datasets[0].data = appState.rainfallData.daily.map(d => d.rainfall);
-            appState.charts.rainfallChart.update();
+            // Rainfall chart
+            AppState.charts.rainfallChart.data.labels = AppState.rainfallData.daily.map(d => d.day);
+            AppState.charts.rainfallChart.data.datasets[0].data = AppState.rainfallData.daily.map(d => d.rainfall);
+            AppState.charts.rainfallChart.update();
 
-            // Update forecast chart
-            appState.charts.forecastChart.data.labels = appState.rainfallData.hourly.map(h => h.hour);
-            appState.charts.forecastChart.data.datasets[0].data = appState.rainfallData.hourly.map(h => h.level);
-            appState.charts.forecastChart.update();
+            // Forecast chart
+            AppState.charts.forecastChart.data.labels = AppState.rainfallData.hourly.map(h => h.hour);
+            AppState.charts.forecastChart.data.datasets[0].data = AppState.rainfallData.hourly.map(h => h.level);
+            AppState.charts.forecastChart.update();
         }
 
-        // Update road alerts
         function updateRoadAlerts() {
-            if (!appState.affectedRoads) return;
+            if (!AppState.affectedRoads) return;
 
-            const roadAlertsContainer = document.getElementById('road-alerts');
-            roadAlertsContainer.innerHTML = '';
+            const container = document.getElementById('road-alerts');
+            container.innerHTML = '';
 
-            appState.affectedRoads.roads.forEach(road => {
+            AppState.affectedRoads.roads.forEach(road => {
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'road-alert';
                 alertDiv.innerHTML = `
@@ -2433,21 +2201,19 @@
                         <button class="modal-btn modal-btn-primary" onclick="window.zoomToRoad('${road.id}')">View on Map</button>
                     `);
                 });
-                roadAlertsContainer.appendChild(alertDiv);
+                container.appendChild(alertDiv);
             });
         }
 
-        // Update hotspots list
         function updateHotspotsList() {
-            if (!appState.floodData) return;
+            if (!AppState.floodData) return;
 
-            const hotspotsContainer = document.getElementById('hotspots-list');
-            hotspotsContainer.innerHTML = '';
+            const container = document.getElementById('hotspots-list');
+            container.innerHTML = '';
 
-            // Sort locations by water level (highest first)
-            const hotspots = [...appState.floodData.locations]
+            const hotspots = [...AppState.floodData.locations]
                 .sort((a, b) => b.waterLevel - a.waterLevel)
-                .slice(0, 5); // Top 5 hotspots
+                .slice(0, 5);
 
             hotspots.forEach(location => {
                 const hotspotDiv = document.createElement('div');
@@ -2464,18 +2230,17 @@
                 hotspotDiv.addEventListener('click', () => {
                     window.zoomToLocation(location.id);
                 });
-                hotspotsContainer.appendChild(hotspotDiv);
+                container.appendChild(hotspotDiv);
             });
         }
 
-        // Update evacuation centers list
         function updateEvacuationCentersList() {
-            if (!appState.evacuationCenters) return;
+            if (!AppState.evacuationCenters) return;
 
-            const evacContainer = document.getElementById('evacuation-centers');
-            evacContainer.innerHTML = '';
+            const container = document.getElementById('evacuation-centers');
+            container.innerHTML = '';
 
-            appState.evacuationCenters.centers.forEach(center => {
+            AppState.evacuationCenters.centers.forEach(center => {
                 const centerDiv = document.createElement('div');
                 centerDiv.className = 'sensor-item';
                 centerDiv.innerHTML = `
@@ -2495,13 +2260,12 @@
                         <button class="modal-btn modal-btn-primary" onclick="window.zoomToEvacuationCenter('${center.id}')">View on Map</button>
                     `);
                 });
-                evacContainer.appendChild(centerDiv);
+                container.appendChild(centerDiv);
             });
         }
 
-        // Update sensor data
         function updateSensorData() {
-            if (!appState.sensorData) return;
+            if (!AppState.sensorData) return;
 
             const sensorTypes = {
                 'rain-rate': 'water_drop',
@@ -2511,7 +2275,7 @@
             };
 
             Object.keys(sensorTypes).forEach(id => {
-                const sensor = appState.sensorData.sensors.find(s => s.type === id);
+                const sensor = AppState.sensorData.sensors.find(s => s.type === id);
                 if (sensor) {
                     const element = document.getElementById(id);
                     if (element) {
@@ -2521,33 +2285,29 @@
             });
         }
 
-        // Update predictions
         function updatePredictions() {
-            if (!appState.predictions) return;
+            if (!AppState.predictions) return;
 
-            document.getElementById('prediction-time').textContent = appState.predictions.timeToFlood;
-            document.getElementById('prediction-level').textContent = appState.predictions.riskLevel.toUpperCase();
-            document.getElementById('prediction-level').className = `prediction-level ${appState.predictions.riskLevel}-risk`;
-            document.getElementById('prediction-details').textContent = `Confidence: ${appState.predictions.confidence}%`;
+            document.getElementById('prediction-time').textContent = AppState.predictions.timeToFlood;
+            document.getElementById('prediction-level').textContent = AppState.predictions.riskLevel.toUpperCase();
+            document.getElementById('prediction-level').className = `prediction-level ${AppState.predictions.riskLevel}-risk`;
+            document.getElementById('prediction-details').textContent = `Confidence: ${AppState.predictions.confidence}%`;
         }
 
-        // Update last updated time
         function updateLastUpdated() {
-            if (appState.lastUpdate) {
-                document.getElementById('update-time').textContent = formatDateTime(appState.lastUpdate);
+            if (AppState.lastUpdate) {
+                document.getElementById('update-time').textContent = formatDateTime(AppState.lastUpdate);
             }
         }
 
-        // Check for emergency conditions
+        // Emergency Management
         function checkForEmergencies() {
-            if (!appState.selectedLocation) return;
-
-            if (appState.selectedLocation.riskLevel === 'high' || appState.selectedLocation.riskLevel === 'extreme') {
-                showEmergencyAlert(appState.selectedLocation);
+            if (!AppState.selectedLocation) return;
+            if (['high', 'extreme'].includes(AppState.selectedLocation.riskLevel)) {
+                showEmergencyAlert(AppState.selectedLocation);
             }
         }
 
-        // Show emergency alert
         function showEmergencyAlert(location) {
             const emergencyCard = document.getElementById('emergency-card');
             const emergencyContent = document.getElementById('emergency-alert-content');
@@ -2559,8 +2319,6 @@
 
             emergencyCard.style.display = 'block';
             emergencyCard.classList.add('animate__animated', 'animate__shakeX');
-
-            // Remove animation class after it completes
             setTimeout(() => {
                 emergencyCard.classList.remove('animate__animated', 'animate__shakeX');
             }, 1000);
@@ -2580,81 +2338,57 @@
             });
         }
 
-        // Get emergency advice
         function getEmergencyAdvice(riskLevel) {
             switch (riskLevel) {
-                case 'extreme':
-                    return 'Immediate evacuation recommended. Move to higher ground or designated evacuation center.';
-                case 'high':
-                    return 'Prepare to evacuate. Gather essential items and monitor water levels closely.';
-                case 'moderate':
-                    return 'Stay alert. Avoid low-lying areas and prepare emergency supplies.';
-                default:
-                    return 'Monitor situation. Be prepared to move if conditions worsen.';
+                case 'extreme': return 'Immediate evacuation recommended. Move to higher ground or designated evacuation center.';
+                case 'high': return 'Prepare to evacuate. Gather essential items and monitor water levels closely.';
+                case 'moderate': return 'Stay alert. Avoid low-lying areas and prepare emergency supplies.';
+                default: return 'Monitor situation. Be prepared to move if conditions worsen.';
             }
         }
 
-        // Handle search
+        // User Interactions
         async function handleSearch() {
             const searchInput = document.getElementById('location-search');
             const query = searchInput.value.trim();
-
             if (!query) return;
 
             document.getElementById('search-text').style.display = 'none';
             document.getElementById('search-spinner').style.display = 'inline-block';
 
             try {
-                // In a real implementation, we would call a geocoding API
-                const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GEOLOCATION}?query=${encodeURIComponent(query)}`, {
-                    headers: {
-                        'Authorization': `Bearer ${API_CONFIG.API_KEY}`
-                    }
+                const response = await fetch(`${AppConfig.API_BASE_URL}${AppConfig.API_ENDPOINTS.GEOLOCATION}?query=${encodeURIComponent(query)}`, {
+                    headers: { 'Authorization': `Bearer ${AppConfig.API_KEY}` }
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Location not found');
-                }
+                if (!response.ok) throw new Error('Location not found');
                 
                 const location = await response.json();
-                
-                appState.currentLocation = {
+                AppState.currentLocation = {
                     lat: location.latitude,
                     lng: location.longitude,
                     name: location.name
                 };
 
-                appState.map.setView([location.latitude, location.longitude], 14);
+                AppState.map.setView([location.latitude, location.longitude], 14);
                 updateLocationInfo();
-
-                logEvent('location_searched', {
-                    query,
-                    found: true
-                });
+                logEvent('location_searched', { query, found: true });
                 
             } catch (error) {
                 console.error('Search error:', error);
-                
                 showBottomSheet('Search Results', `
                     <p>No matches found for "${query}".</p>
                     <p>Try searching for nearby barangays or cities.</p>
                 `);
-
-                logEvent('location_searched', {
-                    query,
-                    found: false,
-                    error: error.message
-                });
-                
+                logEvent('location_searched', { query, found: false, error: error.message });
             } finally {
                 document.getElementById('search-text').style.display = 'inline';
                 document.getElementById('search-spinner').style.display = 'none';
             }
         }
 
-        // Locate user
         async function locateUser() {
-            if (appState.preferences.locationPermission === 'denied') {
+            if (AppState.preferences.locationPermission === 'denied') {
                 showBottomSheet('Location Access', `
                     <p>You've previously denied location access.</p>
                     <p>Please enable location permissions in your browser settings to use this feature.</p>
@@ -2663,51 +2397,33 @@
             }
 
             showLoading(true);
-
             try {
                 const position = await getCurrentPosition();
-
-                appState.currentLocation = {
+                AppState.currentLocation = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude,
                     name: 'Your Location'
                 };
 
-                appState.map.setView([position.coords.latitude, position.coords.longitude], 14);
-
-                // Update user marker
-                appState.userMarker.setLatLng([position.coords.latitude, position.coords.longitude]);
-                appState.userMarker.addTo(appState.map);
-
+                AppState.map.setView([position.coords.latitude, position.coords.longitude], 14);
+                updateUserMarker(position.coords.latitude, position.coords.longitude);
                 updateLocationInfo();
-
                 logEvent('location_updated', {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 });
-                
             } catch (error) {
                 console.error('Location error:', error);
-                
-                showBottomSheet('Location Error', `
-                    <p>Unable to determine your location.</p>
-                    <p>${error.message}</p>
-                `);
-
-                logEvent('location_error', {
-                    error: error.message
-                });
-                
+                showBottomSheet('Location Error', `<p>Unable to determine your location.</p><p>${error.message}</p>`);
+                logEvent('location_error', { error: error.message });
             } finally {
                 showLoading(false);
             }
         }
 
-        // Show evacuation routes
         function showEvacuationRoutes() {
-            if (!appState.currentLocation || !appState.evacuationCenters) return;
-
-            const nearestEvacCenter = findNearestEvacuationCenter(appState.currentLocation);
+            if (!AppState.currentLocation || !AppState.evacuationCenters) return;
+            const nearestEvacCenter = findNearestEvacuationCenter(AppState.currentLocation);
 
             if (nearestEvacCenter) {
                 showBottomSheet('Nearest Evacuation Center', `
@@ -2717,7 +2433,6 @@
                     <p><strong>Status:</strong> ${nearestEvacCenter.currentOccupancy >= nearestEvacCenter.capacity ? 'Full' : 'Available'}</p>
                     <button class="modal-btn modal-btn-primary" onclick="window.zoomToEvacuationCenter('${nearestEvacCenter.id}')">View on Map</button>
                 `);
-
                 logEvent('evacuation_routes_viewed', {
                     center: nearestEvacCenter.name,
                     distance: nearestEvacCenter.distance
@@ -2725,23 +2440,18 @@
             }
         }
 
-        // Find nearest evacuation center
         function findNearestEvacuationCenter(coords) {
-            if (!appState.evacuationCenters || !appState.evacuationCenters.centers.length) {
-                return null;
-            }
-
+            if (!AppState.evacuationCenters?.centers) return null;
+            
             let nearest = null;
             let minDistance = Infinity;
 
-            appState.evacuationCenters.centers.forEach(center => {
+            AppState.evacuationCenters.centers.forEach(center => {
                 if (!center.coordinates) return;
-
                 const distance = calculateDistance(
                     coords.lat, coords.lng,
                     center.coordinates[0], center.coordinates[1]
                 );
-
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearest = center;
@@ -2751,53 +2461,21 @@
             return nearest;
         }
 
-        // Show emergency contacts
         function showEmergencyContacts() {
-            showBottomSheet('Emergency Contacts', `
-                <p><strong>National Emergency Hotline:</strong> 911</p>
-                <p><strong>NDRRMC:</strong> (02) 8911-6606</p>
-                <p><strong>Red Cross:</strong> 143 or (02) 8527-7927</p>
-                <p><strong>MMDA:</strong> 136</p>
-                <p><strong>PNP:</strong> 117 or (02) 8723-0401</p>
-            `);
-
+            const contactsHTML = AppConfig.EMERGENCY_CONTACTS.map(contact => 
+                `<p><strong>${contact.name}:</strong> ${contact.number}</p>`
+            ).join('');
+            
+            showBottomSheet('Emergency Contacts', contactsHTML);
             logEvent('emergency_contacts_viewed');
         }
 
-        // Show loading overlay
-        function showLoading(show) {
-            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
-        }
-
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'road-alert';
-            errorDiv.innerHTML = `
-                <i class="material-icons">error</i>
-                <div>
-                    <div class="road-name">Error</div>
-                    <div class="road-status">${message}</div>
-                </div>
-            `;
-            
-            // Prepend to dashboard
-            const dashboard = document.querySelector('.dashboard');
-            if (dashboard) {
-                dashboard.prepend(errorDiv);
-            }
-        }
-
-        // Format time
+        // Utility Functions
         function formatTime(date) {
             if (!(date instanceof Date)) date = new Date(date);
-            return date.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Format date and time
         function formatDateTime(date) {
             if (!(date instanceof Date)) date = new Date(date);
             return date.toLocaleString([], {
@@ -2809,41 +2487,37 @@
             });
         }
 
-        // Log event (analytics)
         function logEvent(eventName, metadata = {}) {
-            if (appState.preferences.tracking === 'essential') return;
+            if (AppState.preferences.tracking === 'essential') return;
 
             const eventData = {
                 event: eventName,
                 timestamp: new Date().toISOString(),
-                location: appState.currentLocation,
+                location: AppState.currentLocation,
                 ...metadata
             };
 
-            // In a real implementation, send to analytics service
             console.log('Event:', eventData);
             
-            // Example of sending to analytics endpoint
-            if (appState.preferences.tracking !== 'essential' && !appState.offlineMode) {
-                fetch(`${API_CONFIG.BASE_URL}/analytics`, {
+            // In production, send to analytics endpoint
+            if (AppState.preferences.tracking !== 'essential' && !AppState.offlineMode) {
+                fetch(`${AppConfig.API_BASE_URL}/analytics`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_CONFIG.API_KEY}`
+                        'Authorization': `Bearer ${AppConfig.API_KEY}`
                     },
                     body: JSON.stringify(eventData)
-                }).catch(err => {
-                    console.error('Error sending analytics:', err);
-                });
+                }).catch(console.error);
             }
         }
 
-        // Global functions
+        // Global Functions
         window.zoomToLocation = function(locationId) {
-            const location = appState.floodData.locations.find(loc => loc.id === locationId);
-            if (location && location.coordinates) {
-                appState.map.fitBounds(location.coordinates);
-                appState.currentLocation = {
+            const location = AppState.floodData.locations.find(loc => loc.id === locationId);
+            if (location?.coordinates) {
+                AppState.map.fitBounds(location.coordinates);
+                AppState.currentLocation = {
                     lat: location.coordinates[0][0],
                     lng: location.coordinates[0][1],
                     name: location.name
@@ -2854,24 +2528,22 @@
         };
 
         window.zoomToRoad = function(roadId) {
-            const road = appState.affectedRoads.roads.find(r => r.id === roadId);
-            if (road && road.coordinates) {
-                appState.map.fitBounds(road.coordinates);
+            const road = AppState.affectedRoads.roads.find(r => r.id === roadId);
+            if (road?.coordinates) {
+                AppState.map.fitBounds(road.coordinates);
                 hideBottomSheet();
             }
         };
 
         window.zoomToEvacuationCenter = function(centerId) {
-            const center = appState.evacuationCenters.centers.find(c => c.id === centerId);
-            if (center && center.coordinates) {
-                appState.map.setView(center.coordinates, 15);
+            const center = AppState.evacuationCenters.centers.find(c => c.id === centerId);
+            if (center?.coordinates) {
+                AppState.map.setView(center.coordinates, 15);
                 hideBottomSheet();
             }
         };
 
-        // Show loading overlay
         window.showLoading = showLoading;
     </script>
 </body>
-
 </html>
