@@ -1,14 +1,15 @@
 const CACHE_NAME = 'countify-plus-v3.0.0';
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
-  '/main.js',
-  '/main.css',
-  '/mdui.css',
-  '/mdui.min.css',
-  '/countify.svg',
-  '/manifest.json',
-  '/offline.html'
+  '/lans.html',
+  '/fonts/language.js',
+  '/css/main.css',
+  '/css/mdui.css',
+  '/css/mdui.min.css',
+  '/logo/countify.svg',
+  '/manifest.json’,
+'/docs/privacy.html',
+'/docs/terms.html'
 ];
 
 // Fonts to cache
