@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="css/main.css" />
     <script src="https://www.paypal.com/sdk/js?client-id=BAALvw_Ri8vqAGObpMeZGYY0eLZZ3trTxQ_MdB5qdHJZrbWJAVRlgoykIK3X4P0iovnRJYksnD1WwUI6HA&components=hosted-buttons&disable-funding=venmo&currency=PHP">
     </script>
-    <script src="/font/language.js"></script>
+    <script src="/fonts/language.js"></script>
     <link rel="manifest" href="https://countify-black.vercel.app/manifest.json" />
 </head>
 <style>
@@ -686,7 +686,7 @@ GETTING STARTED:
         async loadLanguageSupport() {
             try {
                 const script = document.createElement('script');
-                script.src = 'font/language.js';
+                script.src = '/fonts/language.js';
                 document.body.appendChild(script);
 
                 script.onload = () => {
