@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Support Us</title>
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self';">
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -1017,7 +1018,43 @@
 
     <!-- Overlay for Bottom Sheet -->
     <div class="overlay" id="overlay"></div>
+<script>
+  document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+<script>
+  document.addEventListener('keydown', function (e) {
+    if (
+      e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+      (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+      (e.ctrlKey && e.key === 'U') || 
+      (e.ctrlKey && e.shiftKey && e.key === 'C')
+    ) {
+      e.preventDefault();
+    }
+  });
+</script>
+<script>
+  let devtoolsOpen = false;
 
+  setInterval(function () {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+      devtoolsOpen = true;
+      alert('Developer Tools Detected!');
+      window.location.href = 'about:blank';
+    }
+  }, 1000);
+</script>
+<style>
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+</style>
 <script src="config.private.js"></script>
 <script src="https://www.paypal.com/sdk/js?client-id=test&currency=PHP" data-client-token></script>
 <script type="module">
