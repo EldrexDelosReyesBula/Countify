@@ -1,4 +1,4 @@
-// public/config.js
+
 window.appConfig = {
   firebase: {
     apiKey: "AIzaSyCEBkAxkrm95b4LN-iNHmwXcpoLtwpQVlg",
@@ -11,6 +11,6 @@ window.appConfig = {
   },
   paypal: {
     clientId: "AYG_Ze1ITfxBvEb3QwW4F5BgdXThYisLcu_ZQTzgPeFRBsxp_yOGrjCGBxrqzvK4mKBZSK-VkhIMooPu",
-    env: "production"
+    currency:"PHP"
   }
 };
