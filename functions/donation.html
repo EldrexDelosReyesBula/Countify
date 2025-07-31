@@ -1048,7 +1048,6 @@
     // Overlay
     const overlay = document.getElementById('overlay');
 
-
     // Selected amount (default to 200)
     let selectedAmount = 200;
     let selectedCurrency = 'PHP';
@@ -1069,6 +1068,32 @@
     let analytics;
     let trackingConsentGiven = false;
 
+    // Check cookie consent
+    function checkCookieConsent() {
+        return localStorage.getItem('cookieConsent') === 'accepted';
+    }
+
+    // Initialize cookie consent
+    function initCookieConsent() {
+        const bannerShown = localStorage.getItem('cookieBannerShown');
+        const consentGiven = localStorage.getItem('cookieConsent');
+        
+        if (!bannerShown && !consentGiven) {
+            document.getElementById('cookie-consent').style.display = 'block';
+            showCookieBanner();
+        } else {
+            document.getElementById('cookie-consent').style.display = 'none';
+        }
+    }
+
+    // Show cookie banner
+    function showCookieBanner() {
+        const cookieConsent = document.getElementById('cookie-consent');
+        if (cookieConsent) {
+            void cookieConsent.offsetWidth; // Trigger reflow
+            cookieConsent.classList.add('active');
+        }
+    }
 
     // Initialize Firebase conditionally based on consent
     function initializeFirebase() {
@@ -1121,7 +1146,7 @@
 
     // Track events with consent check
     function trackEvent(eventName, eventParams = {}) {
-        if (!trackingConsentGiven) return;
+        if (!trackingConsentGiven || !analytics) return;
         
         try {
             logEvent(analytics, eventName, {
@@ -1137,6 +1162,8 @@
 
     // Bottom sheet functionality
     function openBottomSheet(sheet) {
+        if (!sheet) return;
+        
         sheet.classList.add('active');
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -1159,7 +1186,6 @@
         trackScreenView(); // Return to main screen view
     }
 
-
     // Event listeners for opening sheets
     [privacyLink, footerPrivacyLink].forEach(link => {
         if (link) {
@@ -1179,130 +1205,119 @@
         }
     });
 
-
     // Event listeners for closing sheets (only X buttons)
     if (privacyClose) privacyClose.addEventListener('click', closeBottomSheets);
     if (termsClose) termsClose.addEventListener('click', closeBottomSheets);
-
 
     // Initialize everything when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
         initCookieConsent();
         initializeFirebase();
         trackScreenView();
-        
     });
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
-  const cookieConsent = document.getElementById('cookie-consent');
-  const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
-  const cookieDeclineBtn = document.getElementById('cookie-decline-btn');
-  const cookieLearnMore = document.getElementById('cookie-learn-more');
-  const cookieSheet = document.getElementById('cookie-sheet');
-  const cookieClose = document.getElementById('cookie-close');
-  const overlay = document.getElementById('overlay');
+    // DOM Elements
+    const cookieConsent = document.getElementById('cookie-consent');
+    const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+    const cookieDeclineBtn = document.getElementById('cookie-decline-btn');
+    const cookieLearnMore = document.getElementById('cookie-learn-more');
+    const cookieSheet = document.getElementById('cookie-sheet');
+    const cookieClose = document.getElementById('cookie-close');
+    const overlay = document.getElementById('overlay');
 
-  // Check if user has made a choice before
-  function hasCookieConsent() {
-    return localStorage.getItem('cookieConsent') !== null;
-  }
-
-  // Show the cookie banner with animation
-  function showCookieBanner() {
-    if (cookieConsent) {
-      // Trigger reflow to enable animation
-      void cookieConsent.offsetWidth;
-      cookieConsent.classList.add('active');
+    // Show the cookie banner with animation
+    function showCookieBanner() {
+        if (cookieConsent) {
+            // Trigger reflow to enable animation
+            void cookieConsent.offsetWidth;
+            cookieConsent.classList.add('active');
+        }
     }
-  }
 
-  // Hide the cookie banner
-  function hideCookieBanner() {
-    if (cookieConsent) {
-      cookieConsent.classList.remove('active');
-      // Remove from DOM after animation completes
-      setTimeout(() => {
-        cookieConsent.style.display = 'none';
-      }, 300);
+    // Hide the cookie banner
+    function hideCookieBanner() {
+        if (cookieConsent) {
+            cookieConsent.classList.remove('active');
+            // Remove from DOM after animation completes
+            setTimeout(() => {
+                cookieConsent.style.display = 'none';
+            }, 300);
+        }
     }
-  }
 
-  // Show bottom sheet
-  function showBottomSheet(sheet) {
-    sheet.classList.add('active');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  }
-
-  // Hide all bottom sheets
-  function hideBottomSheets() {
-    document.querySelectorAll('.bottom-sheet').forEach(sheet => {
-      sheet.classList.remove('active');
-    });
-    overlay.classList.remove('active');
-    document.body.style.overflow = '';
-  }
-
-  // Set cookie consent choice
-  function setCookieConsent(choice) {
-    localStorage.setItem('cookieConsent', choice);
-    if (choice === 'accepted') {
-      initializeAnalytics();
+    // Show bottom sheet
+    function showBottomSheet(sheet) {
+        if (!sheet) return;
+        sheet.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
     }
-    hideCookieBanner();
-  }
 
-  // Initialize analytics if accepted
-  function initializeAnalytics() {
-    // Replace with your actual analytics initialization code
-    console.log('Analytics initialized - Tracking enabled');
-  }
-
-  // Event listeners
-  if (cookieAcceptBtn) {
-    cookieAcceptBtn.addEventListener('click', () => setCookieConsent('accepted'));
-  }
-
-  if (cookieDeclineBtn) {
-    cookieDeclineBtn.addEventListener('click', () => setCookieConsent('declined'));
-  }
-
-  if (cookieLearnMore) {
-    cookieLearnMore.addEventListener('click', (e) => {
-      e.preventDefault();
-      showBottomSheet(cookieSheet);
-    });
-  }
-
-  if (cookieClose) {
-    cookieClose.addEventListener('click', hideBottomSheets);
-  }
-
-  if (overlay) {
-    overlay.addEventListener('click', hideBottomSheets);
-  }
-
-  // Initialize cookie banner
-  function initCookieBanner() {
-    if (!hasCookieConsent()) {
-      showCookieBanner();
-    } else {
-      // If choice was already made, hide the banner
-      cookieConsent.style.display = 'none';
-      
-      // Initialize analytics if previously accepted
-      if (localStorage.getItem('cookieConsent') === 'accepted') {
-        initializeAnalytics();
-      }
+    // Hide all bottom sheets
+    function hideBottomSheets() {
+        document.querySelectorAll('.bottom-sheet').forEach(sheet => {
+            sheet.classList.remove('active');
+        });
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
     }
-  }
 
-  // Start the cookie banner flow
-  initCookieBanner();
+    // Set cookie consent choice
+    function setCookieConsent(choice) {
+        localStorage.setItem('cookieConsent', choice);
+        localStorage.setItem('cookieBannerShown', 'true');
+        if (choice === 'accepted') {
+            // Reload to initialize Firebase with new consent
+            window.location.reload();
+        }
+        hideCookieBanner();
+    }
+
+    // Event listeners
+    if (cookieAcceptBtn) {
+        cookieAcceptBtn.addEventListener('click', () => setCookieConsent('accepted'));
+    }
+
+    if (cookieDeclineBtn) {
+        cookieDeclineBtn.addEventListener('click', () => setCookieConsent('declined'));
+    }
+
+    if (cookieLearnMore) {
+        cookieLearnMore.addEventListener('click', (e) => {
+            e.preventDefault();
+            showBottomSheet(cookieSheet);
+        });
+    }
+
+    if (cookieClose) {
+        cookieClose.addEventListener('click', hideBottomSheets);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', hideBottomSheets);
+    }
+
+    // Initialize cookie banner
+    function initCookieBanner() {
+        const hasConsent = localStorage.getItem('cookieConsent') !== null;
+        const bannerShown = localStorage.getItem('cookieBannerShown') !== null;
+        
+        if (!hasConsent && !bannerShown) {
+            showCookieBanner();
+        } else {
+            // If choice was already made, hide the banner
+            if (cookieConsent) cookieConsent.style.display = 'none';
+        }
+    }
+
+    // Start the cookie banner flow
+    initCookieBanner();
 });
 </script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // =============================================
