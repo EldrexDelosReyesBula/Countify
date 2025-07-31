@@ -1018,6 +1018,8 @@
 
     <!-- Overlay for Bottom Sheet -->
     <div class="overlay" id="overlay"></div>
+<script src="https://www.paypal.com/sdk/js?client-id=PAYPAL_CLIENT_ID&currency=PHP"></script>
+
 <script type="module">
     // Import Firebase modules
     import {
@@ -1052,15 +1054,15 @@
     let selectedAmount = 200;
     let selectedCurrency = 'PHP';
 
-    // Firebase configuration
+    // Firebase configuration - Replace with your actual values from .env
     const firebaseConfig = {
-        apiKey: "FIREBASE_API_KEY",
-        authDomain: "FIREBASE_AUTH_DOMAIN",
-        projectId: "FIREBASE_PROJECT_ID",
-        storageBucket: "FIREBASE_STORAGE_BUCKET",
-        messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
-        appId: "FIREBASE_APP_ID",
-        measurementId: "FIREBASE_MEASUREMENT_ID"
+        apiKey: process.env.FIREBASE_API_KEY || "FIREBASE_API_KEY",
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN || "FIREBASE_AUTH_DOMAIN",
+        projectId: process.env.FIREBASE_PROJECT_ID || "FIREBASE_PROJECT_ID",
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "FIREBASE_STORAGE_BUCKET",
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "FIREBASE_MESSAGING_SENDER_ID",
+        appId: process.env.FIREBASE_APP_ID || "FIREBASE_APP_ID",
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID || "FIREBASE_MEASUREMENT_ID"
     };
     
     // Firebase variables
@@ -1071,28 +1073,6 @@
     // Check cookie consent
     function checkCookieConsent() {
         return localStorage.getItem('cookieConsent') === 'accepted';
-    }
-
-    // Initialize cookie consent
-    function initCookieConsent() {
-        const bannerShown = localStorage.getItem('cookieBannerShown');
-        const consentGiven = localStorage.getItem('cookieConsent');
-        
-        if (!bannerShown && !consentGiven) {
-            document.getElementById('cookie-consent').style.display = 'block';
-            showCookieBanner();
-        } else {
-            document.getElementById('cookie-consent').style.display = 'none';
-        }
-    }
-
-    // Show cookie banner
-    function showCookieBanner() {
-        const cookieConsent = document.getElementById('cookie-consent');
-        if (cookieConsent) {
-            void cookieConsent.offsetWidth; // Trigger reflow
-            cookieConsent.classList.add('active');
-        }
     }
 
     // Initialize Firebase conditionally based on consent
@@ -1179,11 +1159,23 @@
     }
 
     function closeBottomSheets() {
-        privacySheet.classList.remove('active');
-        termsSheet.classList.remove('active');
-        overlay.classList.remove('active');
+        privacySheet?.classList.remove('active');
+        termsSheet?.classList.remove('active');
+        overlay?.classList.remove('active');
         document.body.style.overflow = '';
         trackScreenView(); // Return to main screen view
+    }
+
+    // Initialize cookie consent
+    function initCookieConsent() {
+        const bannerShown = localStorage.getItem('cookieBannerShown');
+        const consentGiven = localStorage.getItem('cookieConsent');
+        
+        if (!bannerShown && !consentGiven) {
+            document.getElementById('cookie-consent')?.style.display = 'block';
+        } else {
+            document.getElementById('cookie-consent')?.style.display = 'none';
+        }
     }
 
     // Event listeners for opening sheets
@@ -1270,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('cookieConsent', choice);
         localStorage.setItem('cookieBannerShown', 'true');
         if (choice === 'accepted') {
-            // Reload to initialize Firebase with new consent
+            // Reload to initialize Firebase with consent
             window.location.reload();
         }
         hideCookieBanner();
@@ -1303,13 +1295,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize cookie banner
     function initCookieBanner() {
         const hasConsent = localStorage.getItem('cookieConsent') !== null;
-        const bannerShown = localStorage.getItem('cookieBannerShown') !== null;
-        
-        if (!hasConsent && !bannerShown) {
+        if (!hasConsent) {
             showCookieBanner();
         } else {
-            // If choice was already made, hide the banner
-            if (cookieConsent) cookieConsent.style.display = 'none';
+            cookieConsent.style.display = 'none';
         }
     }
 
@@ -1379,13 +1368,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Firebase Configuration
     // =============================================
     const firebaseConfig = {
-        apiKey: "AIzaSyCEBkAxkrm95b4LN-iNHmwXcpoLtwpQVlg",
-        authDomain: "countify-eb9dd.firebaseapp.com",
-        projectId: "countify-eb9dd",
-        storageBucket: "countify-eb9dd.appspot.com",
-        messagingSenderId: "112900990389",
-        appId: "1:112900990389:web:b2adbd5edbb658a27725fc",
-        measurementId: "G-LDBWQNNWG9"
+        apiKey: process.env.FIREBASE_API_KEY || "AIzaSyCEBkAxkrm95b4LN-iNHmwXcpoLtwpQVlg",
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN || "countify-eb9dd.firebaseapp.com",
+        projectId: process.env.FIREBASE_PROJECT_ID || "countify-eb9dd",
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "countify-eb9dd.appspot.com",
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || "112900990389",
+        appId: process.env.FIREBASE_APP_ID || "1:112900990389:web:b2adbd5edbb658a27725fc",
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID || "G-LDBWQNNWG9"
     };
 
     // =============================================
@@ -1508,15 +1497,13 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('cookieConsent', 'accepted');
         localStorage.setItem('cookieBannerShown', 'true');
         hideCookieBanner();
-        initializeFirebase();
-        trackEvent('cookie_consent_accepted');
+        window.location.reload(); // Reload to initialize Firebase with consent
     }
 
     function declineCookies() {
         localStorage.setItem('cookieConsent', 'declined');
         localStorage.setItem('cookieBannerShown', 'true');
         hideCookieBanner();
-        trackEvent('cookie_consent_declined');
     }
 
     function showCookieBanner() {
@@ -1552,7 +1539,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
 
     function initPayPalButton() {
-        if (typeof paypal === 'undefined') return;
+        if (typeof paypal === 'undefined') {
+            console.error('PayPal SDK not loaded');
+            return;
+        }
+        
+        if (!elements.paypalButtonContainer) {
+            console.error('PayPal button container not found');
+            return;
+        }
         
         paypal.Buttons({
             style: {
@@ -1562,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 label: 'donate'
             },
             createOrder: function(data, actions) {
-                if (!elements.termsCheck.checked) {
+                if (!elements.termsCheck?.checked) {
                     trackEvent('donation_error', { error: 'terms_not_accepted' });
                     alert('Please agree to the terms before donating');
                     return false;
@@ -1590,10 +1585,12 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             onApprove: function(data, actions) {
                 return actions.order.capture().then(function(details) {
-                    new mdui.snackbar({
-                        message: 'Thank you for your donation!',
-                        position: 'right-bottom'
-                    });
+                    // Show thank you message
+                    const snackbar = document.createElement('div');
+                    snackbar.className = 'snackbar';
+                    snackbar.textContent = 'Thank you for your donation!';
+                    document.body.appendChild(snackbar);
+                    setTimeout(() => snackbar.remove(), 3000);
 
                     trackEvent('donation_completed', {
                         amount: state.selectedAmount,
@@ -1611,10 +1608,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     currency: state.selectedCurrency
                 });
                 
-                new mdui.snackbar({
-                    message: 'An error occurred with your donation. Please try again.',
-                    position: 'right-bottom'
-                });
+                // Show error message
+                const snackbar = document.createElement('div');
+                snackbar.className = 'snackbar';
+                snackbar.textContent = 'An error occurred with your donation. Please try again.';
+                document.body.appendChild(snackbar);
+                setTimeout(() => snackbar.remove(), 3000);
             },
             onClick: function() {
                 trackEvent('donation_button_click', {
@@ -1630,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
 
     // Donation options
-    elements.donationOptions.forEach(option => {
+    elements.donationOptions?.forEach(option => {
         option.addEventListener('click', function() {
             elements.donationOptions.forEach(opt => opt.classList.remove('active'));
             this.classList.add('active');
@@ -1644,9 +1643,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Custom amount input
-    elements.customAmountInput.addEventListener('input', function() {
+    elements.customAmountInput?.addEventListener('input', function() {
         if (this.value) {
-            elements.donationOptions.forEach(opt => opt.classList.remove('active'));
+            elements.donationOptions?.forEach(opt => opt.classList.remove('active'));
             state.selectedAmount = parseFloat(this.value) || 0;
             trackEvent('custom_amount_entered', {
                 amount: state.selectedAmount,
@@ -1656,7 +1655,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Currency change
-    elements.currencySelect.addEventListener('change', function() {
+    elements.currencySelect?.addEventListener('change', function() {
         state.selectedCurrency = this.value;
         trackEvent('currency_changed', {
             currency: state.selectedCurrency
@@ -1706,7 +1705,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cookie consent buttons
     if (elements.cookieAcceptBtn) elements.cookieAcceptBtn.addEventListener('click', acceptCookies);
-    if (elements.cookieDeclineBtn) elements.cookieDeclineBtn.addEventListener('click', declineCookies);
+    if (elements.cookieDeclineBtn) elements.cookieDeclineBtn.addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'declined');
+        hideCookieBanner();
+    });
 
     // Keyboard support
     document.addEventListener('keydown', function(e) {
@@ -1727,7 +1729,7 @@ document.addEventListener('DOMContentLoaded', function() {
         trackScreenView();
         
         // Set default option as active if donation options exist
-        if (elements.donationOptions.length > 0) {
+        if (elements.donationOptions?.length > 0) {
             elements.donationOptions[0].classList.add('active');
         }
 
