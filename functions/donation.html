@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
-<script src="/config.js"></script>
     <style>
         :root {
             --primary-50: #f5f3ff;
@@ -1018,91 +1017,89 @@
 
     <!-- Overlay for Bottom Sheet -->
     <div class="overlay" id="overlay"></div>
+
+<script src="config.js"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=PHP" data-client-token></script>
 <script type="module">
-    // Dynamically load Firebase and PayPal SDKs based on config.js
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Check if config is loaded
-        if (!window.appConfig) {
-            console.error('Configuration not loaded. Make sure config.js is properly included.');
-            return;
-        }
+    // Import Firebase modules (using v9+ modular SDK)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+    import { getAnalytics, setUserProperties, logEvent, setCurrentScreen } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
 
-        // Load Firebase SDK dynamically
-        await loadFirebaseSDK();
-        
-        // Initialize Firebase if consent given
-        if (checkCookieConsent()) {
-            initializeFirebase();
-        }
+    // Get configuration from config.js
+    const firebaseConfig = window.appConfig.getFirebaseConfig();
+    const paypalConfig = window.appConfig.getPayPalConfig();
 
-        // Load PayPal SDK
-        loadPayPalSDK();
+    // Initialize PayPal SDK dynamically with config values
+    const paypalScript = document.querySelector('script[data-client-token]');
+    paypalScript.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=${paypalConfig.currency}`;
 
-        // Initialize the rest of the application
-        initApplication();
-    });
+    // DOM Elements
+    const privacyLink = document.getElementById('privacy-link');
+    const termsLink = document.getElementById('terms-link');
+    const footerPrivacyLink = document.getElementById('footer-privacy-link');
+    const footerTermsLink = document.getElementById('footer-terms-link');
 
-    // ========== SDK LOADING FUNCTIONS ==========
-    async function loadFirebaseSDK() {
-        return new Promise((resolve) => {
-            const firebaseScript = document.createElement('script');
-            firebaseScript.src = 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js';
-            firebaseScript.onload = () => {
-                // Load Analytics after core Firebase loads
-                const analyticsScript = document.createElement('script');
-                analyticsScript.src = 'https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics-compat.js';
-                analyticsScript.onload = resolve;
-                document.head.appendChild(analyticsScript);
-            };
-            document.head.appendChild(firebaseScript);
-        });
-    }
+    // Bottom sheets
+    const privacySheet = document.getElementById('privacy-sheet');
+    const termsSheet = document.getElementById('terms-sheet');
+    const cookieSheet = document.getElementById('cookie-sheet');
 
-    function loadPayPalSDK() {
-        const { clientId, currency } = window.appConfig.paypal;
-        const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=${currency || 'PHP'}`;
-        script.async = true;
-        document.head.appendChild(script);
-    }
+    // Close buttons
+    const privacyClose = document.getElementById('privacy-close');
+    const termsClose = document.getElementById('terms-close');
 
-    // ========== FIREBASE FUNCTIONS ==========
+    // Overlay
+    const overlay = document.getElementById('overlay');
+
+    // Selected amount and currency
+    let selectedAmount = 200;
+    let selectedCurrency = paypalConfig.currency;
+
+    // Firebase variables
+    let app;
+    let analytics;
+    let trackingConsentGiven = false;
+
+    // Initialize Firebase conditionally based on consent
     function initializeFirebase() {
+        if (!checkCookieConsent()) return;
+        
         try {
-            const app = firebase.initializeApp(window.appConfig.firebase);
-            const analytics = firebase.analytics(app);
+            app = initializeApp(firebaseConfig);
+            analytics = getAnalytics(app);
             
             // Set user properties
-            firebase.analytics().setUserProperties({
+            setUserProperties(analytics, {
                 anonymous_id: generateAnonymousId(),
                 tracking_consent: true
             });
             
             // Log initialization event
-            firebase.analytics().logEvent('analytics_initialized');
-            trackScreenView();
-            
-            // Store references for later use
-            window.firebaseApp = app;
-            window.firebaseAnalytics = analytics;
-            
+            logEvent(analytics, 'analytics_initialized');
+            trackScreenView(); // Track initial screen view
+            trackingConsentGiven = true;
         } catch (error) {
             console.error('Firebase initialization error:', error);
         }
     }
 
-    // ========== TRACKING FUNCTIONS ==========
+    // Track screen views
     function trackScreenView(screenName = null) {
-        if (!window.firebaseAnalytics) return;
+        if (!trackingConsentGiven || !analytics) return;
         
-        const screen = screenName || document.title || window.location.pathname;
-        firebase.analytics().setCurrentScreen(screen);
-        firebase.analytics().logEvent('screen_view', {
-            screen_name: screen,
-            screen_class: document.title || 'Unknown'
-        });
+        try {
+            const screen = screenName || document.title || window.location.pathname;
+            setCurrentScreen(analytics, screen);
+            logEvent(analytics, 'screen_view', {
+                screen_name: screen,
+                screen_class: document.title || 'Unknown'
+            });
+        } catch (error) {
+            console.error('Screen view tracking error:', error);
+        }
     }
 
+    // Generate anonymous ID for tracking
     function generateAnonymousId() {
         let id = localStorage.getItem('anonymous_id');
         if (!id) {
@@ -1112,112 +1109,85 @@
         return id;
     }
 
+    // Track events with consent check
     function trackEvent(eventName, eventParams = {}) {
-        if (!window.firebaseAnalytics) return;
+        if (!trackingConsentGiven) return;
         
-        firebase.analytics().logEvent(eventName, {
-            ...eventParams,
-            currency: window.appConfig.paypal.currency || 'PHP',
-            page_title: document.title,
-            page_location: window.location.href
-        });
-    }
-
-    // ========== APPLICATION INITIALIZATION ==========
-    function initApplication() {
-        // Initialize PayPal buttons after SDK loads
-        if (window.paypal) {
-            initPayPalButtons();
-        } else {
-            window.addEventListener('paypal-sdk:loaded', initPayPalButtons);
+        try {
+            logEvent(analytics, eventName, {
+                ...eventParams,
+                currency: selectedCurrency,
+                page_title: document.title,
+                page_location: window.location.href
+            });
+        } catch (error) {
+            console.error('Tracking error:', error);
         }
-
-        // Setup event listeners
-        setupEventListeners();
     }
 
-    function initPayPalButtons() {
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: selectedAmount,
-                            currency_code: window.appConfig.paypal.currency || 'PHP'
-                        }
-                    }]
-                });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    trackEvent('payment_completed', {
-                        value: selectedAmount,
-                        currency: window.appConfig.paypal.currency || 'PHP',
-                        transaction_id: details.id
-                    });
-                    // Handle successful payment
-                });
-            }
-        }).render('#paypal-button-container');
-    }
-
-    function setupEventListeners() {
-        // DOM Elements
-        const privacyLink = document.getElementById('privacy-link');
-        const termsLink = document.getElementById('terms-link');
-        const footerPrivacyLink = document.getElementById('footer-privacy-link');
-        const footerTermsLink = document.getElementById('footer-terms-link');
-        const privacyClose = document.getElementById('privacy-close');
-        const termsClose = document.getElementById('terms-close');
-        const overlay = document.getElementById('overlay');
-
-        // Bottom sheets
-        const privacySheet = document.getElementById('privacy-sheet');
-        const termsSheet = document.getElementById('terms-sheet');
-
-        // Event listeners for opening sheets
-        [privacyLink, footerPrivacyLink].forEach(link => {
-            if (link) link.addEventListener('click', (e) => {
-                e.preventDefault();
-                openBottomSheet(privacySheet);
-            });
-        });
-
-        [termsLink, footerTermsLink].forEach(link => {
-            if (link) link.addEventListener('click', (e) => {
-                e.preventDefault();
-                openBottomSheet(termsSheet);
-            });
-        });
-
-        // Close buttons
-        if (privacyClose) privacyClose.addEventListener('click', closeBottomSheets);
-        if (termsClose) termsClose.addEventListener('click', closeBottomSheets);
-    }
-
-    // ========== UI FUNCTIONS ==========
+    // Bottom sheet functionality
     function openBottomSheet(sheet) {
         sheet.classList.add('active');
-        document.getElementById('overlay').classList.add('active');
+        overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        if (sheet.id === 'privacy-sheet') {
+        // Track which sheet was opened
+        if (sheet === privacySheet) {
             trackEvent('privacy_policy_viewed');
             trackScreenView('Privacy Policy');
-        } else if (sheet.id === 'terms-sheet') {
+        } else if (sheet === termsSheet) {
             trackEvent('terms_viewed');
             trackScreenView('Terms and Conditions');
         }
     }
 
     function closeBottomSheets() {
-        document.querySelectorAll('.bottom-sheet').forEach(sheet => {
-            sheet.classList.remove('active');
-        });
-        document.getElementById('overlay').classList.remove('active');
+        privacySheet.classList.remove('active');
+        termsSheet.classList.remove('active');
+        overlay.classList.remove('active');
         document.body.style.overflow = '';
-        trackScreenView();
+        trackScreenView(); // Return to main screen view
     }
+
+    // Cookie consent functions (placeholder - implement as needed)
+    function checkCookieConsent() {
+        // Implement your actual cookie consent logic
+        return true; // Temporary for example
+    }
+
+    function initCookieConsent() {
+        // Implement your cookie consent initialization
+    }
+
+    // Event listeners for opening sheets
+    [privacyLink, footerPrivacyLink].forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBottomSheet(privacySheet);
+            });
+        }
+    });
+
+    [termsLink, footerTermsLink].forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBottomSheet(termsSheet);
+            });
+        }
+    });
+
+    // Event listeners for closing sheets (only X buttons)
+    if (privacyClose) privacyClose.addEventListener('click', closeBottomSheets);
+    if (termsClose) termsClose.addEventListener('click', closeBottomSheets);
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initCookieConsent();
+        initializeFirebase();
+        trackScreenView();
+    });
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
