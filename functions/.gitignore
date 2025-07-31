@@ -1,7 +1,71 @@
+# Dependency directories
 node_modules/
-.env
+bower_components/
+jspm_packages/
+.pnp/
+
+# Configuration files
 config.js
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env*.local
+
+# Sensitive files
+*.key
+*.pem
+*.crt
+*.cert
+*.pub
+
+# IDE files
 .DS_Store
-*.log
 .idea/
 .vscode/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build directories
+dist/
+build/
+out/
+.next/
+.serverless/
+.temp/
+
+# Cache
+.cache/
+.turbo/
+
+# System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Debug files
+*.pid
+*.seed
+*.pid.lock
+
+# Package manager specific
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
