@@ -1,20 +1,18 @@
 # Node modules
 node_modules/
 
-# Logs
+# Log files
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment variables file
+# Environment and private configuration files
 .env
+config.private.js
 
-# Configuration file
-config.js
-
-# Debugger files
+# Editor and IDE settings
 .vscode/
 .idea/
 *.suo
@@ -22,7 +20,7 @@ config.js
 *.njsproj
 *.sln
 
-# OS files
+# OS and system files
 .DS_Store
 Thumbs.db
 
@@ -30,11 +28,9 @@ Thumbs.db
 dist/
 build/
 
-# Optional npm cache folder
+# npm and REPL
 .npm
-
-# Coverage directory used by testing tools
-coverage/
-
-# Optional REPL history
 .node_repl_history
+
+# Test coverage
+coverage/
