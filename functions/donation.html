@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support Us</title>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYG_Ze1ITfxBvEb3QwW4F5BgdXThYisLcu_ZQTzgPeFRBsxp_yOGrjCGBxrqzvK4mKBZSK-VkhIMooPu&currency=PHP"></script>
+    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-50: #f5f3ff;
+            --primary-100: #ede9fe;
+            --primary-200: #ddd6fe;
+            --primary-300: #c4b5fd;
+            --primary-400: #a78bfa;
+            --primary-500: #8b5cf6;
+            --primary-600: #7c3aed;
+            --primary-700: #6d28d9;
+            --primary-800: #5b21b6;
+            --primary-900: #4c1d95;
+
+            --secondary-50: #ecfdf5;
+            --secondary-100: #d1fae5;
+            --secondary-200: #a7f3d0;
+            --secondary-300: #6ee7b7;
+            --secondary-400: #34d399;
+            --secondary-500: #10b981;
+            --secondary-600: #059669;
+            --secondary-700: #047857;
+            --secondary-800: #065f46;
+            --secondary-900: #064e3b;
+
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --text-tertiary: var(--gray-400);
+            --background: var(--gray-50);
+            --surface: #ffffff;
+            --error: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --elevation-1: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --glass-opacity: 0.7;
+            --glass-blur: 12px;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: var(--gray-100);
+            --text-secondary: var(--gray-300);
+            --text-tertiary: var(--gray-500);
+            --background: var(--gray-900);
+            --surface: var(--gray-800);
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            margin: 0;
+            transition: var(--transition);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Accessibility improvements */
+        a:focus,
+        button:focus,
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid var(--primary-500);
+            outline-offset: 2px;
+        }
+
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-600);
+            color: white;
+            padding: 8px;
+            z-index: 100;
+            transition: top 0.3s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--surface);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: var(--primary-600);
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .back-button:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .container {
+            padding: 24px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeSlide 0.5s ease-out both;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .hero-icon {
+            font-size: 48px;
+            color: var(--primary-500);
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 8px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin: 0;
+            max-width: 80%;
+            margin: 0 auto;
+        }
+
+        .donation-card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .donation-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .donation-card h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0 0 16px;
+            color: var(--text-primary);
+        }
+
+        .donation-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .donation-option {
+            background: var(--primary-50);
+            border-radius: var(--border-radius-sm);
+            padding: 12px 16px;
+            font-weight: 500;
+            color: var(--primary-700);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--primary-100);
+        }
+
+        [data-theme="dark"] .donation-option {
+            background: var(--primary-900);
+            color: var(--primary-100);
+            border-color: var(--primary-800);
+        }
+
+        .donation-option:hover,
+        .donation-option:focus {
+            background: var(--primary-100);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="dark"] .donation-option:hover,
+        [data-theme="dark"] .donation-option:focus {
+            background: var(--primary-800);
+        }
+
+        .donation-option.active {
+            background: var(--primary-500);
+            color: white;
+        }
+
+        .custom-amount {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .custom-amount input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--gray-300);
+            font-family: inherit;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .custom-amount input {
+            background: var(--gray-700);
+            border-color: var(--gray-600);
+            color: var(--text-primary);
+        }
+
+        .custom-amount input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+
+        .custom-amount select {
+            padding: 0 12px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--gray-300);
+            font-family: inherit;
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .checkbox-container input {
+            margin-top: 3px;
+            accent-color: var(--primary-500);
+            min-width: 16px;
+            min-height: 16px;
+        }
+
+        .checkbox-container label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-container label a {
+            color: var(--primary-500);
+            text-decoration: none;
+        }
+
+        .checkbox-container label a:hover {
+            text-decoration: underline;
+        }
+
+        #paypal-button-container {
+            margin-top: 16px;
+        }
+
+        .paypal-disclaimer {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        /* Alternative payment methods */
+        .alt-payment-methods {
+            margin-top: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 16px;
+        }
+
+        [data-theme="dark"] .alt-payment-methods {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .alt-payment-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .alt-payment-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .alt-payment-btn {
+            background: var(--surface);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius-sm);
+            padding: 8px 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        [data-theme="dark"] .alt-payment-btn {
+            border-color: var(--gray-600);
+        }
+
+        .alt-payment-btn:hover {
+            background: var(--gray-100);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .alt-payment-btn:hover {
+            background: var(--gray-700);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer a {
+            color: var(--primary-600);
+            text-decoration: none;
+            margin: 0 4px;
+            cursor: pointer;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bottom-sheet-header {
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            padding: 16px 0;
+            margin-bottom: 16px;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .bottom-sheet-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .bottom-sheet-content {
+            padding: 16px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        .bottom-sheet-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .bottom-sheet-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .bottom-sheet-close:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .bottom-sheet-close:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        body.bottom-sheet-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Cookie consent banner */
+        .cookie-consent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            padding: 16px 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cookie-consent.active {
+            transform: translateY(0);
+        }
+
+        .cookie-consent p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .cookie-consent-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cookie-btn {
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .cookie-btn-accept {
+            background: var(--primary-500);
+            color: white;
+            border: none;
+        }
+
+        .cookie-btn-accept:hover {
+            background: var(--primary-600);
+        }
+
+        .cookie-btn-settings {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--text-secondary);
+        }
+
+        .cookie-btn-settings:hover {
+            background: var(--gray-100);
+        }
+
+        [data-theme="dark"] .cookie-btn-settings {
+            border-color: var(--gray-600);
+        }
+
+        [data-theme="dark"] .cookie-btn-settings:hover {
+            background: var(--gray-700);
+        }
+
+        /* Animations */
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 600px) {
+            .container {
+                padding: 32px 20px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .cookie-consent {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .cookie-consent-buttons {
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .donation-options {
+                gap: 8px;
+            }
+
+            .donation-option {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .custom-amount {
+                flex-direction: column;
+            }
+
+            .custom-amount input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <header>
+        <button class="back-button" onclick="history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <h3 style="margin: 0; font-weight: 500;">Support Us</h3>
+    </header>
+
+    <main class="container">
+        <div class="hero">
+            <div class="hero-icon">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h1>Help Keep Us Going</h1>
+            <p>Your support allows us to continue developing and improving our services for everyone.</p>
+        </div>
+
+        <div class="donation-card">
+            <h2>Select Donation Amount</h2>
+
+            <div class="donation-options">
+                <div class="donation-option" data-amount="50">₱50</div>
+                <div class="donation-option" data-amount="100">₱100</div>
+                <div class="donation-option active" data-amount="200">₱200</div>
+                <div class="donation-option" data-amount="500">₱500</div>
+            </div>
+
+            <div class="custom-amount">
+                <input type="number" id="custom-amount" style="width: 80%;" placeholder="Custom amount" min="1">
+                <select id="currency">
+                    <option value="PHP">PHP</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="terms-check" required>
+                <label for="terms-check">I agree to the <a href="#" id="privacy-link">Privacy Policy</a> and <a href="#" id="terms-link">Terms of Service</a></label>
+            </div>
+
+            <div id="paypal-button-container"></div>
+            <p class="paypal-disclaimer">PayPal handles all transactions securely. We don't store your payment information.</p>
+        </div>
+    </main>
+
+    <footer>
+        © 2025 Landecs ·
+        <a href="#" id="footer-privacy-link">Privacy</a> ·
+        <a href="#" id="footer-terms-link">Terms</a> ·
+        <a href="#" id="footer-cookie-link">Cookies</a> ·
+        <a href="mailto:support@landecs.com">Contact</a>
+    </footer>
+
+<!-- Cookie Consent Banner -->
+<div class="cookie-consent" id="cookie-consent">
+    <p>We use cookies to enhance your experience. By continuing to visit this site, you agree to our use of cookies as described in our <a href="#" id="cookie-policy-link">Cookie Policy</a>.</p>
+    <div class="cookie-consent-buttons">
+        <button class="cookie-btn cookie-btn-settings" id="cookie-settings-btn">Decline</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookie-accept-btn">Accept</button>
+    </div>
+</div>
+
+
+    <!-- Bottom Sheets for Legal Documents -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Privacy Policy -->
+    <div class="bottom-sheet" id="privacy-sheet">
+        <div class="bottom-sheet-header">
+            <h3>Privacy Policy</h3>
+            <button class="bottom-sheet-close" id="privacy-close" aria-label="Close privacy policy">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="bottom-sheet-content">
+            <p><strong>Last Updated:</strong> January 1, 2025</p>
+            <p>Landecs ("we", "us", or "our") respects your privacy and is committed to protecting your personal data. This privacy policy explains how we collect, use, and protect your information when you use our website or make a donation.</p>
+
+            <h4>1. Information We Collect</h4>
+            <p>We may collect the following types of information:</p>
+            <ul>
+                <li><strong>Personal Identification Information:</strong> Name, email address, phone number when you voluntarily provide it.</li>
+                <li><strong>Payment Information:</strong> When you make a donation, payment processors (like PayPal) collect payment details. We only receive confirmation of the transaction, not your full payment details.</li>
+                <li><strong>Usage Data:</strong> Information about how you use our website, collected through cookies and similar technologies.</li>
+            </ul>
+
+            <h4>2. Legal Basis for Processing</h4>
+            <p>We process your personal data on the following legal bases:</p>
+            <ul>
+                <li>Your consent (for cookies and marketing communications)</li>
+                <li>Performance of a contract (processing donations)</li>
+                <li>Legitimate interests (website security, analytics, service improvement)</li>
+            </ul>
+
+            <h4>3. How We Use Your Information</h4>
+            <p>We use the information we collect to:</p>
+            <ul>
+                <li>Process your donation and send receipts</li>
+                <li>Improve our website and services</li>
+                <li>Communicate with you about your donation</li>
+                <li>Comply with legal obligations</li>
+                <li>Prevent fraud and ensure security</li>
+            </ul>
+
+            <h4>4. Data Sharing and Transfers</h4>
+            <p>We may share your information with:</p>
+            <ul>
+                <li>Payment processors to complete transactions</li>
+                <li>Service providers who assist with our operations</li>
+                <li>Legal authorities when required by law</li>
+            </ul>
+            <p>As we operate internationally, your data may be transferred outside your country of residence.</p>
+
+            <h4>5. Data Retention</h4>
+            <p>We retain personal data only as long as necessary for the purposes collected, including legal, accounting, or reporting requirements.</p>
+
+            <h4>6. Your Rights</h4>
+            <p>Depending on your jurisdiction, you may have rights to:</p>
+            <ul>
+                <li>Access your personal data</li>
+                <li>Request correction or deletion</li>
+                <li>Object to processing</li>
+                <li>Request data portability</li>
+                <li>Withdraw consent</li>
+            </ul>
+            <p>To exercise these rights, contact us at privacy@landecs.com.</p>
+
+            <h4>7. Cookies and Tracking</h4>
+            <p>We use essential cookies for site functionality and analytics cookies to improve our services. You can manage preferences through our cookie banner.</p>
+
+            <h4>8. Children's Privacy</h4>
+            <p>Our services are not directed to children under 16. We do not knowingly collect data from children.</p>
+
+            <h4>9. Changes to This Policy</h4>
+            <p>We may update this policy periodically. We will notify you of significant changes through our website or email.</p>
+
+            <h4>10. Contact Us</h4>
+            <p>For questions about this policy or your data: privacy@landecs.com</p>
+        </div>
+    </div>
+
+    <!-- Terms of Service -->
+    <div class="bottom-sheet" id="terms-sheet">
+        <div class="bottom-sheet-header">
+            <h3>Terms of Service</h3>
+            <button class="bottom-sheet-close" id="terms-close" aria-label="Close terms of service">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="bottom-sheet-content">
+            <p><strong>Last Updated:</strong> January 1, 2025</p>
+
+            <h4>1. Acceptance of Terms</h4>
+            <p>By accessing or using Landecs' services, you agree to be bound by these Terms of Service ("Terms"). If you disagree, please refrain from using our services.</p>
+
+            <h4>2. Donations</h4>
+            <ul>
+                <li>All donations are voluntary and non-refundable.</li>
+                <li>You must be at least 18 years old or have parental consent to donate.</li>
+                <li>You represent that you are authorized to use the payment method.</li>
+            </ul>
+
+            <h4>3. Use of Funds</h4>
+            <p>Donations support Landecs' operations, including service development, maintenance, and improvement. We reserve discretion in allocating funds.</p>
+
+            <h4>4. User Conduct</h4>
+            <p>You agree not to:</p>
+            <ul>
+                <li>Use our services for unlawful purposes</li>
+                <li>Attempt to disrupt or compromise our systems</li>
+                <li>Provide false information</li>
+            </ul>
+
+            <h4>5. Intellectual Property</h4>
+            <p>All content on our website is our property or licensed to us. You may not reproduce, distribute, or create derivative works without permission.</p>
+
+            <h4>6. Disclaimer of Warranties</h4>
+            <p>Our services are provided "as is" without warranties of any kind, express or implied. We do not guarantee uninterrupted or error-free service.</p>
+
+            <h4>7. Limitation of Liability</h4>
+            <p>To the maximum extent permitted by law, Landecs shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of our services.</p>
+
+            <h4>8. Indemnification</h4>
+            <p>You agree to indemnify Landecs against any claims arising from your violation of these Terms or misuse of our services.</p>
+
+            <h4>9. Governing Law</h4>
+            <p>These Terms shall be governed by the laws of the Philippines, without regard to conflict of law principles.</p>
+
+            <h4>10. Dispute Resolution</h4>
+            <p>Any disputes shall first be resolved through good faith negotiations. If unresolved, disputes shall be submitted to binding arbitration in Manila, Philippines.</p>
+
+            <h4>11. Changes to Terms</h4>
+            <p>We may modify these Terms at any time. Continued use after changes constitutes acceptance.</p>
+
+            <h4>12. Termination</h4>
+            <p>We may terminate or suspend access to our services for violations of these Terms.</p>
+
+            <h4>13. Entire Agreement</h4>
+            <p>These Terms constitute the entire agreement between you and Landecs regarding our services.</p>
+
+            <h4>14. Contact Information</h4>
+            <p>For questions about these Terms: legal@landecs.com</p>
+        </div>
+    </div>
+
+    <!-- Cookie Policy -->
+    <div class="bottom-sheet" id="cookie-sheet">
+        <div class="bottom-sheet-header">
+            <h3>Cookie Policy</h3>
+            <button class="bottom-sheet-close" id="cookie-close" aria-label="Close cookie policy">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="bottom-sheet-content">
+            <p><strong>Last Updated:</strong> January 1, 2025</p>
+
+            <h4>1. What Are Cookies?</h4>
+            <p>Cookies are small text files stored on your device when you visit websites. They help websites remember information about your visit.</p>
+
+            <h4>2. How We Use Cookies</h4>
+            <p>We use cookies for:</p>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Necessary for website functionality</li>
+                <li><strong>Analytics Cookies:</strong> Help us understand how visitors use our site</li>
+                <li><strong>Preference Cookies:</strong> Remember your settings</li>
+            </ul>
+
+            <h4>3. Third-Party Cookies</h4>
+            <p>We use these services that may set cookies:</p>
+            <ul>
+                <li><strong>PayPal:</strong> For payment processing</li>
+                <li><strong>Google Analytics:</strong> For website analytics</li>
+            </ul>
+
+            <h4>4. Managing Cookies</h4>
+            <p>You can control cookies through your browser settings. However, disabling essential cookies may affect website functionality.</p>
+
+            <h4>5. Changes to This Policy</h4>
+            <p>We may update this policy as our cookie usage changes.</p>
+
+            <h4>6. Contact Us</h4>
+            <p>For questions about our cookie usage: privacy@landecs.com</p>
+        </div>
+    </div>
+
+
+<script type="module">
+    // Import Firebase modules
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+    import {
+        getAnalytics,
+        logEvent,
+        setUserProperties,
+        setCurrentScreen
+    } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics.js";
+
+    // DOM Elements
+    const donationOptions = document.querySelectorAll('.donation-option');
+    const customAmountInput = document.getElementById('custom-amount');
+    const currencySelect = document.getElementById('currency');
+    const termsCheck = document.getElementById('terms-check');
+    const paypalButtonContainer = document.getElementById('paypal-button-container');
+    const privacyLink = document.getElementById('privacy-link');
+    const termsLink = document.getElementById('terms-link');
+    const footerPrivacyLink = document.getElementById('footer-privacy-link');
+    const footerTermsLink = document.getElementById('footer-terms-link');
+    const footerCookieLink = document.getElementById('footer-cookie-link');
+    const cookiePolicyLink = document.getElementById('cookie-policy-link');
+
+    // Bottom sheets
+    const privacySheet = document.getElementById('privacy-sheet');
+    const termsSheet = document.getElementById('terms-sheet');
+    const cookieSheet = document.getElementById('cookie-sheet');
+
+    // Close buttons
+    const privacyClose = document.getElementById('privacy-close');
+    const termsClose = document.getElementById('terms-close');
+    const cookieClose = document.getElementById('cookie-close');
+
+    // Overlay
+    const overlay = document.getElementById('overlay');
+
+    // Cookie consent elements
+    const cookieConsent = document.getElementById('cookie-consent');
+    const cookieAcceptBtn = document.getElementById('cookie-accept-btn');
+    const cookieSettingsBtn = document.getElementById('cookie-settings-btn');
+
+    // Selected amount (default to 200)
+    let selectedAmount = 200;
+    let selectedCurrency = 'PHP';
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCEBkAxkrm95b4LN-iNHmwXcpoLtwpQVlg",
+        authDomain: "countify-eb9dd.firebaseapp.com",
+        projectId: "countify-eb9dd",
+        storageBucket: "countify-eb9dd.appspot.com",
+        messagingSenderId: "112900990389",
+        appId: "1:112900990389:web:b2adbd5edbb658a27725fc",
+        measurementId: "G-LDBWQNNWG9"
+    };
+    
+    // Firebase variables
+    let app;
+    let analytics;
+    let trackingConsentGiven = false;
+
+    // Check for existing cookie consent
+    function checkCookieConsent() {
+        return localStorage.getItem('cookieConsent') === 'accepted';
+    }
+
+    // Initialize Firebase conditionally based on consent
+    function initializeFirebase() {
+        if (!checkCookieConsent()) return;
+        
+        try {
+            app = initializeApp(firebaseConfig);
+            analytics = getAnalytics(app);
+            
+            // Set user properties
+            setUserProperties(analytics, {
+                anonymous_id: generateAnonymousId(),
+                tracking_consent: true
+            });
+            
+            // Log initialization event
+            logEvent(analytics, 'analytics_initialized');
+            trackScreenView(); // Track initial screen view
+            trackingConsentGiven = true;
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+        }
+    }
+
+    // Track screen views
+    function trackScreenView(screenName = null) {
+        if (!trackingConsentGiven || !analytics) return;
+        
+        try {
+            const screen = screenName || document.title || window.location.pathname;
+            setCurrentScreen(analytics, screen);
+            logEvent(analytics, 'screen_view', {
+                screen_name: screen,
+                screen_class: document.title || 'Unknown'
+            });
+        } catch (error) {
+            console.error('Screen view tracking error:', error);
+        }
+    }
+
+    // Generate anonymous ID for tracking
+    function generateAnonymousId() {
+        let id = localStorage.getItem('anonymous_id');
+        if (!id) {
+            id = 'anon_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('anonymous_id', id);
+        }
+        return id;
+    }
+
+    // Track events with consent check
+    function trackEvent(eventName, eventParams = {}) {
+        if (!trackingConsentGiven) return;
+        
+        try {
+            logEvent(analytics, eventName, {
+                ...eventParams,
+                currency: selectedCurrency,
+                page_title: document.title,
+                page_location: window.location.href
+            });
+        } catch (error) {
+            console.error('Tracking error:', error);
+        }
+    }
+
+    // Initialize PayPal button
+    function initPayPalButton() {
+        if (typeof paypal === 'undefined') return;
+        
+        paypal.Buttons({
+            style: {
+                shape: 'pill',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'donate'
+            },
+            createOrder: function(data, actions) {
+                // Validate terms
+                if (!termsCheck.checked) {
+                    trackEvent('donation_error', { error: 'terms_not_accepted' });
+                    alert('Please agree to the terms before donating');
+                    return false;
+                }
+
+                // Validate amount
+                if (selectedAmount <= 0) {
+                    trackEvent('donation_error', { error: 'invalid_amount' });
+                    alert('Please enter a valid donation amount');
+                    return false;
+                }
+
+                trackEvent('donation_started', {
+                    amount: selectedAmount,
+                    currency: selectedCurrency
+                });
+
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: selectedAmount.toFixed(2),
+                            currency_code: selectedCurrency
+                        }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    // Show success message
+                    new mdui.snackbar({
+                        message: 'Thank you for your donation!',
+                        position: 'right-bottom'
+                    });
+
+                    // Track successful donation
+                    trackEvent('donation_completed', {
+                        amount: selectedAmount,
+                        currency: selectedCurrency,
+                        transaction_id: data.orderID,
+                        payer_id: details.payer.payer_id
+                    });
+                });
+            },
+            onError: function(err) {
+                console.error('PayPal error:', err);
+                trackEvent('donation_error', {
+                    error: err.message || 'unknown_error',
+                    amount: selectedAmount,
+                    currency: selectedCurrency
+                });
+                
+                new mdui.snackbar({
+                    message: 'An error occurred with your donation. Please try again.',
+                    position: 'right-bottom'
+                });
+            },
+            onClick: function() {
+                trackEvent('donation_button_click', {
+                    amount: selectedAmount,
+                    currency: selectedCurrency
+                });
+            }
+        }).render('#paypal-button-container');
+    }
+
+    // Handle donation option clicks
+    donationOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove active class from all options
+            donationOptions.forEach(opt => opt.classList.remove('active'));
+
+            // Add active class to clicked option
+            this.classList.add('active');
+
+            // Set selected amount
+            selectedAmount = parseInt(this.dataset.amount);
+            customAmountInput.value = '';
+            
+            trackEvent('donation_option_selected', {
+                amount: selectedAmount,
+                currency: selectedCurrency
+            });
+        });
+    });
+
+    // Handle custom amount input
+    customAmountInput.addEventListener('input', function() {
+        if (this.value) {
+            // Remove active class from all options
+            donationOptions.forEach(opt => opt.classList.remove('active'));
+
+            // Set selected amount
+            selectedAmount = parseFloat(this.value) || 0;
+            
+            trackEvent('custom_amount_entered', {
+                amount: selectedAmount,
+                currency: selectedCurrency
+            });
+        }
+    });
+
+    // Handle currency change
+    currencySelect.addEventListener('change', function() {
+        selectedCurrency = this.value;
+        trackEvent('currency_changed', {
+            currency: selectedCurrency
+        });
+    });
+
+    // Bottom sheet functionality
+    function openBottomSheet(sheet) {
+        sheet.classList.add('active');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Track which sheet was opened
+        if (sheet === privacySheet) {
+            trackEvent('privacy_policy_viewed');
+            trackScreenView('Privacy Policy');
+        } else if (sheet === termsSheet) {
+            trackEvent('terms_viewed');
+            trackScreenView('Terms and Conditions');
+        } else if (sheet === cookieSheet) {
+            trackEvent('cookie_policy_viewed');
+            trackScreenView('Cookie Policy');
+        }
+    }
+
+    function closeBottomSheets() {
+        privacySheet.classList.remove('active');
+        termsSheet.classList.remove('active');
+        cookieSheet.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        trackScreenView(); // Return to main screen view
+    }
+
+    // Cookie consent functions
+    function acceptCookies() {
+        localStorage.setItem('cookieConsent', 'accepted');
+        localStorage.setItem('cookieBannerShown', 'true');
+        cookieConsent.style.display = 'none';
+        initializeFirebase();
+        trackEvent('cookie_consent_accepted');
+    }
+
+    function declineCookies() {
+        localStorage.setItem('cookieConsent', 'declined');
+        localStorage.setItem('cookieBannerShown', 'true');
+        cookieConsent.style.display = 'none';
+        trackEvent('cookie_consent_declined');
+    }
+
+    // Event listeners for opening sheets
+    [privacyLink, footerPrivacyLink].forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBottomSheet(privacySheet);
+            });
+        }
+    });
+
+    [termsLink, footerTermsLink].forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBottomSheet(termsSheet);
+            });
+        }
+    });
+
+    [cookiePolicyLink, footerCookieLink].forEach(link => {
+        if (link) {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                openBottomSheet(cookieSheet);
+            });
+        }
+    });
+
+    // Event listeners for closing sheets (only X buttons)
+    if (privacyClose) privacyClose.addEventListener('click', closeBottomSheets);
+    if (termsClose) termsClose.addEventListener('click', closeBottomSheets);
+    if (cookieClose) cookieClose.addEventListener('click', closeBottomSheets);
+
+    // Cookie consent buttons
+    if (cookieAcceptBtn) cookieAcceptBtn.addEventListener('click', acceptCookies);
+    if (cookieSettingsBtn) cookieSettingsBtn.addEventListener('click', declineCookies);
+
+    // Initialize cookie consent banner
+    function initCookieConsent() {
+        const bannerShown = localStorage.getItem('cookieBannerShown');
+        const consentGiven = localStorage.getItem('cookieConsent');
+        
+        // Only show if banner hasn't been shown before
+        if (!bannerShown && !consentGiven) {
+            cookieConsent.style.display = 'block';
+        } else {
+            cookieConsent.style.display = 'none';
+        }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initCookieConsent();
+        initializeFirebase();
+        trackScreenView();
+        
+        // Set default option as active if donation options exist
+        if (donationOptions.length > 0) {
+            donationOptions[0].classList.add('active');
+        }
+    });
+
+    // Initialize PayPal button when SDK is loaded
+    if (typeof paypal !== 'undefined') {
+        initPayPalButton();
+    } else {
+        // If PayPal SDK isn't loaded yet, wait for it
+        window.addEventListener('load', initPayPalButton);
+    }
+
+    // Track form interactions
+    if (termsCheck) {
+        termsCheck.addEventListener('change', (e) => {
+            trackEvent('terms_toggled', { checked: e.target.checked });
+        });
+    }
+
+    // Track page visibility changes for single-page applications
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            trackScreenView();
+        }
+    });
+</script>
+
+
+</body>
+
+</html>
