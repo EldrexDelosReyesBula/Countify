@@ -1,4 +1,4 @@
-// language.js - Enhanced Multilingual Support for Countify+
+// language.js - Multilingual Support for Countify+
 window.CountifyLanguage = (function() {
     'use strict';
 
@@ -925,188 +925,188 @@ VOICE MODE:
 3. Ang iyong voice input ay pinoproseso sa lokal`
         },
         'war': {
-            // App UI
-            'app_title': 'Countify+',
-            'new': 'Bag-o',
-            'back': 'Balik',
-            'save': 'I-save',
-            'cancel': 'Kanselahon',
-            'confirm': 'Kompermahon',
-            'ok': 'Sige',
-            'edit': 'I-edit',
-            'delete': 'Paraon',
-            'archive': 'I-archive',
-            'unarchive': 'I-unarchive',
-            'delete_permanently': 'Pirmanenteng Paraon',
+// App UI
+'app_title': 'Countify+',
+'new': 'Bag-o',
+'back': 'Balik',
+'save': 'Tipig',
+'cancel': 'Bawi',
+'confirm': 'Siguroha',
+'ok': 'Sige',
+'edit': 'Usba',
+'delete': 'Pawara',
+'archive': 'I-arkibo',
+'unarchive': 'Bungkaga tikang ha arkibo',
+'delete_permanently': 'Waray na gud pagbalik',
 
-            // Navigation
-            'views': 'MGA TAN-AWON',
-            'dashboard': 'Dashboard',
-            'today_activities': 'Mga Kalihukan Yana',
-            'yesterday_activities': 'Mga Kalihukan Kahapon',
-            'writing_history': 'Kasaysayan han Pagsurat',
-            'manage': 'PAGDUMARA',
-            'deleted_activities': 'Mga Napara nga Kalihukan',
-            'archived_activities': 'Mga Na-archive nga Kalihukan',
-            'settings': 'MGA SETTING',
-            'language': 'Yinaknan',
-            'app_font': 'Font han App',
-            'text_size': 'Kadak-an han Teksto',
-            'app_theme': 'Tema han App',
-            'about': 'TUNGOD HAN',
-            'privacy_policy': 'Polisiya han Privacy',
-            'terms_service': 'Mga Termino han Serbisyo',
-            'version': 'Bersyon',
+// Navigation
+'views': 'PANMIRING',
+'dashboard': 'Dashboard',
+'today_activities': 'Mga Binuhat Yana nga Adlaw',
+'yesterday_activities': 'Mga Binuhat Kakulop',
+'writing_history': 'Kasaysayan han Pagsurat',
+'manage': 'DUMARA',
+'deleted_activities': 'Ginpara nga mga Binuhat',
+'archived_activities': 'Gin-arkibo nga mga Binuhat',
+'settings': 'SETTINGS',
+'language': 'Pinulungan',
+'app_font': 'Font han App',
+'text_size': 'Kadako han Teksto',
+'app_theme': 'Tema han App',
+'about': 'MAHITUNGOD',
+'privacy_policy': 'Polisiya ha Pagkapribado',
+'terms_service': 'Mga Termino han Serbisyo',
+'version': 'Bersyon',
 
-            // Font options
-            'font_poppins': 'Poppins',
-            'font_arial': 'Arial',
-            'font_helvetica': 'Helvetica',
-            'font_georgia': 'Georgia',
-            'font_times': 'Times New Roman',
-            'font_courier': 'Courier New',
+// Font options
+'font_poppins': 'Poppins',
+'font_arial': 'Arial',
+'font_helvetica': 'Helvetica',
+'font_georgia': 'Georgia',
+'font_times': 'Times New Roman',
+'font_courier': 'Courier New',
 
-            // Text size options
-            'size_small': 'Gutiay',
-            'size_normal': 'Normal',
-            'size_large': 'Dako',
+// Text size options
+'size_small': 'Gutí-ay',
+'size_normal': 'Normal',
+'size_large': 'Dako',
 
-            // Theme options
-            'theme_light': 'Light',
-            'theme_dark': 'Dark',
-            'theme_system': 'System',
+// Theme options
+'theme_light': 'Masanag',
+'theme_dark': 'Madulom',
+'theme_system': 'Sistema',
 
-            // Editor
-            'words': 'mga pulong',
-            'characters': 'Mga Karakter',
-            'chars_no_spaces': 'Mga Karakter (waray spaces)',
-            'sentences': 'Mga Pangungusap',
-            'paragraphs': 'Mga Parapo',
-            'reading_time': 'Oras han Pagbasa',
-            'speaking_time': 'Oras han Pagsulti',
-            'min': 'min',
-            'mins': 'mins',
-            'start_typing': 'Sugdi pag-type dinhi...',
-            'predictive_results': 'An iba nga resulta hula la ngan para ha reference la.',
+// Editor
+'words': 'Mga Pulong',
+'characters': 'Mga Karakter',
+'chars_no_spaces': 'Karakter (waray espasyo)',
+'sentences': 'Mga Sentensya',
+'paragraphs': 'Mga Talata',
+'reading_time': 'Panahon ha Pagbasa',
+'speaking_time': 'Panahon ha Pagyakan',
+'min': 'min',
+'mins': 'minuto',
+'start_typing': 'Pagtikang pagsurat dinhi...',
+'predictive_results': 'An iba nga resulta ginbabase la ha prediksyon ngan para la ha reperensya.',
 
-            // Voice mode
-            'voice_mode': 'Voice Mode',
-            'start': 'Sugdan',
-            'pause': 'I-pause',
-            'stop': 'Undangon',
-            'continue': 'Padayunon',
-            'space': 'Space',
+// Voice mode
+'voice_mode': 'Modo hin Tingog',
+'start': 'Sugdi',
+'pause': 'Pahuway',
+'stop': 'Undang',
+'continue': 'Padayon',
+'space': 'Espasyo',
 
-            // Modals
-            'confirm_action': 'Kompermahon an Aksyon',
-            'confirm_message': 'Sigurado ka nga gusto mo ini himuon?',
-            'alert': 'Alert',
-            'alert_message': 'Ini usa ka alert message.',
-            'cannot_save': 'Diri Pwede I-save',
-            'cannot_save_message': 'Ini usa ka tutorial activity ngan diri pwede bag-ohon.',
-            'cannot_delete': 'Diri Pwede Paraon',
-            'cannot_delete_message': 'Ini usa ka tutorial activity ngan diri pwede paraon.',
-            'delete_activity': 'Paraon an Kalihukan',
-            'delete_confirm': 'Sigurado ka nga gusto mo paraon ini nga kalihukan? Diri na ini mababalik.',
-            'clear_text': 'Paraon an Teksto',
-            'clear_text_confirm': 'Sigurado ka nga gusto mo paraon an tanan nga teksto? Diri na ini mababalik.',
-            'unarchive_activity': 'I-unarchive an Kalihukan',
-            'unarchive_confirm': 'Naka-archive ini nga kalihukan. Gusto mo ba ini i-unarchive para ma-edit?',
-            'delete_permanent_confirm': 'Sigurado ka nga gusto mo pirmanenteng paraon ini nga kalihukan? Diri na ini mababalik.',
-            'voice_input_error': 'Error ha Voice Input',
+// Modals
+'confirm_action': 'Siguroha an Bubuhaon',
+'confirm_message': 'Sigurado ka ba nga bubuhaton mo ini?',
+'alert': 'Pahimangno',
+'alert_message': 'Ini in pahimangno nga mensahe.',
+'cannot_save': 'Diri Matitipig',
+'cannot_save_message': 'Ini nga buhat usa la nga panutdoan ngan diri mababag-o.',
+'cannot_delete': 'Diri Mapapara',
+'cannot_delete_message': 'Ini nga buhat usa la nga panutdoan ngan diri mapapara.',
+'delete_activity': 'Paparaon an Binuhat',
+'delete_confirm': 'Sigurado ka ba nga karuyag mo paparaon ini nga buhat? Diri na ini mababalik.',
+'clear_text': 'Kuhaa an Teksto',
+'clear_text_confirm': 'Sigurado ka ba nga karuyag mo kuhaon an ngatanan nga teksto? Diri na ini mababalik.',
+'unarchive_activity': 'Bungkaga tikang ha Arkibo',
+'unarchive_confirm': 'Ini nga buhat naka-arkibo. Karuyag mo ba bungkagon agud mausab?',
+'delete_permanent_confirm': 'Sigurado ka ba nga karuyag mo gud paparaon ini nga buhat? Diri na ini mababalik.',
+'voice_input_error': 'Sayop ha Tingog nga Input',
 
-            // Empty states
-            'no_activities': 'Waray Mga Kalihukan',
-            'create_first_activity': 'I-klik an "+" button para paghimo hin una nga word count activity.',
-            'create_activity': 'Himuon an Kalihukan',
-            'no_activities_found': 'Waray Nakita nga Mga Kalihukan',
-            'no_today_activities': 'Waray ka naghimo hin bisan ano nga kalihukan yana.',
-            'create_today_activity': 'Himuon an Kalihukan',
-            'no_yesterday_activities': 'Waray ka naghimo hin bisan ano nga kalihukan kahapon.',
-            'no_deleted_activities': 'An imo mga napara nga kalihukan makikita dinhi.',
-            'no_archived_activities': 'An imo mga na-archive nga kalihukan makikita dinhi.',
-            'no_results': 'Waray Nakita nga Mga Resulta',
-            'no_match_query': 'Waray kalihukan nga nag-uupod ha imo pag-search para ha',
-            'results_for': 'mga resulta para ha',
-            'search_results': 'Mga Resulta han Pag-search',
-            'search_placeholder': 'Pangitaa an mga kalihukan...',
-            'no_results_found': 'Waray resulta nga nakita para ha',
+// Empty states
+'no_activities': 'Waray pa aktibidad',
+'create_first_activity': 'Pindota an "+" agud makaghimo han imo syahan nga binuhi ha pulong.',
+'create_activity': 'Paghimo hin aktibidad',
+'no_activities_found': 'Waray Nahipapakita nga Binuhi',
+'no_today_activities': 'Waray ka pa binuhat yana nga adlaw.',
+'create_today_activity': 'Himo yana na aktibidad',
+'no_yesterday_activities': 'Waray ka binuhat kahapon.',
+'no_deleted_activities': 'Makikita dinhi an imo ginpapara nga mga aktibidad.',
+'no_archived_activities': 'Makikita dinhi an imo gin-arkibo nga mga aktibidad.',
+'no_results': 'Waray Nahipapakita',
+'no_match_query': 'Waray aktibidad nga nagtutugma ha',
+'results_for': 'mga resulta para ha',
+'search_results': 'Mga Resulta han Pamiling',
+'search_placeholder': 'Pamiling hin mga binuhi...',
+'no_results_found': 'Waray resulta nga nahipapakita para ha',
 
-            // Dates
-            'today': 'Yana',
-            'yesterday': 'Kahapon',
-            'morning_activity': 'Kalihukan ha Agahon',
-            'afternoon_activity': 'Kalihukan ha Udto',
-            'evening_activity': 'Kalihukan ha Gab-i',
+// Dates
+'today': 'Yana nga Adlaw',
+'yesterday': 'Kakulop',
+'morning_activity': 'Aktibidad ha Aga',
+'afternoon_activity': 'Aktibidad ha Kulop',
+'evening_activity': 'Aktibidad ha Gab-i',
 
-            // Stats
-            'total_words_week': 'Total nga mga pulong hini nga semana',
-            'avg_per_day': 'Average kada adlaw',
-            'most_productive_day': 'Pinaka produktibo nga adlaw',
+// Stats
+'total_words_week': 'Kabug-osan nga mga pulong hini nga semana',
+'avg_per_day': 'Averahi kada adlaw',
+'most_productive_day': 'Pinakamasinabuton nga adlaw',
 
-            // Privacy
-            'privacy_tracking': 'Privacy & Tracking',
-            'privacy_description': 'An Countify+ nagpoproseso han imo pagsurat ngan tingog ha imo device para maghatag hin real-time nga calculations ngan analysis. Waray data nga ipinapadara ha external servers — diri kami nangongolekta o nagiimbak hin bisan ano nga personal nga impormasyon.',
-            'i_understand': 'Nasabtan ko',
-            'decline': 'Dili',
-            'saved': 'Na-save',
+// Privacy
+'privacy_tracking': 'Pagkapribado ngan Pagsubay',
+'privacy_description': 'Ginhihimo han Countify+ an imo mga sinurat ngan tingog ha sulod la han imo device para ha real-time nga kalkulasyon ngan analisis. Waray data nga ginsusumat ha gawas nga server — diri kami nagtitipig o nagkukolekta hin bisan ano nga personal nga impormasyon.',
+'i_understand': 'Maaram ako',
+'decline': 'Bumalos',
+'saved': 'Naitipig na',
 
-            // Tutorials
-            'tutorial1_title': 'Maupay nga Pag-abot ha Countify+ - An Imo Writing Analytics Hub',
-            'tutorial1_content': `An Countify+ amo an imo komprehensibo nga gamit ha pagsusuri han pagsurat nga gindesinyo para subaybayan, suruon, ngan i-optimize an imo produktibidad ha pagsurat nga may katukma.
+// Tutorials
+'tutorial1_title': 'Dayon ha Countify+ — Imo Sentro ha Analisis han Pagsurat',
+'tutorial1_content': `An Countify+ amo an imo bug-os nga gamit ha pagsubay, pag-analisa, ngan pagpaopay han imo produktibidad ha pagsurat ha eksakto nga paagi.
 
-MGA PANGUNAHING TAMPOK:
+PANGUNAHI NGA MGA HIMOON:
 
-Advanced nga Pagsusuri:
-- Real-time nga ihap han pulong, karakter, ngan parapo
-- Pagtantiya han oras han pagbasa ngan pagsulti
-- Pagsusuri han istruktura han pangungusap
-- Pagsubaybay han kasaysayan han pag-uswag
+Abanse nga Analisis:
+- Real-time nga ihap han mga pulong, karakter, ngan talata
+- Tantiya ha oras han pagbasa ngan pagyakan
+- Analisis han estruktura han mga sentensya
+- Pagsubay han imo pag-uswag ha pagsurat
 
-Ginhadian nga Produktibidad:
-- Voice-to-text dictation (nagsusuporta ha damu nga mga yinaknan)
-- Dark/light mode para ha komportable nga pagsurat
+Pagpauswag han Produktibidad:
+- Tingog ngadto ha teksto nga pagsurat (nagsusustenir hin damo nga pinulungan)
+- Madulom/masanag nga tema para ha komportable nga pagsurat
 
-Seguridad han Data:
-- Local-first nga pag-imbak han data
-- Waray cloud storage
+Seguridad han Datos:
+- Lokal la nga panitipigan han datos
+- Waray paggamit hin cloud storage
 
-PAUNSA SUGOD:
-1. Pinduta an "+" button para paghimo han imo syahan nga writing activity
-2. Gamit hin deskriptibo nga mga titulo para ha mas maupay nga organisasyon
-3. An dashboard nagpapakita han imo mga bag-o nga kalihukan ngan stats ha pagsurat
-4. Kitaa an analytics panel para ha detalyado nga metrics han pagsurat`,
+PAGTIKANG:
+1. Pindota an "+" agud maghimo han imo syahan nga binuhi ha pagsurat
+2. Gumamit hin deskriptibo nga titulo para ha mas maupay nga pag-organisa
+3. Ipakita han dashboard an imo mga bag-o nga binuhi ngan stats han pagsurat
+4. Tan-awa an analitik nga panel para ha detalye han metrics han imo sinurat`,
 
-            'tutorial2_title': 'Pag-master ha Countify+ Editor',
-            'tutorial2_content': `An Countify+ editor nagtatao hin makusog pero waray istorbo nga palibot para ha tanan nga imo kinahanglanon ha pagsurat. Amon dinhi kun paano ini gamiton nga maupay:
+'tutorial2_title': 'Pagmaster han Countify+ Editor',
+'tutorial2_content': `An editor han Countify+ naghahatag hin kusog pero waray samok nga palibot para ha imo ngatanan nga kinahanglan ha pagsurat. Ini an mga paagi agud mas magamit mo ini hin bug-os:
 
-MGA TAMPOK HAN EDITOR:
+MGA HIMOON HAN EDITOR:
 
 Real-time Analytics Panel:
-- Na-uupdate an word count samtang nagta-type ka
-- Ihap han mga karakter (mayda o waray spaces)
-- Pagsusuri han parapo ngan pangungusap
-- Tinatantiya nga oras han pagbasa/pagsulti
+- Ihap han pulong samtang nagsusurat ka
+- Ihap han karakter (mayda/waray espasyo)
+- Analisis han mga talata ngan sentensya
+- Tantiya ha oras han pagbasa/pagyakan
 
 Mga Gamit ha Produktibidad:
-- Voice Input: Mag-dikta imbes nga mag-type (nagsusuporta ha damu nga mga yinaknan)
-- Quick Save: Ctrl+S o pinduta an save button
-- Pagmentinar han Format: Ginmementinar an mga parapo ngan spacing
-- Dark/Light Mode: Na-aadjust ha imo preferensya
+- Tingog nga Input: Pagsurat pinaagi han tingog (nagsusustenir hin damo nga pinulungan)
+- Madagmit nga Tipig: Ctrl+S o pindota an save button
+- Pagpabilin han Format: Gintitipigan an mga talata ngan espasyo
+- Masanag/Madulom nga Tema: Nagaayon ha imo karuyag
 
-Pagdumara han Kontento:
-- I-archive imbes nga paraon para ha mas maupay nga organisasyon
-- Mangita ha tanan nga imo mga dokumento
+Pagdumara han Sulod:
+- I-arkibo imbes paparaon para mas organisado
+- Pamiling ha ngatanan mo nga dokumento
 
-MGA TAMPOK HAN KASIGURUHAN:
-- Mga pula nga button nagpapahayag han mga makakaraot nga aksyon (pag-para, pag-clear han teksto)
-- Mga berde nga button nagpapahayag han mga aksyon ha input (tingog)
-- Mga purple nga button nagpapahayag han navigation/pag-save
+MGA SEGURIDAD NGA HIMOON:
+- Pula nga button: Para ha peligroso nga mga buhat (paparaon, kuhaa an teksto)
+- Berde nga button: Para ha pagsulod nga mga buhat (tingog)
+- Kulor purpura nga button: Para ha pagliwat/panigtipig
 
-VOICE MODE:
-1. Pinduta an microphone para sugdan an voice input
-2. Gamiton an bottom sheet controls para madumara an dikta
-3. An imo voice input pinoproseso ha lokal`
+MODO HIN TINGOG:
+1. Pindota an mikropono para magtikang
+2. Gamiton an buttom sheet controls para magdumara han tingog nga input
+3. An imo tingog nga input ginproseso ha lokal la nga device`
         }
     };
 
