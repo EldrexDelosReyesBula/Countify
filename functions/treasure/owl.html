@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hungry Owl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .header button {
+            background: none;
+            border: none;
+            color: #333;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .header button:hover {
+            background: rgba(0, 0, 0, 0.05);
+            transform: scale(1.1);
+        }
+        
+        .donate-info {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            width: 200px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .owl-container {
+            margin: 20px 0;
+            position: relative;
+            width: 200px;
+            height: 200px;
+            transition: all 0.5s;
+        }
+        
+        .owl {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: all 0.3s;
+            animation: float 3s ease-in-out infinite;
+user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .message {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            max-width: 80%;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: messageAppear 0.5s 0.3s forwards;
+        }
+        
+        @keyframes messageAppear {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: messageAppear 0.5s 0.5s forwards;
+        }
+        
+        .option-btn {
+            background: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 120px;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .apple { color: #ff3b30; }
+        .meat { color: #ff9500; }
+        .money { color: #34c759; }
+        .nope { color: #007aff; }
+        
+        .eagle {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            right: -150px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: right 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+            display: none;
+            animation: eagleFloat 0.5s ease-in-out infinite alternate;
+user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+        
+        @keyframes eagleFloat {
+            from { transform: translateY(-50%) rotate(-5deg); }
+            to { transform: translateY(-50%) rotate(5deg); }
+        }
+        
+        .revive-countdown {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            animation: fadeIn 0.5s;
+        }
+        
+        .countdown-text {
+            font-size: 1rem;
+font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .countdown-timer {
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 25px;
+            border-radius: 15px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s;
+        }
+        
+        .music-control:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            z-index: 10;
+        }
+        
+        @media (max-width: 500px) {
+            .options {
+                flex-direction: column;
+                max-width: 300px;
+            }
+            
+            .option-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button id="backBtn"><span class="material-icons">arrow_back</span></button>
+        <h1>Hungry Owl</h1>
+        <button id="infoBtn"><span class="material-icons">info</span></button>
+        <div class="donate-info" id="donateInfo">
+            <p>Help keep the owl fed by donating!</p>
+            <button class="option-btn money" style="margin-top: 10px;">Donate</button>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="message" id="message">I'm hungry... can you give me some food?</div>
+        
+        <div class="owl-container">
+            <img src="20250802_151621_0000.png" alt="Owl" class="owl" id="owl">
+            <img src="20250802_151622_0004.png" alt="Eagle" class="eagle" id="eagle">
+        </div>
+        
+        <div class="options">
+            <button class="option-btn apple" id="appleBtn">
+                <span class="material-icons">local_florist</span> Apple
+            </button>
+            <button class="option-btn meat" id="meatBtn">
+                <span class="material-icons">icecream</span> Ice Cream
+            </button>
+            <button class="option-btn money" id="moneyBtn">
+                <span class="material-icons">attach_money</span> Money
+            </button>
+            <button class="option-btn nope" id="nopeBtn">
+                <span class="material-icons">block</span> Nope
+            </button>
+        </div>
+    </div>
+    
+    <div class="revive-countdown" id="reviveCountdown">
+<img src="20250802_152907_0000.png" style="width: 80%; height: auto;">
+        <div class="countdown-text">Your owl was attacked!</div>
+        <div class="countdown-text">It will revive in:</div>
+        <div class="countdown-timer" id="countdownTimer">30:00</div>
+    </div>
+    
+    <div class="music-control" id="musicControl">
+        <span class="material-icons" id="musicIcon">music_note</span>
+    </div>
+    
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="happySound">
+        <source src="https://www.soundjay.com/misc/sounds/cartoon-jump-01.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="moneySound">
+        <source src="https://www.soundjay.com/misc/sounds/cash-register-01.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="eagleSound">
+        <source src="https://www.soundjay.com/misc/sounds/eagle-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sadSound">
+        <source src="https://www.soundjay.com/misc/sounds/cartoon-sad-01.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // DOM elements
+        const backBtn = document.getElementById('backBtn');
+        const infoBtn = document.getElementById('infoBtn');
+        const donateInfo = document.getElementById('donateInfo');
+        const message = document.getElementById('message');
+        const owl = document.getElementById('owl');
+        const eagle = document.getElementById('eagle');
+        const appleBtn = document.getElementById('appleBtn');
+        const meatBtn = document.getElementById('meatBtn');
+        const moneyBtn = document.getElementById('moneyBtn');
+        const nopeBtn = document.getElementById('nopeBtn');
+        const reviveCountdown = document.getElementById('reviveCountdown');
+        const countdownTimer = document.getElementById('countdownTimer');
+        const musicControl = document.getElementById('musicControl');
+        const musicIcon = document.getElementById('musicIcon');
+        const bgMusic = document.getElementById('bgMusic');
+        const happySound = document.getElementById('happySound');
+        const moneySound = document.getElementById('moneySound');
+        const eagleSound = document.getElementById('eagleSound');
+        const sadSound = document.getElementById('sadSound');
+        
+        // Game state
+        let isMusicOn = false;
+        let moneyGiven = false;
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check if owl needs to revive
+            const reviveTime = localStorage.getItem('owlReviveTime');
+            if (reviveTime && Date.now() < parseInt(reviveTime)) {
+                startReviveCountdown(parseInt(reviveTime));
+            }
+            
+            // Set music volume
+            bgMusic.volume = 0.3;
+            happySound.volume = 0.5;
+            moneySound.volume = 0.5;
+            eagleSound.volume = 0.5;
+            sadSound.volume = 0.5;
+        });
+        
+        // Info button toggle
+        infoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            donateInfo.classList.toggle('show');
+        });
+        
+        // Close donate info when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!donateInfo.contains(e.target) && e.target !== infoBtn) {
+                donateInfo.classList.remove('show');
+            }
+        });
+        
+        // Back button functionality
+        backBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+        
+        // Music control
+        musicControl.addEventListener('click', () => {
+            isMusicOn = !isMusicOn;
+            if (isMusicOn) {
+                bgMusic.play();
+                musicIcon.textContent = 'music_note';
+                musicControl.style.background = 'rgba(255, 255, 255, 0.9)';
+            } else {
+                bgMusic.pause();
+                musicIcon.textContent = 'music_off';
+                musicControl.style.background = 'rgba(255, 255, 255, 0.6)';
+            }
+        });
+        
+        // Option button handlers
+        appleBtn.addEventListener('click', () => {
+            feedOwl('apple');
+        });
+        
+        meatBtn.addEventListener('click', () => {
+            feedOwl('meat');
+        });
+        
+        moneyBtn.addEventListener('click', () => {
+            feedOwl('money');
+        });
+        
+        nopeBtn.addEventListener('click', () => {
+            eagleAttack();
+        });
+        
+        // Owl feeding function
+        function feedOwl(foodType) {
+            let response = '';
+            let owlImage = '';
+            let sound = happySound;
+            
+            // Reset any previous animations
+            owl.style.animation = '';
+            void owl.offsetWidth; // Trigger reflow
+            owl.style.animation = 'float 3s ease-in-out infinite';
+            
+            switch(foodType) {
+                case 'apple':
+                    response = 'Yum! Took one bite and instantly remembered Isaac Newton... felt the gravity of the situation, literally!';
+                    owlImage = '20250802_151621_0001.png';
+                    break;
+                case 'meat':
+                    response = 'Ice cream! My fav 😩🍦 not me falling in love again with dairy LMAO';
+                    owlImage = '20250802_151621_0001.png';
+                    break;
+                case 'money':
+                    response = 'Pera!!! Sa wakas, makakabili na ako ng pagkain na di lang sardinas!';
+                    owlImage = '20250802_151621_0002.png';
+                    sound = moneySound;
+                    moneyGiven = true;
+                    break;
+            }
+            
+            // Animate message change
+            message.style.opacity = 0;
+            setTimeout(() => {
+                message.textContent = response;
+                message.style.opacity = 1;
+                owl.src = owlImage;
+                sound.currentTime = 0;
+                sound.play();
+                
+                // Create confetti for money
+                if (foodType === 'money') {
+                    createConfetti();
+                }
+            }, 300);
+            
+            // Different behavior for money
+            if (foodType === 'money') {
+                setTimeout(() => {
+                    message.style.opacity = 0;
+                    setTimeout(() => {
+                        message.textContent = "I spent all my money on ice cream... now I’m broke and cold, but at least I’m sweet.";
+                        message.style.opacity = 1;
+                        owl.src = "20250802_151621_0000.png";
+                        sadSound.play();
+                        moneyGiven = false;
+                    }, 300);
+                }, 4000);
+            } else {
+                // Reset after 3 seconds for other foods
+                setTimeout(() => {
+                    if (!moneyGiven) { // Only reset if money wasn't given
+                        message.style.opacity = 0;
+                        setTimeout(() => {
+                            message.textContent = "I'm hungry... can you give me some food?";
+                            message.style.opacity = 1;
+                            owl.src = "20250802_151621_0000.png";
+                        }, 300);
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                
+                // Animate confetti
+                const animation = confetti.animate([
+                    { top: '-10px', opacity: 1, transform: `rotate(${Math.random() * 360}deg)` },
+                    { top: '100vh', opacity: 0, transform: `rotate(${Math.random() * 360}deg)` }
+                ], {
+                    duration: 2000 + Math.random() * 3000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Eagle attack function
+        function eagleAttack() {
+            message.style.opacity = 0;
+            setTimeout(() => {
+                message.textContent = "Oh no! An eagle is coming!";
+                message.style.opacity = 1;
+                owl.src = "20250802_152908_0001.png";
+                
+                // Show eagle after a delay
+                setTimeout(() => {
+                    eagle.style.display = 'block';
+                    eagle.style.right = '-150px';
+                    eagleSound.play();
+                    
+                    // Animate eagle attack
+                    setTimeout(() => {
+                        eagle.style.right = 'calc(100% + 20px)';
+                    }, 50);
+                    
+                    // After animation completes
+                    setTimeout(() => {
+                        eagle.style.display = 'none';
+                        owl.src = "20250802_151621_0003.png";
+                        message.style.opacity = 0;
+                        setTimeout(() => {
+                            message.textContent = "Your owl was attacked by the eagle!";
+                            message.style.opacity = 1;
+                            sadSound.play();
+                            
+                            // Show revive countdown
+                            const reviveTime = Date.now() + 30 * 60 * 1000; // 30 minutes from now
+                            localStorage.setItem('owlReviveTime', reviveTime);
+                            startReviveCountdown(reviveTime);
+                        }, 300);
+                    }, 1050);
+                }, 1000);
+            }, 300);
+        }
+        
+        // Revive countdown function
+        function startReviveCountdown(reviveTime) {
+            // Disable all buttons
+            appleBtn.disabled = true;
+            meatBtn.disabled = true;
+            moneyBtn.disabled = true;
+            nopeBtn.disabled = true;
+            
+            // Show countdown overlay
+            reviveCountdown.style.display = 'flex';
+            
+            // Calculate time left
+            const updateCountdown = () => {
+                const now = Date.now();
+                const timeLeft = Math.max(0, reviveTime - now);
+                
+                if (timeLeft <= 0) {
+                    reviveOwl();
+                    return;
+                }
+                
+                // Format time as MM:SS
+                const minutes = Math.floor(timeLeft / 60000);
+                const seconds = Math.floor((timeLeft % 60000) / 1000);
+                
+                countdownTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Continue updating
+                setTimeout(updateCountdown, 1000);
+            };
+            
+            updateCountdown();
+        }
+        
+        // Revive owl function
+        function reviveOwl() {
+            reviveCountdown.style.display = 'none';
+            localStorage.removeItem('owlReviveTime');
+            
+            // Animate revival
+            message.style.opacity = 0;
+            setTimeout(() => {
+                message.textContent = "I'm back! And hungry again...";
+                message.style.opacity = 1;
+                owl.src = "20250802_151621_0000.png";
+                happySound.play();
+                
+                // Re-enable buttons
+                appleBtn.disabled = false;
+                meatBtn.disabled = false;
+                moneyBtn.disabled = false;
+                nopeBtn.disabled = false;
+            }, 300);
+        }
+    </script>
+</body>
+</html>
