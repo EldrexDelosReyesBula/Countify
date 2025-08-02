@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';">
     <meta name="theme-color" content="#7c3aed" />
     <meta name="description" content="Countify Lite - Advanced writing analytics tool with word count, character count, reading time and more" />
     <title>Countify+</title>
@@ -14,7 +13,6 @@
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/main.css" />
-    <script src="https://www.paypal.com/sdk/js?client-id=BAALvw_Ri8vqAGObpMeZGYY0eLZZ3trTxQ_MdB5qdHJZrbWJAVRlgoykIK3X4P0iovnRJYksnD1WwUI6HA&components=hosted-buttons&disable-funding=venmo&currency=PHP">
     </script>
     <script src="fonts/language.js"></script>
     <link rel="manifest" href="/manifest.json" />
@@ -51,11 +49,6 @@
         <span class="material-icons">check_circle</span>
         <span>Changes saved</span>
     </div>
-    <script>
-        paypal.HostedButtons({
-            hostedButtonId: "CDAMVH4KJQPGE",
-        }).render("#paypal-container-CDAMVH4KJQPGE");
-    </script>
     <script>
         // PWA Installation Manager
         class PWAInstaller {
@@ -238,25 +231,7 @@
             });
         });
     </script>
-    <style>
-        window.CountifyLanguage.onLanguageChange=(newLang)=> {
-            // Update the app's current language state
-            this.state.currentLanguage=newLang;
 
-            // Save the new language preference
-            this.saveSettings();
-
-            // Update all UI texts
-            this.updateUITexts();
-
-            // If in voice mode, update the recognition language
-            if (this.state.voiceRecognition) {
-                this.state.voiceRecognition.lang=this.getVoiceRecognitionLanguage();
-            }
-        }
-
-        ;
-    </style>
 <script>
     // Main App Class
     class CountifyApp {
@@ -321,8 +296,7 @@
                     }
                 ];
             }
-            
-            // Fallback English tutorials if language support not loaded
+           
             return [
                 {
                     id: 'tutorial-2',
@@ -488,9 +462,9 @@
                     <button id="drawerToggle" class="btn-icon" aria-label="Open menu" style="border: none;">
                         <span class="material-icons">menu</span>
                     </button>
-                    <h1 class="header-title" data-translate="app_title">
-                        Countify+
-                    </h1>
+<h1 class="header-title" data-translate="app_title" onclick="window.location.href='functions/treasure/owl.html'" style="cursor: pointer;">
+    Countify+
+</h1>
                     <div class="header-actions">
                         <button id="newActivityBtn" class="btn btn-primary">
                             <span class="material-icons">add</span>
@@ -663,10 +637,44 @@
 
                 <div class="drawer-section" style="text-decoration: none;">
                     <div class="drawer-section-title" data-translate="about">ABOUT</div>
-                    <a style="text-decoration: none; color: var(--text-secondary); background: rgba(255, 185, 185, 0.6); " class="drawer-item" href="/functions/donation.html" target="_blank" rel="noopener noreferrer">
-                        <span class="material-icons drawer-item-icon" style="color: #FF4668;">favorite</span>
-                        <span style="font-weight: bold;">Support app</span>
-                    </a>
+<a style="
+    text-decoration: none;
+    color: var(--text-secondary);
+    background: linear-gradient(145deg, rgba(255, 185, 185, 0.9), rgba(255, 130, 130, 0.8));
+    box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 0.5), 
+        inset -4px -4px 6px rgba(255, 110, 110, 0.3),
+        6px 6px 14px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    padding: 12px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    transform: perspective(1000px);
+" 
+class="drawer-item" 
+href="/functions/donation.html" 
+target="_blank" 
+rel="noopener noreferrer"
+>
+    <span class="material-icons drawer-item-icon" style="
+        color: #FF4668;
+        font-size: 24px;
+        /* Removed translateY */
+        display: flex;
+        align-items: center;
+    ">favorite</span>
+    
+    <span style="
+        font-weight: bold;
+        font-size: 16px;
+        color: #6c1b1b;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.6);
+    ">Support app</span>
+</a>
                     <a style="text-decoration: none; color: var(--text-secondary); " class="drawer-item" href="/docs/privacy.html" target="_blank" rel="noopener noreferrer">
                         <span class="material-icons drawer-item-icon">lock</span>
                         <span data-translate="privacy_policy">Privacy Policy</span>
