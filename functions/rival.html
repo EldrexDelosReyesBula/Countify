@@ -3,257 +3,1330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Rival • Debate Your Notes</title>
-    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.css">
-    <!-- Self-Hosted Poppins (Privacy-First) -->
-    <style>
-        @font-face {
-            font-family: 'Poppins';
-            src: local('Poppins'), url('https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2') format('woff2');
-            font-display: swap;
-        }
-    </style>
-    <!-- TensorFlow.js (Offline ML) -->
+    <title>AI Rival Pro • Intellectual Debate Platform</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@1.3.3"></script>
-    <!-- MD3 (Material You) -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
-<style>
-    @font-face {
-        font-family: 'Material Icons';
-        font-style: normal;
-        font-weight: 400;
-        src: url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff2'),
-            url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff');
-    }
-
-    .material-icons {
-        font-family: 'Material Icons';
-        font-weight: normal;
-        font-style: normal;
-        font-size: 24px;
-        line-height: 1;
-        letter-spacing: normal;
-        text-transform: none;
-        display: inline-block;
-        white-space: nowrap;
-        direction: ltr;
-        -webkit-font-feature-settings: 'liga';
-        -webkit-font-smoothing: antialiased;
-    }
-</style>
-
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         :root {
-            --mdui-color-primary: #007AFF;
-            --mdui-color-secondary: #5856D6;
-            --mdui-shadow-key-umbra-opacity: 0.1;
-            --mdui-shadow-key-penumbra-opacity: 0.05;
-            --mdui-font-family: 'Poppins', -apple-system, sans-serif;
+            /* Light Theme */
+            --color-primary: #4361ee;
+            --color-primary-dark: #3a56d4;
+            --color-secondary: #7209b7;
+            --color-accent: #f72585;
+            --color-surface: #ffffff;
+            --color-background: #f8f9fa;
+            --color-on-surface: #212529;
+            --color-on-primary: #ffffff;
+            --color-border: #e9ecef;
+            --color-success: #4cc9f0;
+            --color-warning: #f8961e;
+            --color-error: #ef233c;
+            
+            /* Elevation shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
+            
+            /* Border radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, sans-serif;
+            --font-secondary: 'Poppins', -apple-system, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            
+            /* Animation */
+            --transition-fast: 0.15s;
+            --transition-normal: 0.3s;
+            --transition-slow: 0.5s;
         }
-        body {
-            font-family: 'Poppins', -apple-system, sans-serif;
-            background: var(--mdui-color-surface);
-            color: var(--mdui-color-on-surface);
+        
+        [data-theme="dark"] {
+            --color-primary: #4895ef;
+            --color-primary-dark: #4361ee;
+            --color-secondary: #b5179e;
+            --color-accent: #f72585;
+            --color-surface: #1a1a1a;
+            --color-background: #121212;
+            --color-on-surface: #e9ecef;
+            --color-on-primary: #ffffff;
+            --color-border: #2d2d2d;
+            --color-success: #4cc9f0;
+            --color-warning: #f8961e;
+            --color-error: #ef233c;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.35);
+            --shadow-xl: 0 20px 50px rgba(0,0,0,0.4);
+        }
+        
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--color-background);
+            color: var(--color-on-surface);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        /* iOS 26 3D Depth Effect */
-        .card-3d {
-            border-radius: 14px;
-            box-shadow: 
-                0 4px 16px rgba(0, 0, 0, 0.1),
-                0 1px 3px rgba(0, 0, 0, 0.08);
-            transform: translateZ(0);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
-            will-change: transform;
+        
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
         }
-        .card-3d:hover {
-            transform: translateY(-2px) translateZ(5px);
-            box-shadow: 
-                0 8px 24px rgba(0, 0, 0, 0.12),
-                0 2px 6px rgba(0, 0, 0, 0.1);
+        
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-secondary);
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: var(--space-sm);
         }
-        /* Debate Animation */
-        @keyframes debatePulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        
+        h1 {
+            font-size: var(--text-3xl);
         }
-        .debate-pulse {
-            animation: debatePulse 1.5s infinite;
+        
+        h2 {
+            font-size: var(--text-2xl);
+        }
+        
+        h3 {
+            font-size: var(--text-xl);
+        }
+        
+        p {
+            margin-bottom: var(--space-md);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-secondary);
+            font-weight: 500;
+            font-size: var(--text-sm);
+            line-height: 1;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast) ease;
+            border: none;
+            outline: none;
+            user-select: none;
+            white-space: nowrap;
+            gap: var(--space-xs);
+        }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-secondary {
+            background-color: var(--color-secondary);
+            color: var(--color-on-primary);
+        }
+        
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(var(--color-primary), 0.1);
+        }
+        
+        .btn-icon {
+            padding: var(--space-sm);
+            border-radius: 50%;
+        }
+        
+        /* Cards */
+        .card {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all var(--transition-normal) ease;
+            margin-bottom: var(--space-lg);
+            border: 1px solid var(--color-border);
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .card-body {
+            padding: var(--space-md);
+        }
+        
+        .card-footer {
+            padding: var(--space-md);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--space-xs);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-on-surface);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            background-color: var(--color-surface);
+            color: var(--color-on-surface);
+            transition: border-color var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary), 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background-color: var(--color-surface);
+            box-shadow: var(--shadow-sm);
+            padding: var(--space-sm) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .navbar-brand {
+            font-family: var(--font-secondary);
+            font-weight: 700;
+            font-size: var(--text-xl);
+            color: var(--color-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        /* Debate Chat */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-user {
+            align-self: flex-end;
+            background-color: var(--color-primary);
+            color: var(--color-on-primary);
+            border-bottom-right-radius: var(--radius-xs);
+        }
+        
+        .message-ai {
+            align-self: flex-start;
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-bottom-left-radius: var(--radius-xs);
+        }
+        
+        .message-system {
+            align-self: center;
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            padding: var(--space-xs) var(--space-sm);
+            font-size: var(--text-xs);
+            color: var(--color-on-surface);
+            opacity: 0.7;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: var(--space-sm);
+            padding: var(--space-md);
+            border-top: 1px solid var(--color-border);
+            background-color: var(--color-surface);
+        }
+        
+        /* Skeleton Loading */
+        .skeleton {
+            background-color: var(--color-border);
+            border-radius: var(--radius-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .skeleton-text {
+            height: 1em;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .skeleton-text:last-child {
+            margin-bottom: 0;
+            width: 80%;
+        }
+        
+        /* Debate History */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .history-item {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .history-item:hover {
+            background-color: var(--color-background);
+            transform: translateX(2px);
+        }
+        
+        .history-item-title {
+            font-weight: 500;
+            margin-bottom: var(--space-xs);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .history-item-preview {
+            font-size: var(--text-sm);
+            color: var(--color-on-surface);
+            opacity: 0.7;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--space-md);
+        }
+        
+        .tab {
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--color-on-surface);
+            opacity: 0.7;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
+        }
+        
+        .tab.active {
+            opacity: 1;
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .mt-1 { margin-top: var(--space-xs); }
+        .mt-2 { margin-top: var(--space-sm); }
+        .mt-3 { margin-top: var(--space-md); }
+        .mt-4 { margin-top: var(--space-lg); }
+        .mt-5 { margin-top: var(--space-xl); }
+        
+        .mb-1 { margin-bottom: var(--space-xs); }
+        .mb-2 { margin-bottom: var(--space-sm); }
+        .mb-3 { margin-bottom: var(--space-md); }
+        .mb-4 { margin-bottom: var(--space-lg); }
+        .mb-5 { margin-bottom: var(--space-xl); }
+        
+        .text-center { text-align: center; }
+        .text-muted { opacity: 0.7; }
+        
+        /* Animations */
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--space-sm);
+            }
+            
+            .chat-container {
+                height: 400px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
         }
     </style>
 </head>
-<body class="mdui-theme-primary-blue mdui-theme-accent-purple">
-    <div class="mdui-appbar mdui-appbar-fixed">
-        <div class="mdui-toolbar mdui-color-primary">
-            <span class="mdui-typo-headline">AI Rival</span>
-            <div class="mdui-toolbar-spacer"></div>
-            <button class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#theme-menu'}">
-                <i class="mdui-icon material-icons">palette</i>
-            </button>
-            <ul class="mdui-menu" id="theme-menu">
-                <li class="mdui-menu-item">
-                    <a href="#" class="mdui-ripple" onclick="setTheme('light')">Light</a>
-                </li>
-                <li class="mdui-menu-item">
-                    <a href="#" class="mdui-ripple" onclick="setTheme('dark')">Dark</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="mdui-container mdui-p-t-6 mdui-p-b-4">
-        <!-- 3D Card Note Input -->
-        <div class="card-3d mdui-card mdui-m-b-4">
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title">Debate Your Thoughts</div>
-                <div class="mdui-card-primary-subtitle">AI will challenge your ideas</div>
-            </div>
-            <div class="mdui-card-content">
-                <textarea id="noteInput" class="mdui-textfield-input" placeholder="Type your controversial note..."></textarea>
-            </div>
-            <div class="mdui-card-actions">
-                <button id="debateButton" class="mdui-btn mdui-ripple mdui-color-primary">
-                    <i class="mdui-icon material-icons">forum</i> Start Debate
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="#" class="navbar-brand">
+                <span class="material-icons-round">forum</span>
+                AI Rival Pro
+            </a>
+            <div class="navbar-actions">
+                <button id="themeToggle" class="btn btn-icon">
+                    <span class="material-icons-round">brightness_medium</span>
                 </button>
-                <button id="saveButton" class="mdui-btn mdui-ripple">
-                    <i class="mdui-icon material-icons">save</i> Save
+                <button id="settingsToggle" class="btn btn-icon">
+                    <span class="material-icons-round">settings</span>
                 </button>
             </div>
         </div>
+    </nav>
 
-        <!-- AI Response (3D Animated) -->
-        <div id="debateOutput" class="card-3d mdui-card mdui-m-b-4" style="display: none;">
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title">🤖 AI Rival Responds</div>
-                <div class="mdui-card-primary-subtitle">Critical Counterpoints</div>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="mt-4">
+            <h1>Intellectual Debate Platform</h1>
+            <p class="text-muted">Challenge your ideas with an AI that thinks differently</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs mt-4">
+            <div class="tab active" data-tab="debate">New Debate</div>
+            <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="settings">Settings</div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="tab-content active" id="debate-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Start a Debate</h2>
+                    <p class="text-muted">Present your argument and the AI will challenge it</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="debateTopic" class="form-label">Topic/Position</label>
+                        <input type="text" id="debateTopic" class="form-control" placeholder="Briefly state your position...">
+                    </div>
+                    <div class="form-group">
+                        <label for="debateArgument" class="form-label">Your Argument</label>
+                        <textarea id="debateArgument" class="form-control" placeholder="Present your case in detail..."></textarea>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="startDebateBtn" class="btn btn-primary">
+                        <span class="material-icons-round">forum</span>
+                        Start Debate
+                    </button>
+                    <button id="clearDebateBtn" class="btn btn-outline">
+                        <span class="material-icons-round">clear</span>
+                        Clear
+                    </button>
+                </div>
             </div>
-            <div class="mdui-card-content">
-                <div id="aiResponse" class="mdui-typo"></div>
-            </div>
-            <div class="mdui-card-actions">
-                <button id="rebuttalButton" class="mdui-btn mdui-ripple mdui-color-accent">
-                    <i class="mdui-icon material-icons">replay</i> Rebuttal
-                </button>
-                <button id="agreeButton" class="mdui-btn mdui-ripple">
-                    <i class="mdui-icon material-icons">check</i> Concede
-                </button>
+
+            <!-- Debate Chat -->
+            <div id="debateChatContainer" class="card hidden">
+                <div class="card-header">
+                    <h2>Live Debate</h2>
+                    <p class="text-muted">Engage with your AI opponent</p>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <!-- Messages will be added here dynamically -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" class="form-control" placeholder="Type your response..." style="flex: 1;">
+                            <button id="sendMessageBtn" class="btn btn-primary">
+                                <span class="material-icons-round">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="endDebateBtn" class="btn btn-secondary">
+                        <span class="material-icons-round">flag</span>
+                        End Debate
+                    </button>
+                    <button id="saveDebateBtn" class="btn btn-outline">
+                        <span class="material-icons-round">save</span>
+                        Save
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Saved Notes (3D List) -->
-        <div class="card-3d mdui-card">
-            <div class="mdui-card-primary">
-                <div class="mdui-card-primary-title">Your Debate History</div>
-            </div>
-            <div class="mdui-card-content">
-                <ul id="savedNotes" class="mdui-list"></ul>
+        <!-- History Tab -->
+        <div class="tab-content" id="history-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Past Debates</h2>
+                    <p class="text-muted">Review your intellectual exchanges</p>
+                </div>
+                <div class="card-body">
+                    <div class="history-list" id="debateHistory">
+                        <!-- History items will be added here dynamically -->
+                        <div class="text-center text-muted mt-4 animate-pulse" id="loadingHistory">
+                            Loading your debate history...
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://unpkg.com/mdui@3.0.4/dist/js/mdui.min.js"></script>
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Settings</h2>
+                    <p class="text-muted">Customize your debate experience</p>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="aiPersonality" class="form-label">AI Debate Style</label>
+                        <select id="aiPersonality" class="form-control">
+                            <option value="neutral">Neutral Examiner</option>
+                            <option value="socratic">Socratic Questioner</option>
+                            <option value="devil">Devil's Advocate</option>
+                            <option value="scholar">Academic Scholar</option>
+                            <option value="passionate">Passionate Opponent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="aiIntensity" class="form-label">Debate Intensity</label>
+                        <input type="range" id="aiIntensity" class="form-control" min="1" max="5" value="3">
+                        <div class="flex justify-between mt-1">
+                            <span>Gentle</span>
+                            <span>Balanced</span>
+                            <span>Intense</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="userDebateStyle" class="form-label">Your Preferred Style</label>
+                        <select id="userDebateStyle" class="form-control">
+                            <option value="logical">Logical/Formal</option>
+                            <option value="casual">Casual/Conversational</option>
+                            <option value="academic">Academic</option>
+                            <option value="creative">Creative/Abstract</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="saveSettingsBtn" class="btn btn-primary">
+                        <span class="material-icons-round">save</span>
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script>
-        // ==== Privacy-First LocalStorage ====
-        const NOTES_KEY = "ai_rival_notes";
-        let notes = JSON.parse(localStorage.getItem(NOTES_KEY)) || [];
+        // ===== Global Variables =====
+        const DEBATES_KEY = "ai_rival_debates";
+        const SETTINGS_KEY = "ai_rival_settings";
+        let debates = JSON.parse(localStorage.getItem(DEBATES_KEY)) || [];
+        let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
+            aiPersonality: "neutral",
+            aiIntensity: 3,
+            userDebateStyle: "logical",
+            theme: "light"
+        };
+        let currentDebate = null;
+        let useModel = null;
+        let debateState = {
+            topic: "",
+            argument: "",
+            messages: [],
+            context: [],
+            lastUserPosition: ""
+        };
 
-        // ==== TensorFlow.js (Offline ML) ====
-        let model;
+        // ===== DOM Elements =====
+        const elements = {
+            // Tabs
+            tabs: document.querySelectorAll(".tab"),
+            tabContents: document.querySelectorAll(".tab-content"),
+            
+            // Debate Form
+            debateTopic: document.getElementById("debateTopic"),
+            debateArgument: document.getElementById("debateArgument"),
+            startDebateBtn: document.getElementById("startDebateBtn"),
+            clearDebateBtn: document.getElementById("clearDebateBtn"),
+            
+            // Debate Chat
+            debateChatContainer: document.getElementById("debateChatContainer"),
+            chatMessages: document.getElementById("chatMessages"),
+            chatInput: document.getElementById("chatInput"),
+            sendMessageBtn: document.getElementById("sendMessageBtn"),
+            endDebateBtn: document.getElementById("endDebateBtn"),
+            saveDebateBtn: document.getElementById("saveDebateBtn"),
+            
+            // History
+            debateHistory: document.getElementById("debateHistory"),
+            loadingHistory: document.getElementById("loadingHistory"),
+            
+            // Settings
+            aiPersonality: document.getElementById("aiPersonality"),
+            aiIntensity: document.getElementById("aiIntensity"),
+            userDebateStyle: document.getElementById("userDebateStyle"),
+            saveSettingsBtn: document.getElementById("saveSettingsBtn"),
+            
+            // Theme
+            themeToggle: document.getElementById("themeToggle"),
+            settingsToggle: document.getElementById("settingsToggle")
+        };
+
+        // ===== Initialize App =====
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Load settings
+            loadSettings();
+            
+            // Load TensorFlow model
+            await loadModel();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Load debate history
+            loadDebateHistory();
+        });
+
+        // ===== TensorFlow Model =====
         async function loadModel() {
-            model = await use.load();
-            console.log("AI Model ready (offline)");
+            try {
+                console.log("Loading TensorFlow model...");
+                useModel = await use.load();
+                console.log("Model loaded successfully");
+            } catch (error) {
+                console.error("Failed to load model:", error);
+                showError("Failed to initialize AI capabilities. Some features may not work offline.");
+            }
         }
-        loadModel();
 
-        // ==== Smarter Debate Logic ====
-        async function generateCounterArgument(note) {
-            // Sentiment Analysis (TinyML)
-            const embeddings = await model.embed([note]);
+        // ===== Event Listeners =====
+        function setupEventListeners() {
+            // Tab navigation
+            elements.tabs.forEach(tab => {
+                tab.addEventListener("click", () => {
+                    const tabId = tab.getAttribute("data-tab");
+                    switchTab(tabId);
+                });
+            });
+            
+            // Debate form
+            elements.startDebateBtn.addEventListener("click", startDebate);
+            elements.clearDebateBtn.addEventListener("click", clearDebateForm);
+            
+            // Chat interface
+            elements.sendMessageBtn.addEventListener("click", sendMessage);
+            elements.chatInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") sendMessage();
+            });
+            elements.endDebateBtn.addEventListener("click", endDebate);
+            elements.saveDebateBtn.addEventListener("click", saveDebate);
+            
+            // Settings
+            elements.saveSettingsBtn.addEventListener("click", saveSettings);
+            
+            // Theme toggle
+            elements.themeToggle.addEventListener("click", toggleTheme);
+            
+            // Settings toggle
+            elements.settingsToggle.addEventListener("click", () => {
+                switchTab("settings");
+            });
+        }
+
+        // ===== Tab Navigation =====
+        function switchTab(tabId) {
+            // Update active tab
+            elements.tabs.forEach(tab => {
+                if (tab.getAttribute("data-tab") === tabId) {
+                    tab.classList.add("active");
+                } else {
+                    tab.classList.remove("active");
+                }
+            });
+            
+            // Update active content
+            elements.tabContents.forEach(content => {
+                if (content.id === `${tabId}-tab`) {
+                    content.classList.add("active");
+                } else {
+                    content.classList.remove("active");
+                }
+            });
+            
+            // Special handling for history tab
+            if (tabId === "history") {
+                loadDebateHistory();
+            }
+        }
+
+        // ===== Debate Functions =====
+        async function startDebate() {
+            const topic = elements.debateTopic.value.trim();
+            const argument = elements.debateArgument.value.trim();
+            
+            if (!topic || !argument) {
+                showError("Please provide both a topic and your argument");
+                return;
+            }
+            
+            // Initialize debate state
+            debateState = {
+                topic,
+                argument,
+                messages: [],
+                context: [],
+                lastUserPosition: argument
+            };
+            
+            // Add user's initial argument to messages
+            addMessage("user", `Topic: ${topic}\n\nMy Position: ${argument}`);
+            
+            // Show chat interface
+            elements.debateChatContainer.classList.remove("hidden");
+            
+            // Scroll to chat
+            elements.debateChatContainer.scrollIntoView({ behavior: "smooth" });
+            
+            // Generate AI response
+            await generateAIResponse("initial");
+        }
+
+        function clearDebateForm() {
+            elements.debateTopic.value = "";
+            elements.debateArgument.value = "";
+        }
+
+        function endDebate() {
+            if (confirm("Are you sure you want to end this debate? You can save it to your history first.")) {
+                addMessage("system", "Debate ended by user");
+                elements.debateChatContainer.classList.add("hidden");
+                clearDebateForm();
+            }
+        }
+
+        function saveDebate() {
+            if (debateState.messages.length === 0) {
+                showError("No debate to save");
+                return;
+            }
+            
+            const debate = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                topic: debateState.topic,
+                messages: debateState.messages
+            };
+            
+            debates.unshift(debate);
+            localStorage.setItem(DEBATES_KEY, JSON.stringify(debates));
+            
+            showSuccess("Debate saved to history");
+            loadDebateHistory();
+        }
+
+        function sendMessage() {
+            const message = elements.chatInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage("user", message);
+            debateState.lastUserPosition = message;
+            
+            // Clear input
+            elements.chatInput.value = "";
+            
+            // Generate AI response
+            generateAIResponse("response");
+        }
+
+        function addMessage(sender, text) {
+            const message = {
+                sender,
+                text,
+                timestamp: new Date().toISOString()
+            };
+            
+            debateState.messages.push(message);
+            
+            // Add to UI
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message", `message-${sender}`);
+            
+            if (sender === "system") {
+                messageElement.innerHTML = `<small>${text}</small>`;
+            } else {
+                messageElement.textContent = text;
+            }
+            
+            elements.chatMessages.appendChild(messageElement);
+            
+            // Scroll to bottom
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+            
+            return message;
+        }
+
+        // ===== AI Response Generation =====
+        async function generateAIResponse(type) {
+            // Show loading indicator
+            const loadingMessage = addMessage("ai", "");
+            const loadingElement = elements.chatMessages.lastChild;
+            loadingElement.innerHTML = `
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            `;
+            
+            // Generate response based on type
+            let response;
+            try {
+                if (type === "initial") {
+                    response = await generateInitialResponse();
+                } else {
+                    response = await generateFollowUpResponse();
+                }
+                
+                // Replace loading with actual response
+                loadingElement.innerHTML = "";
+                loadingElement.textContent = response;
+                
+                // Add to debate state
+                const aiMessage = debateState.messages.find(m => m.timestamp === loadingMessage.timestamp);
+                if (aiMessage) {
+                    aiMessage.text = response;
+                }
+            } catch (error) {
+                console.error("Error generating AI response:", error);
+                loadingElement.innerHTML = "";
+                loadingElement.textContent = "I encountered an error processing your argument. Please try again.";
+            }
+        }
+
+        async function generateInitialResponse() {
+            const { topic, argument } = debateState;
+            const personality = settings.aiPersonality;
+            const intensity = settings.aiIntensity;
+            
+            // Generate embeddings for sentiment and topic analysis
+            let embeddings;
+            try {
+                embeddings = await useModel.embed([argument]);
+            } catch (error) {
+                console.error("Error generating embeddings:", error);
+                // Fallback to simple response
+                return generateFallbackResponse(topic, argument, personality, intensity);
+            }
+            
+            // Analyze sentiment (simple approach)
             const sentiment = tf.tidy(() => {
                 const x = embeddings.slice([0, 0], [1, 512]);
                 const dense = tf.layers.dense({ units: 1, activation: 'sigmoid' }).apply(x);
                 return dense.dataSync()[0];
             });
+            
+            // Determine response strategy based on settings and analysis
+            return generateStrategicResponse(topic, argument, sentiment, personality, intensity);
+        }
 
-            // Debate Strategies
-            const strategies = [
-                { 
-                    condition: (s) => s > 0.6, 
-                    templates: [
-                        "You seem very positive about '{NOTE}'. But consider: {COUNTER}",
-                        "Optimism is good, but have you thought about {COUNTER}?"
+        async function generateFollowUpResponse() {
+            const { topic, lastUserPosition } = debateState;
+            const personality = settings.aiPersonality;
+            const intensity = settings.aiIntensity;
+            
+            // In a real implementation, we would analyze the conversation flow
+            // For this demo, we'll generate a follow-up response based on personality
+            
+            return generateStrategicResponse(topic, lastUserPosition, 0.5, personality, intensity);
+        }
+
+        function generateStrategicResponse(topic, argument, sentiment, personality, intensity) {
+            // Debate strategies based on personality
+            const strategies = {
+                neutral: {
+                    introductions: [
+                        "Let me examine your position that '{TOPIC}'...",
+                        "Your argument presents an interesting perspective on '{TOPIC}'...",
+                        "Regarding your position on '{TOPIC}', let's analyze it carefully..."
                     ],
                     counters: [
-                        "the risks being overlooked",
-                        "historical cases where this failed"
+                        "Have you considered {COUNTER}?",
+                        "An alternative perspective might be {COUNTER}.",
+                        "This position might overlook {COUNTER}."
+                    ],
+                    questions: [
+                        "What evidence supports this position?",
+                        "How would you respond to the objection that {COUNTER}?",
+                        "Could there be exceptions to this view?"
+                    ],
+                    closings: [
+                        "I look forward to your response on these points.",
+                        "These are aspects worth considering in our discussion.",
+                        "Your thoughts on these counterpoints would be valuable."
                     ]
                 },
-                { 
-                    condition: (s) => s < 0.4, 
-                    templates: [
-                        "Your negative take on '{NOTE}' ignores {COUNTER}",
-                        "Pessimism clouds opportunity. What if {COUNTER}?"
+                socratic: {
+                    introductions: [
+                        "Let me ask you about your position on '{TOPIC}'...",
+                        "Your argument raises some important questions about '{TOPIC}'...",
+                        "I'd like to explore your thinking on '{TOPIC}' further..."
                     ],
                     counters: [
-                        "potential upsides",
-                        "exceptions to this pattern"
+                        "What do you mean by {COUNTER}?",
+                        "How would you reconcile this with {COUNTER}?",
+                        "Why do you believe {COUNTER} isn't a factor?"
+                    ],
+                    questions: [
+                        "What is the basis for that conclusion?",
+                        "Could you define your terms more precisely?",
+                        "What would change your mind about this?"
+                    ],
+                    closings: [
+                        "I'm interested in how you'll address these questions.",
+                        "These questions might help refine your position.",
+                        "Your answers to these would clarify your stance."
                     ]
                 },
-                { 
-                    condition: () => true, 
-                    templates: [
-                        "'{NOTE}' is interesting, but {COUNTER}",
-                        "Have you considered that {COUNTER}?"
+                devil: {
+                    introductions: [
+                        "I must challenge your position on '{TOPIC}'...",
+                        "Your argument about '{TOPIC}' seems problematic because...",
+                        "Let me play devil's advocate regarding '{TOPIC}'..."
                     ],
                     counters: [
-                        "the opposite might be true",
-                        "this could be more nuanced"
+                        "This completely ignores {COUNTER}!",
+                        "The fatal flaw here is {COUNTER}.",
+                        "Anyone could point out {COUNTER} as a weakness."
+                    ],
+                    questions: [
+                        "How can you possibly ignore {COUNTER}?",
+                        "Isn't it obvious that {COUNTER}?",
+                        "Don't you see the problem with {COUNTER}?"
+                    ],
+                    closings: [
+                        "I can't see how your position holds up to these criticisms.",
+                        "These points seem to undermine your argument completely.",
+                        "You'll need a strong response to these objections."
+                    ]
+                },
+                scholar: {
+                    introductions: [
+                        "Academic analysis of your position on '{TOPIC}' suggests...",
+                        "The scholarly consensus on '{TOPIC}' would question...",
+                        "From a research perspective, your view on '{TOPIC}'..."
+                    ],
+                    counters: [
+                        "Studies have shown that {COUNTER}.",
+                        "The literature consistently demonstrates {COUNTER}.",
+                        "Peer-reviewed research contradicts this with {COUNTER}."
+                    ],
+                    questions: [
+                        "How does this align with the existing research on {COUNTER}?",
+                        "What methodology led you to this conclusion about {COUNTER}?",
+                        "Have you accounted for the findings regarding {COUNTER}?"
+                    ],
+                    closings: [
+                        "The evidence seems to challenge your position.",
+                        "These academic perspectives merit serious consideration.",
+                        "Your argument would need to address these research findings."
+                    ]
+                },
+                passionate: {
+                    introductions: [
+                        "I strongly disagree with your position on '{TOPIC}'!",
+                        "Your argument about '{TOPIC}' is deeply flawed because...",
+                        "I must passionately oppose your view on '{TOPIC}'..."
+                    ],
+                    counters: [
+                        "How can you ignore {COUNTER}? It's outrageous!",
+                        "The emotional impact of {COUNTER} alone disproves this!",
+                        "This completely disregards {COUNTER} and it's unacceptable!"
+                    ],
+                    questions: [
+                        "How can you sleep at night believing {COUNTER}?",
+                        "Don't you care about {COUNTER}?",
+                        "What kind of person would argue {COUNTER}?"
+                    ],
+                    closings: [
+                        "I'm frankly appalled by this position!",
+                        "These points make your argument indefensible!",
+                        "I can't believe anyone would maintain this view!"
                     ]
                 }
-            ];
-
-            const strategy = strategies.find(s => s.condition(sentiment)) || strategies[2];
-            const template = strategy.templates[Math.floor(Math.random() * strategy.templates.length)];
-            const counter = strategy.counters[Math.floor(Math.random() * strategy.counters.length)];
-
-            return template
-                .replace('{NOTE}', note.substring(0, 80) + (note.length > 80 ? "..." : ""))
-                .replace('{COUNTER}', counter);
-        }
-
-        // ==== 3D UI Interactions ====
-        document.getElementById('debateButton').addEventListener('click', async function() {
-            const note = document.getElementById('noteInput').value.trim();
-            if (!note) return;
-
-            const debateOutput = document.getElementById('debateOutput');
-            const aiResponse = document.getElementById('aiResponse');
+            };
             
-            debateOutput.style.display = 'block';
-            aiResponse.innerHTML = '<div class="mdui-spinner mdui-center"></div>';
-            debateOutput.classList.add('debate-pulse');
-
-            setTimeout(async () => {
-                const response = await generateCounterArgument(note);
-                aiResponse.innerHTML = response;
-                debateOutput.classList.remove('debate-pulse');
-            }, 1500);
-        });
-
-        // ==== Theme Toggle (Material You) ====
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+            // Select strategy based on personality
+            const strategy = strategies[personality] || strategies.neutral;
+            
+            // Select random templates
+            const intro = randomFromArray(strategy.introductions);
+            const counter = randomFromArray(strategy.counters);
+            const question = randomFromArray(strategy.questions);
+            const closing = randomFromArray(strategy.closings);
+            
+            // Generate counterpoints based on sentiment and intensity
+            const counterpoints = generateCounterpoints(argument, sentiment, intensity);
+            
+            // Build response
+            let response = intro.replace("{TOPIC}", topic.substring(0, 50));
+            
+            // Add counterpoints
+            counterpoints.forEach((point, i) => {
+                response += `\n\n${i+1}. ${point}`;
+            });
+            
+            // Add question
+            const questionCounter = counterpoints[Math.floor(Math.random() * counterpoints.length)];
+            response += `\n\n${question.replace("{COUNTER}", questionCounter.substring(0, 50))}`;
+            
+            // Add closing
+            response += `\n\n${closing}`;
+            
+            return response;
         }
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
+        function generateCounterpoints(argument, sentiment, intensity) {
+            const intensityLevel = Math.min(5, Math.max(1, intensity));
+            const counterpoints = [];
+            
+            // Base counterpoints (these would be enhanced with real NLP in production)
+            const baseCounters = [
+                "the potential for confirmation bias in this position",
+                "historical examples that contradict this view",
+                "alternative interpretations of the same evidence",
+                "the risk of oversimplifying a complex issue",
+                "competing priorities that might outweigh this consideration",
+                "the possibility of unintended consequences",
+                "ethical concerns raised by this position",
+                "more recent evidence that challenges this perspective",
+                "the diversity of opinions among experts on this matter",
+                "the practical challenges of implementing this idea"
+            ];
+            
+            // Select counterpoints based on intensity
+            for (let i = 0; i < intensityLevel; i++) {
+                const counter = baseCounters[Math.floor(Math.random() * baseCounters.length)];
+                if (!counterpoints.includes(counter)) {
+                    counterpoints.push(counter);
+                }
+                
+                if (counterpoints.length >= 3) break; // Max 3 counterpoints
+            }
+            
+            // Adjust based on sentiment
+            if (sentiment > 0.7) {
+                // Very positive - challenge optimism
+                counterpoints.push("the risks being underestimated in this optimistic view");
+            } else if (sentiment < 0.3) {
+                // Very negative - challenge pessimism
+                counterpoints.push("potential upsides being overlooked in this negative assessment");
+            }
+            
+            return counterpoints;
+        }
+
+        function generateFallbackResponse(topic, argument, personality, intensity) {
+            // Simple fallback when ML features fail
+            const personalities = {
+                neutral: "Your perspective on {TOPIC} is interesting. Could you elaborate on {ARGUMENT}?",
+                socratic: "What do you mean exactly by {ARGUMENT} when discussing {TOPIC}?",
+                devil: "That's a questionable position on {TOPIC}! How do you justify {ARGUMENT}?",
+                scholar: "The academic literature might challenge your view that {ARGUMENT} regarding {TOPIC}.",
+                passionate: "I strongly disagree with your take on {TOPIC}! {ARGUMENT} is completely wrong!"
+            };
+            
+            const template = personalities[personality] || personalities.neutral;
+            return template
+                .replace("{TOPIC}", topic.substring(0, 50))
+                .replace("{ARGUMENT}", argument.substring(0, 50) + (argument.length > 50 ? "..." : ""));
+        }
+
+        // ===== Debate History =====
+        function loadDebateHistory() {
+            elements.debateHistory.innerHTML = "";
+            
+            if (debates.length === 0) {
+                elements.loadingHistory.textContent = "No past debates found";
+                return;
+            }
+            
+            elements.loadingHistory.classList.add("hidden");
+            
+            debates.forEach(debate => {
+                const debateItem = document.createElement("div");
+                debateItem.classList.add("history-item");
+                debateItem.innerHTML = `
+                    <div class="history-item-title">${debate.topic}</div>
+                    <div class="history-item-preview">${debate.messages[0].text.substring(0, 100)}...</div>
+                    <small class="text-muted">${new Date(debate.date).toLocaleDateString()}</small>
+                `;
+                
+                debateItem.addEventListener("click", () => {
+                    viewDebate(debate.id);
+                });
+                
+                elements.debateHistory.appendChild(debateItem);
+            });
+        }
+
+        function viewDebate(debateId) {
+            const debate = debates.find(d => d.id === debateId);
+            if (!debate) return;
+            
+            // Set current debate
+            currentDebate = debate;
+            
+            // Show debate in chat interface
+            elements.debateTopic.value = debate.topic;
+            elements.debateArgument.value = debate.messages.find(m => m.sender === "user")?.text || "";
+            
+            // Clear and populate chat
+            elements.chatMessages.innerHTML = "";
+            debate.messages.forEach(message => {
+                addMessage(message.sender, message.text);
+            });
+            
+            // Show chat
+            elements.debateChatContainer.classList.remove("hidden");
+            
+            // Switch to debate tab
+            switchTab("debate");
+            
+            // Scroll to chat
+            elements.debateChatContainer.scrollIntoView({ behavior: "smooth" });
+        }
+
+        // ===== Settings =====
+        function loadSettings() {
+            // Apply saved settings
+            if (settings.theme) {
+                document.documentElement.setAttribute("data-theme", settings.theme);
+            }
+            
+            if (settings.aiPersonality) {
+                elements.aiPersonality.value = settings.aiPersonality;
+            }
+            
+            if (settings.aiIntensity) {
+                elements.aiIntensity.value = settings.aiIntensity;
+            }
+            
+            if (settings.userDebateStyle) {
+                elements.userDebateStyle.value = settings.userDebateStyle;
+            }
+        }
+
+        function saveSettings() {
+            settings = {
+                aiPersonality: elements.aiPersonality.value,
+                aiIntensity: parseInt(elements.aiIntensity.value),
+                userDebateStyle: elements.userDebateStyle.value,
+                theme: document.documentElement.getAttribute("data-theme") || "light"
+            };
+            
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+            showSuccess("Settings saved successfully");
+        }
+
+        // ===== Theme Management =====
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+            const newTheme = currentTheme === "light" ? "dark" : "light";
+            
+            document.documentElement.setAttribute("data-theme", newTheme);
+            settings.theme = newTheme;
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // ===== Utility Functions =====
+        function randomFromArray(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function showError(message) {
+            alert(`Error: ${message}`);
+        }
+
+        function showSuccess(message) {
+            const toast = document.createElement("div");
+            toast.textContent = message;
+            toast.style.position = "fixed";
+            toast.style.bottom = "20px";
+            toast.style.right = "20px";
+            toast.style.backgroundColor = "var(--color-success)";
+            toast.style.color = "white";
+            toast.style.padding = "var(--space-sm) var(--space-md)";
+            toast.style.borderRadius = "var(--radius-sm)";
+            toast.style.boxShadow = "var(--shadow-md)";
+            toast.style.zIndex = "1000";
+            toast.style.animation = "fadeIn 0.3s ease";
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = "fadeOut 0.3s ease";
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
     </script>
 </body>
 </html>
