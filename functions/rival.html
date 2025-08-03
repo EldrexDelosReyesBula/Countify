@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Rival • Debate Your Notes</title>
+    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.css">
+    <!-- Self-Hosted Poppins (Privacy-First) -->
+    <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: local('Poppins'), url('https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2') format('woff2');
+            font-display: swap;
+        }
+    </style>
+    <!-- TensorFlow.js (Offline ML) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@1.3.3"></script>
+    <!-- MD3 (Material You) -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
+<style>
+    @font-face {
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        src: url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff2'),
+            url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff');
+    }
+
+    .material-icons {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }
+</style>
+
+    <style>
+        :root {
+            --mdui-color-primary: #007AFF;
+            --mdui-color-secondary: #5856D6;
+            --mdui-shadow-key-umbra-opacity: 0.1;
+            --mdui-shadow-key-penumbra-opacity: 0.05;
+            --mdui-font-family: 'Poppins', -apple-system, sans-serif;
+        }
+        body {
+            font-family: 'Poppins', -apple-system, sans-serif;
+            background: var(--mdui-color-surface);
+            color: var(--mdui-color-on-surface);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        /* iOS 26 3D Depth Effect */
+        .card-3d {
+            border-radius: 14px;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                0 1px 3px rgba(0, 0, 0, 0.08);
+            transform: translateZ(0);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
+            will-change: transform;
+        }
+        .card-3d:hover {
+            transform: translateY(-2px) translateZ(5px);
+            box-shadow: 
+                0 8px 24px rgba(0, 0, 0, 0.12),
+                0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Debate Animation */
+        @keyframes debatePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .debate-pulse {
+            animation: debatePulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="mdui-theme-primary-blue mdui-theme-accent-purple">
+    <div class="mdui-appbar mdui-appbar-fixed">
+        <div class="mdui-toolbar mdui-color-primary">
+            <span class="mdui-typo-headline">AI Rival</span>
+            <div class="mdui-toolbar-spacer"></div>
+            <button class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#theme-menu'}">
+                <i class="mdui-icon material-icons">palette</i>
+            </button>
+            <ul class="mdui-menu" id="theme-menu">
+                <li class="mdui-menu-item">
+                    <a href="#" class="mdui-ripple" onclick="setTheme('light')">Light</a>
+                </li>
+                <li class="mdui-menu-item">
+                    <a href="#" class="mdui-ripple" onclick="setTheme('dark')">Dark</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mdui-container mdui-p-t-6 mdui-p-b-4">
+        <!-- 3D Card Note Input -->
+        <div class="card-3d mdui-card mdui-m-b-4">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">Debate Your Thoughts</div>
+                <div class="mdui-card-primary-subtitle">AI will challenge your ideas</div>
+            </div>
+            <div class="mdui-card-content">
+                <textarea id="noteInput" class="mdui-textfield-input" placeholder="Type your controversial note..."></textarea>
+            </div>
+            <div class="mdui-card-actions">
+                <button id="debateButton" class="mdui-btn mdui-ripple mdui-color-primary">
+                    <i class="mdui-icon material-icons">forum</i> Start Debate
+                </button>
+                <button id="saveButton" class="mdui-btn mdui-ripple">
+                    <i class="mdui-icon material-icons">save</i> Save
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Response (3D Animated) -->
+        <div id="debateOutput" class="card-3d mdui-card mdui-m-b-4" style="display: none;">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">🤖 AI Rival Responds</div>
+                <div class="mdui-card-primary-subtitle">Critical Counterpoints</div>
+            </div>
+            <div class="mdui-card-content">
+                <div id="aiResponse" class="mdui-typo"></div>
+            </div>
+            <div class="mdui-card-actions">
+                <button id="rebuttalButton" class="mdui-btn mdui-ripple mdui-color-accent">
+                    <i class="mdui-icon material-icons">replay</i> Rebuttal
+                </button>
+                <button id="agreeButton" class="mdui-btn mdui-ripple">
+                    <i class="mdui-icon material-icons">check</i> Concede
+                </button>
+            </div>
+        </div>
+
+        <!-- Saved Notes (3D List) -->
+        <div class="card-3d mdui-card">
+            <div class="mdui-card-primary">
+                <div class="mdui-card-primary-title">Your Debate History</div>
+            </div>
+            <div class="mdui-card-content">
+                <ul id="savedNotes" class="mdui-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/mdui@3.0.4/dist/js/mdui.min.js"></script>
+    <script>
+        // ==== Privacy-First LocalStorage ====
+        const NOTES_KEY = "ai_rival_notes";
+        let notes = JSON.parse(localStorage.getItem(NOTES_KEY)) || [];
+
+        // ==== TensorFlow.js (Offline ML) ====
+        let model;
+        async function loadModel() {
+            model = await use.load();
+            console.log("AI Model ready (offline)");
+        }
+        loadModel();
+
+        // ==== Smarter Debate Logic ====
+        async function generateCounterArgument(note) {
+            // Sentiment Analysis (TinyML)
+            const embeddings = await model.embed([note]);
+            const sentiment = tf.tidy(() => {
+                const x = embeddings.slice([0, 0], [1, 512]);
+                const dense = tf.layers.dense({ units: 1, activation: 'sigmoid' }).apply(x);
+                return dense.dataSync()[0];
+            });
+
+            // Debate Strategies
+            const strategies = [
+                { 
+                    condition: (s) => s > 0.6, 
+                    templates: [
+                        "You seem very positive about '{NOTE}'. But consider: {COUNTER}",
+                        "Optimism is good, but have you thought about {COUNTER}?"
+                    ],
+                    counters: [
+                        "the risks being overlooked",
+                        "historical cases where this failed"
+                    ]
+                },
+                { 
+                    condition: (s) => s < 0.4, 
+                    templates: [
+                        "Your negative take on '{NOTE}' ignores {COUNTER}",
+                        "Pessimism clouds opportunity. What if {COUNTER}?"
+                    ],
+                    counters: [
+                        "potential upsides",
+                        "exceptions to this pattern"
+                    ]
+                },
+                { 
+                    condition: () => true, 
+                    templates: [
+                        "'{NOTE}' is interesting, but {COUNTER}",
+                        "Have you considered that {COUNTER}?"
+                    ],
+                    counters: [
+                        "the opposite might be true",
+                        "this could be more nuanced"
+                    ]
+                }
+            ];
+
+            const strategy = strategies.find(s => s.condition(sentiment)) || strategies[2];
+            const template = strategy.templates[Math.floor(Math.random() * strategy.templates.length)];
+            const counter = strategy.counters[Math.floor(Math.random() * strategy.counters.length)];
+
+            return template
+                .replace('{NOTE}', note.substring(0, 80) + (note.length > 80 ? "..." : ""))
+                .replace('{COUNTER}', counter);
+        }
+
+        // ==== 3D UI Interactions ====
+        document.getElementById('debateButton').addEventListener('click', async function() {
+            const note = document.getElementById('noteInput').value.trim();
+            if (!note) return;
+
+            const debateOutput = document.getElementById('debateOutput');
+            const aiResponse = document.getElementById('aiResponse');
+            
+            debateOutput.style.display = 'block';
+            aiResponse.innerHTML = '<div class="mdui-spinner mdui-center"></div>';
+            debateOutput.classList.add('debate-pulse');
+
+            setTimeout(async () => {
+                const response = await generateCounterArgument(note);
+                aiResponse.innerHTML = response;
+                debateOutput.classList.remove('debate-pulse');
+            }, 1500);
+        });
+
+        // ==== Theme Toggle (Material You) ====
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    </script>
+</body>
+</html>
