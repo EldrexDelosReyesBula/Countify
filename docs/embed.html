@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>License Document</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1d1d1f;
+      --accent-color: #007aff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-color: #1c1c1e;
+        --text-color: #f2f2f7;
+        --accent-color: #0a84ff;
+      }
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background-color: var(--bg-color);
+      border-bottom: 1px solid #ddd;
+    }
+
+    header a {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    header a i {
+      margin-right: 0.5rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
+
+    @media (max-width: 600px) {
+      iframe {
+        height: 90vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html"><i class="fas fa-chevron-left"></i>Back to Home</a>
+  </header>
+
+  <iframe src="https://countify-black.vercel.app/LICENSE.txt" title="License Document"></iframe>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
