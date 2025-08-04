@@ -24,7 +24,7 @@ All intellectual property rights, visual assets, codebases, and features are the
 To view the complete terms, restrictions, and your legal rights, please refer to the full license file:  
 👉 [`LICENSE.txt`]
 
-For commercial inquiries, licensing requests, or legal concerns, contact: **landevs@protonmail.com**
+For commercial inquiries, licensing requests, or legal concerns, contact: **landecs.org@gmail.com**
 
 ---
 
