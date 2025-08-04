@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>License – Countify+</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+  :root {
+    --bg-color: #ffffff;
+    --text-color: #1d1d1f;
+    --accent-color: #007aff;
+    --border-color: #e5e5ea;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --highlight-color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-color: #1c1c1e;
+      --text-color: #f2f2f7;
+      --accent-color: #0a84ff;
+      --border-color: #2c2c2e;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      --highlight-color: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+
+  /* Header with Back Link */
+  header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  header a {
+    text-decoration: none;
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  header a i {
+    margin-right: 0.5rem;
+  }
+
+  /* Title Row (Image + H1) */
+  .header-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .logo-inline {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow:
+      inset 2px 2px 3px var(--highlight-color),
+      3px 3px 7px var(--shadow-color);
+  }
+
+  .header-row h1 {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  /* Headings & Paragraphs */
+  h2 {
+    font-size: 1.25rem;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  /* License Card */
+  .card {
+    background: var(--bg-color);
+    border-radius: 30px;
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    box-shadow:
+      inset 4px 4px 6px var(--highlight-color),
+      6px 6px 14px var(--shadow-color);
+  }
+
+  ul {
+    padding-left: 1.2rem;
+  }
+
+  li {
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  li i {
+    margin-right: 0.5rem;
+  }
+
+  /* Button Style */
+  a.button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--accent-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 19px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    box-shadow:
+      inset 2px 2px 3px rgba(255, 255, 255, 0.15),
+      3px 3px 7px var(--shadow-color);
+  }
+
+  a.button:hover {
+    background-color: #005ecb;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 3rem;
+    font-size: 0.875rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html"><i class="fas fa-chevron-left"></i>Back to Home</a>
+  </header>
+
+<div class="header-row">
+  <img src="20250804_093405_0000.png" alt="Countify+ Logo" class="logo-inline" />
+  <h1>Landecs Proprietary Software License (LPSL) v1.0</h1>
+</div>
+
+  <div class="card">
+    <p><strong>Countify+</strong> is licensed under the <strong>Landecs Proprietary Software License (LPSL) v1.0</strong>.</p>
+
+    <h2>Summary of License Terms</h2>
+    <ul>
+      <li><i style=" color: #74FF78;" class="fas fa-check"></i> Free to use for personal and educational purposes only.</li>
+      <li><i style=" color: #FF4651;" class="fas fa-times"></i> Not allowed for commercial use, resale, or paid distribution.</li>
+      <li><i style=" color: #FF4651;" class="fas fa-times"></i> Modification, reverse engineering, or derivative works are prohibited.</li>
+      <li><i style=" color: #74FF78;" class="fas fa-check"></i> Users must respect data privacy and all app protections.</li>
+    </ul>
+
+    <a class="button" href="https://countify-black.vercel.app/LICENSE.txt" target="_blank" rel="noopener noreferrer">
+      Read Full License Document
+    </a>
+  </div>
+
+  <footer>
+    © 2025 Landecs. All rights reserved.
+  </footer>
+
+</body>
+</html>
