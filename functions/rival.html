@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Rival (experimental beta 2) • Intellectual Debate Platform</title>
+    <title>AI Rival Pro • Intellectual Debate Platform</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,6 +104,29 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* L3UI Light Reflection Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 20%, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition-normal) ease;
+        }
+
+        [data-theme="light"] body::before {
+            opacity: 1;
         }
         
         /* Layout */
@@ -157,6 +180,28 @@
             user-select: none;
             white-space: nowrap;
             gap: var(--space-xs);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* L3UI Button Effect */
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                transparent 70%);
+            transform: scale(0);
+            transition: transform var(--transition-fast) ease;
+            pointer-events: none;
+        }
+
+        .btn:hover::after {
+            transform: scale(1);
         }
         
         .btn-primary {
@@ -205,6 +250,28 @@
             transition: all var(--transition-normal) ease;
             margin-bottom: var(--space-lg);
             border: 1px solid var(--color-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* L3UI Card Effect */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            opacity: 0;
+            transition: opacity var(--transition-normal) ease;
+        }
+
+        [data-theme="light"] .card::before {
+            opacity: 1;
         }
         
         .card:hover {
@@ -250,13 +317,15 @@
             font-size: var(--text-base);
             background-color: var(--color-surface);
             color: var(--color-on-surface);
-            transition: border-color var(--transition-fast);
+            transition: all var(--transition-fast);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(var(--color-primary), 0.2);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary), 0.2), 
+                        inset 0 1px 2px rgba(0,0,0,0.05);
         }
         
         textarea.form-control {
@@ -273,6 +342,8 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--color-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .navbar-container {
@@ -304,6 +375,7 @@
             flex-direction: column;
             height: 500px;
             overflow: hidden;
+            position: relative;
         }
         
         .chat-messages {
@@ -313,6 +385,7 @@
             display: flex;
             flex-direction: column;
             gap: var(--space-md);
+            scroll-behavior: smooth;
         }
         
         .message {
@@ -320,6 +393,22 @@
             padding: var(--space-sm) var(--space-md);
             border-radius: var(--radius-md);
             animation: fadeIn 0.3s ease;
+            position: relative;
+            line-height: 1.5;
+            transition: all var(--transition-fast);
+        }
+
+        .message::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
         }
         
         @keyframes fadeIn {
@@ -332,6 +421,7 @@
             background-color: var(--color-primary);
             color: var(--color-on-primary);
             border-bottom-right-radius: var(--radius-xs);
+            box-shadow: var(--shadow-sm);
         }
         
         .message-ai {
@@ -339,6 +429,7 @@
             background-color: var(--color-surface);
             border: 1px solid var(--color-border);
             border-bottom-left-radius: var(--radius-xs);
+            box-shadow: var(--shadow-sm);
         }
         
         .message-system {
@@ -349,6 +440,45 @@
             font-size: var(--text-xs);
             color: var(--color-on-surface);
             opacity: 0.7;
+            border-radius: var(--radius-lg);
+        }
+
+        .message-typing {
+            display: flex;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-md);
+            align-items: center;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--color-on-surface);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-5px); opacity: 1; }
         }
         
         .chat-input {
@@ -357,6 +487,20 @@
             padding: var(--space-md);
             border-top: 1px solid var(--color-border);
             background-color: var(--color-surface);
+            position: relative;
+        }
+
+        .chat-input::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
         }
         
         /* Skeleton Loading */
@@ -391,11 +535,56 @@
         .skeleton-text {
             height: 1em;
             margin-bottom: var(--space-xs);
+            border-radius: var(--radius-sm);
         }
         
         .skeleton-text:last-child {
             margin-bottom: 0;
             width: 80%;
+        }
+
+        /* Enhanced Skeleton for AI Response */
+        .skeleton-ai-response {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            width: 100%;
+        }
+
+        .skeleton-ai-line {
+            height: 1em;
+            border-radius: var(--radius-sm);
+            background-color: var(--color-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton-ai-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-ai-line.short {
+            width: 90%;
+        }
+
+        .skeleton-ai-line.medium {
+            width: 95%;
+        }
+
+        .skeleton-ai-line.long {
+            width: 100%;
         }
         
         /* Debate History */
@@ -412,11 +601,27 @@
             border: 1px solid var(--color-border);
             cursor: pointer;
             transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
         }
         
         .history-item:hover {
             background-color: var(--color-background);
             transform: translateX(2px);
+            box-shadow: var(--shadow-sm);
         }
         
         .history-item-title {
@@ -443,6 +648,20 @@
             display: flex;
             border-bottom: 1px solid var(--color-border);
             margin-bottom: var(--space-md);
+            position: relative;
+        }
+
+        .tabs::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
         }
         
         .tab {
@@ -453,6 +672,7 @@
             opacity: 0.7;
             border-bottom: 2px solid transparent;
             transition: all var(--transition-fast);
+            position: relative;
         }
         
         .tab.active {
@@ -467,6 +687,7 @@
         
         .tab-content.active {
             display: block;
+            animation: fadeIn var(--transition-normal) ease;
         }
         
         /* Utility Classes */
@@ -498,7 +719,35 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: var(--space-lg);
+            right: var(--space-lg);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            z-index: 50;
+            transition: all var(--transition-normal) ease;
+        }
+
+        .fab:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .fab:active {
+            transform: translateY(1px);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -512,6 +761,11 @@
             .message {
                 max-width: 90%;
             }
+
+            .fab {
+                bottom: var(--space-md);
+                right: var(--space-md);
+            }
         }
     </style>
 </head>
@@ -521,7 +775,7 @@
         <div class="container navbar-container">
             <a href="#" class="navbar-brand">
                 <span class="material-icons-round">forum</span>
-                AI Rival (beta 1)
+                AI Rival Pro
             </a>
             <div class="navbar-actions">
                 <button id="themeToggle" class="btn btn-icon">
@@ -674,6 +928,11 @@
         </div>
     </main>
 
+    <!-- Floating Action Button -->
+    <div class="fab" id="newDebateFab" title="Start New Debate">
+        <span class="material-icons-round">add</span>
+    </div>
+
     <script>
         // ===== Global Variables =====
         const DEBATES_KEY = "ai_rival_debates";
@@ -692,8 +951,10 @@
             argument: "",
             messages: [],
             context: [],
-            lastUserPosition: ""
+            lastUserPosition: "",
+            embeddings: null
         };
+        let typingTimeout = null;
 
         // ===== DOM Elements =====
         const elements = {
@@ -727,7 +988,10 @@
             
             // Theme
             themeToggle: document.getElementById("themeToggle"),
-            settingsToggle: document.getElementById("settingsToggle")
+            settingsToggle: document.getElementById("settingsToggle"),
+            
+            // FAB
+            newDebateFab: document.getElementById("newDebateFab")
         };
 
         // ===== Initialize App =====
@@ -770,6 +1034,10 @@
             // Debate form
             elements.startDebateBtn.addEventListener("click", startDebate);
             elements.clearDebateBtn.addEventListener("click", clearDebateForm);
+            elements.newDebateFab.addEventListener("click", () => {
+                switchTab("debate");
+                elements.debateTopic.focus();
+            });
             
             // Chat interface
             elements.sendMessageBtn.addEventListener("click", sendMessage);
@@ -815,6 +1083,13 @@
             if (tabId === "history") {
                 loadDebateHistory();
             }
+
+            // Hide FAB on debate tab
+            if (tabId === "debate") {
+                elements.newDebateFab.style.display = "none";
+            } else {
+                elements.newDebateFab.style.display = "flex";
+            }
         }
 
         // ===== Debate Functions =====
@@ -833,7 +1108,8 @@
                 argument,
                 messages: [],
                 context: [],
-                lastUserPosition: argument
+                lastUserPosition: argument,
+                embeddings: null
             };
             
             // Add user's initial argument to messages
@@ -845,7 +1121,7 @@
             // Scroll to chat
             elements.debateChatContainer.scrollIntoView({ behavior: "smooth" });
             
-            // Generate AI response
+            // Generate AI response with typing indicator
             await generateAIResponse("initial");
         }
 
@@ -893,7 +1169,7 @@
             // Clear input
             elements.chatInput.value = "";
             
-            // Generate AI response
+            // Generate AI response with typing indicator
             generateAIResponse("response");
         }
 
@@ -912,6 +1188,16 @@
             
             if (sender === "system") {
                 messageElement.innerHTML = `<small>${text}</small>`;
+            } else if (sender === "typing") {
+                messageElement.classList.add("message-typing");
+                messageElement.innerHTML = `
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                    <small>AI is thinking...</small>
+                `;
             } else {
                 messageElement.textContent = text;
             }
@@ -926,38 +1212,46 @@
 
         // ===== AI Response Generation =====
         async function generateAIResponse(type) {
-            // Show loading indicator
-            const loadingMessage = addMessage("ai", "");
-            const loadingElement = elements.chatMessages.lastChild;
-            loadingElement.innerHTML = `
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-                <div class="skeleton skeleton-text"></div>
-            `;
+            // Show typing indicator
+            const typingMessage = addMessage("typing", "");
             
-            // Generate response based on type
-            let response;
-            try {
-                if (type === "initial") {
-                    response = await generateInitialResponse();
-                } else {
-                    response = await generateFollowUpResponse();
-                }
-                
-                // Replace loading with actual response
-                loadingElement.innerHTML = "";
-                loadingElement.textContent = response;
-                
-                // Add to debate state
-                const aiMessage = debateState.messages.find(m => m.timestamp === loadingMessage.timestamp);
-                if (aiMessage) {
-                    aiMessage.text = response;
-                }
-            } catch (error) {
-                console.error("Error generating AI response:", error);
-                loadingElement.innerHTML = "";
-                loadingElement.textContent = "I encountered an error processing your argument. Please try again.";
+            // Clear any previous timeout
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
             }
+            
+            // Generate response after a realistic delay (1-3 seconds)
+            const delay = 1000 + Math.random() * 2000;
+            
+            typingTimeout = setTimeout(async () => {
+                try {
+                    // Remove typing indicator
+                    elements.chatMessages.removeChild(elements.chatMessages.lastChild);
+                    
+                    // Generate response based on type
+                    let response;
+                    if (type === "initial") {
+                        response = await generateInitialResponse();
+                    } else {
+                        response = await generateFollowUpResponse();
+                    }
+                    
+                    // Add AI message
+                    addMessage("ai", response);
+                    
+                    // Add to debate state
+                    const aiMessage = {
+                        sender: "ai",
+                        text: response,
+                        timestamp: new Date().toISOString()
+                    };
+                    debateState.messages.push(aiMessage);
+                    
+                } catch (error) {
+                    console.error("Error generating AI response:", error);
+                    addMessage("ai", "I encountered an error processing your argument. Please try again.");
+                }
+            }, delay);
         }
 
         async function generateInitialResponse() {
@@ -965,188 +1259,254 @@
             const personality = settings.aiPersonality;
             const intensity = settings.aiIntensity;
             
-            // Generate embeddings for sentiment and topic analysis
-            let embeddings;
             try {
-                embeddings = await useModel.embed([argument]);
+                // Generate embeddings for the argument
+                debateState.embeddings = await useModel.embed([argument]);
+                
+                // Analyze the argument using TensorFlow
+                const analysis = await analyzeArgument(argument, debateState.embeddings);
+                
+                // Generate a strategic response based on the analysis
+                return generateStrategicResponse(topic, argument, analysis, personality, intensity);
             } catch (error) {
-                console.error("Error generating embeddings:", error);
-                // Fallback to simple response
+                console.error("Error in initial response generation:", error);
                 return generateFallbackResponse(topic, argument, personality, intensity);
             }
+        }
+
+        async function generateFollowUpResponse() {
+            const { topic, lastUserPosition, messages } = debateState;
+            const personality = settings.aiPersonality;
+            const intensity = settings.aiIntensity;
             
-            // Analyze sentiment (simple approach)
-            const sentiment = tf.tidy(() => {
+            try {
+                // Generate embeddings for the latest message
+                const embeddings = await useModel.embed([lastUserPosition]);
+                
+                // Analyze the conversation context
+                const contextAnalysis = await analyzeConversationContext(messages, embeddings);
+                
+                // Generate a strategic follow-up
+                return generateStrategicResponse(topic, lastUserPosition, contextAnalysis, personality, intensity);
+            } catch (error) {
+                console.error("Error in follow-up generation:", error);
+                return generateFallbackResponse(topic, lastUserPosition, personality, intensity);
+            }
+        }
+
+        async function analyzeArgument(text, embeddings) {
+            // Perform various analyses using TensorFlow
+            const results = {};
+            
+            // Sentiment analysis (simple approach)
+            results.sentiment = tf.tidy(() => {
                 const x = embeddings.slice([0, 0], [1, 512]);
                 const dense = tf.layers.dense({ units: 1, activation: 'sigmoid' }).apply(x);
                 return dense.dataSync()[0];
             });
             
-            // Determine response strategy based on settings and analysis
-            return generateStrategicResponse(topic, argument, sentiment, personality, intensity);
+            // Key concept extraction (simple frequency-based approach)
+            results.keyConcepts = extractKeyConcepts(text);
+            
+            // Argument strength estimation
+            results.strength = estimateArgumentStrength(text);
+            
+            // Logical consistency
+            results.consistency = estimateLogicalConsistency(text);
+            
+            return results;
         }
 
-        async function generateFollowUpResponse() {
-            const { topic, lastUserPosition } = debateState;
-            const personality = settings.aiPersonality;
-            const intensity = settings.aiIntensity;
+        async function analyzeConversationContext(messages, latestEmbeddings) {
+            // Analyze the flow of the conversation
+            const results = {};
             
-            // In a real implementation, we would analyze the conversation flow
-            // For this demo, we'll generate a follow-up response based on personality
+            // Get all user messages
+            const userMessages = messages.filter(m => m.sender === "user");
             
-            return generateStrategicResponse(topic, lastUserPosition, 0.5, personality, intensity);
-        }
-
-        function generateStrategicResponse(topic, argument, sentiment, personality, intensity) {
-            // Debate strategies based on personality
-            const strategies = {
-                neutral: {
-                    introductions: [
-                        "Let me examine your position that '{TOPIC}'...",
-                        "Your argument presents an interesting perspective on '{TOPIC}'...",
-                        "Regarding your position on '{TOPIC}', let's analyze it carefully..."
-                    ],
-                    counters: [
-                        "Have you considered {COUNTER}?",
-                        "An alternative perspective might be {COUNTER}.",
-                        "This position might overlook {COUNTER}."
-                    ],
-                    questions: [
-                        "What evidence supports this position?",
-                        "How would you respond to the objection that {COUNTER}?",
-                        "Could there be exceptions to this view?"
-                    ],
-                    closings: [
-                        "I look forward to your response on these points.",
-                        "These are aspects worth considering in our discussion.",
-                        "Your thoughts on these counterpoints would be valuable."
-                    ]
-                },
-                socratic: {
-                    introductions: [
-                        "Let me ask you about your position on '{TOPIC}'...",
-                        "Your argument raises some important questions about '{TOPIC}'...",
-                        "I'd like to explore your thinking on '{TOPIC}' further..."
-                    ],
-                    counters: [
-                        "What do you mean by {COUNTER}?",
-                        "How would you reconcile this with {COUNTER}?",
-                        "Why do you believe {COUNTER} isn't a factor?"
-                    ],
-                    questions: [
-                        "What is the basis for that conclusion?",
-                        "Could you define your terms more precisely?",
-                        "What would change your mind about this?"
-                    ],
-                    closings: [
-                        "I'm interested in how you'll address these questions.",
-                        "These questions might help refine your position.",
-                        "Your answers to these would clarify your stance."
-                    ]
-                },
-                devil: {
-                    introductions: [
-                        "I must challenge your position on '{TOPIC}'...",
-                        "Your argument about '{TOPIC}' seems problematic because...",
-                        "Let me play devil's advocate regarding '{TOPIC}'..."
-                    ],
-                    counters: [
-                        "This completely ignores {COUNTER}!",
-                        "The fatal flaw here is {COUNTER}.",
-                        "Anyone could point out {COUNTER} as a weakness."
-                    ],
-                    questions: [
-                        "How can you possibly ignore {COUNTER}?",
-                        "Isn't it obvious that {COUNTER}?",
-                        "Don't you see the problem with {COUNTER}?"
-                    ],
-                    closings: [
-                        "I can't see how your position holds up to these criticisms.",
-                        "These points seem to undermine your argument completely.",
-                        "You'll need a strong response to these objections."
-                    ]
-                },
-                scholar: {
-                    introductions: [
-                        "Academic analysis of your position on '{TOPIC}' suggests...",
-                        "The scholarly consensus on '{TOPIC}' would question...",
-                        "From a research perspective, your view on '{TOPIC}'..."
-                    ],
-                    counters: [
-                        "Studies have shown that {COUNTER}.",
-                        "The literature consistently demonstrates {COUNTER}.",
-                        "Peer-reviewed research contradicts this with {COUNTER}."
-                    ],
-                    questions: [
-                        "How does this align with the existing research on {COUNTER}?",
-                        "What methodology led you to this conclusion about {COUNTER}?",
-                        "Have you accounted for the findings regarding {COUNTER}?"
-                    ],
-                    closings: [
-                        "The evidence seems to challenge your position.",
-                        "These academic perspectives merit serious consideration.",
-                        "Your argument would need to address these research findings."
-                    ]
-                },
-                passionate: {
-                    introductions: [
-                        "I strongly disagree with your position on '{TOPIC}'!",
-                        "Your argument about '{TOPIC}' is deeply flawed because...",
-                        "I must passionately oppose your view on '{TOPIC}'..."
-                    ],
-                    counters: [
-                        "How can you ignore {COUNTER}? It's outrageous!",
-                        "The emotional impact of {COUNTER} alone disproves this!",
-                        "This completely disregards {COUNTER} and it's unacceptable!"
-                    ],
-                    questions: [
-                        "How can you sleep at night believing {COUNTER}?",
-                        "Don't you care about {COUNTER}?",
-                        "What kind of person would argue {COUNTER}?"
-                    ],
-                    closings: [
-                        "I'm frankly appalled by this position!",
-                        "These points make your argument indefensible!",
-                        "I can't believe anyone would maintain this view!"
-                    ]
-                }
-            };
+            // Calculate similarity with previous messages
+            if (userMessages.length > 1) {
+                const previousText = userMessages[userMessages.length - 2].text;
+                const previousEmbeddings = await useModel.embed([previousText]);
+                
+                results.similarity = tf.tidy(() => {
+                    const a = latestEmbeddings;
+                    const b = previousEmbeddings;
+                    const similarity = tf.matMul(a, b, false, true).dataSync()[0];
+                    return similarity;
+                });
+            } else {
+                results.similarity = 0;
+            }
             
-            // Select strategy based on personality
-            const strategy = strategies[personality] || strategies.neutral;
+            // Detect topic drift
+            const initialText = userMessages[0].text;
+            const initialEmbeddings = await useModel.embed([initialText]);
             
-            // Select random templates
-            const intro = randomFromArray(strategy.introductions);
-            const counter = randomFromArray(strategy.counters);
-            const question = randomFromArray(strategy.questions);
-            const closing = randomFromArray(strategy.closings);
-            
-            // Generate counterpoints based on sentiment and intensity
-            const counterpoints = generateCounterpoints(argument, sentiment, intensity);
-            
-            // Build response
-            let response = intro.replace("{TOPIC}", topic.substring(0, 50));
-            
-            // Add counterpoints
-            counterpoints.forEach((point, i) => {
-                response += `\n\n${i+1}. ${point}`;
+            results.topicDrift = tf.tidy(() => {
+                const a = latestEmbeddings;
+                const b = initialEmbeddings;
+                const similarity = tf.matMul(a, b, false, true).dataSync()[0];
+                return 1 - similarity; // Drift is inverse of similarity
             });
             
-            // Add question
-            const questionCounter = counterpoints[Math.floor(Math.random() * counterpoints.length)];
-            response += `\n\n${question.replace("{COUNTER}", questionCounter.substring(0, 50))}`;
-            
-            // Add closing
-            response += `\n\n${closing}`;
-            
-            return response;
+            return results;
         }
 
-        function generateCounterpoints(argument, sentiment, intensity) {
-            const intensityLevel = Math.min(5, Math.max(1, intensity));
-            const counterpoints = [];
+        function extractKeyConcepts(text) {
+            // Simple implementation - in a real app, use proper NLP
+            const words = text.toLowerCase().split(/\s+/);
+            const stopWords = new Set(["the", "and", "but", "for", "with", "this", "that"]);
+            const freq = {};
             
-            // Base counterpoints (these would be enhanced with real NLP in production)
+            words.forEach(word => {
+                if (!stopWords.has(word) && word.length > 3) {
+                    freq[word] = (freq[word] || 0) + 1;
+                }
+            });
+            
+            return Object.entries(freq)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([word]) => word);
+        }
+
+        function estimateArgumentStrength(text) {
+            // Simple heuristic - count supporting evidence markers
+            const evidenceMarkers = ["because", "since", "as shown by", "studies show", "research indicates"];
+            let score = 0;
+            
+            evidenceMarkers.forEach(marker => {
+                if (text.toLowerCase().includes(marker)) {
+                    score += 1;
+                }
+            });
+            
+            // Normalize to 0-1 range
+            return Math.min(1, score / 3);
+        }
+
+        function estimateLogicalConsistency(text) {
+            // Simple heuristic - count logical connectors
+            const connectors = ["therefore", "thus", "hence", "consequently", "however", "although"];
+            let score = 0;
+            
+            connectors.forEach(connector => {
+                if (text.toLowerCase().includes(connector)) {
+                    score += 1;
+                }
+            });
+            
+            // Normalize to 0-1 range
+            return Math.min(1, score / 4);
+        }
+
+        function generateStrategicResponse(topic, argument, analysis, personality, intensity) {
+            // Enhanced response generation with dynamic structure
+            const intensityLevel = Math.min(5, Math.max(1, intensity));
+            
+            // Response components
+            const components = [];
+            
+            // 1. Introduction based on personality and sentiment
+            components.push(generateIntroduction(topic, analysis.sentiment, personality));
+            
+            // 2. Key point recognition
+            if (analysis.keyConcepts && analysis.keyConcepts.length > 0) {
+                components.push(generateKeyPointRecognition(analysis.keyConcepts, personality));
+            }
+            
+            // 3. Counterarguments based on intensity
+            const counterpoints = generateCounterpoints(argument, analysis, intensityLevel);
+            if (counterpoints.length > 0) {
+                components.push(generateCounterargumentSection(counterpoints, personality));
+            }
+            
+            // 4. Questions based on analysis
+            components.push(generateQuestion(analysis, personality));
+            
+            // 5. Closing based on personality
+            components.push(generateClosing(personality));
+            
+            // Combine components with appropriate spacing
+            return components.filter(c => c).join("\n\n");
+        }
+
+        function generateIntroduction(topic, sentiment, personality) {
+            const introductions = {
+                neutral: [
+                    `Let me examine your position on "${topic.substring(0, 50)}"...`,
+                    `Your argument presents an interesting perspective on "${topic.substring(0, 50)}"...`,
+                    `Regarding your position on "${topic.substring(0, 50)}", let's analyze it carefully...`
+                ],
+                socratic: [
+                    `Let me ask you about your position on "${topic.substring(0, 50)}"...`,
+                    `Your argument raises some important questions about "${topic.substring(0, 50)}"...`,
+                    `I'd like to explore your thinking on "${topic.substring(0, 50)}" further...`
+                ],
+                devil: [
+                    `I must challenge your position on "${topic.substring(0, 50)}"...`,
+                    `Your argument about "${topic.substring(0, 50)}" seems problematic because...`,
+                    `Let me play devil's advocate regarding "${topic.substring(0, 50)}"...`
+                ],
+                scholar: [
+                    `Academic analysis of your position on "${topic.substring(0, 50)}" suggests...`,
+                    `The scholarly consensus on "${topic.substring(0, 50)}" would question...`,
+                    `From a research perspective, your view on "${topic.substring(0, 50)}"...`
+                ],
+                passionate: [
+                    `I strongly disagree with your position on "${topic.substring(0, 50)}"!`,
+                    `Your argument about "${topic.substring(0, 50)}" is deeply flawed because...`,
+                    `I must passionately oppose your view on "${topic.substring(0, 50)}"...`
+                ]
+            };
+            
+            // Select based on personality
+            const options = introductions[personality] || introductions.neutral;
+            
+            // Adjust based on sentiment
+            if (sentiment > 0.7) {
+                // Very positive - challenge optimism
+                if (personality === "devil") {
+                    return `Your overly optimistic view on "${topic.substring(0, 50)}" needs serious reconsideration...`;
+                } else if (personality === "passionate") {
+                    return `Your rose-colored glasses about "${topic.substring(0, 50)}" are blinding you to reality!`;
+                }
+            } else if (sentiment < 0.3) {
+                // Very negative - challenge pessimism
+                if (personality === "devil") {
+                    return `Your pessimistic stance on "${topic.substring(0, 50)}" ignores important positive aspects...`;
+                } else if (personality === "passionate") {
+                    return `Your doom-and-gloom about "${topic.substring(0, 50)}" is completely exaggerated!`;
+                }
+            }
+            
+            return randomFromArray(options);
+        }
+
+        function generateKeyPointRecognition(keyConcepts, personality) {
+            const recognitions = {
+                neutral: `I notice you emphasize ${formatConcepts(keyConcepts)} in your argument.`,
+                socratic: `You focus on ${formatConcepts(keyConcepts)} - could you define these more precisely?`,
+                devil: `Your emphasis on ${formatConcepts(keyConcepts)} conveniently ignores important factors!`,
+                scholar: `The concepts ${formatConcepts(keyConcepts)} have been extensively studied in the literature.`,
+                passionate: `You're obsessed with ${formatConcepts(keyConcepts)} while ignoring everything else!`
+            };
+            
+            return recognitions[personality] || recognitions.neutral;
+        }
+
+        function formatConcepts(concepts) {
+            if (concepts.length === 1) return concepts[0];
+            if (concepts.length === 2) return `${concepts[0]} and ${concepts[1]}`;
+            return `${concepts.slice(0, -1).join(', ')}, and ${concepts[concepts.length - 1]}`;
+        }
+
+        function generateCounterpoints(argument, analysis, intensity) {
+            const counterpoints = [];
+            const numPoints = Math.min(intensity, 3); // 1-3 counterpoints
+            
+            // Base counterpoints (would be enhanced with real NLP)
             const baseCounters = [
                 "the potential for confirmation bias in this position",
                 "historical examples that contradict this view",
@@ -1161,41 +1521,127 @@
             ];
             
             // Select counterpoints based on intensity
-            for (let i = 0; i < intensityLevel; i++) {
+            for (let i = 0; i < numPoints; i++) {
                 const counter = baseCounters[Math.floor(Math.random() * baseCounters.length)];
                 if (!counterpoints.includes(counter)) {
                     counterpoints.push(counter);
                 }
-                
-                if (counterpoints.length >= 3) break; // Max 3 counterpoints
             }
             
-            // Adjust based on sentiment
-            if (sentiment > 0.7) {
+            // Adjust based on analysis
+            if (analysis.sentiment > 0.7) {
                 // Very positive - challenge optimism
                 counterpoints.push("the risks being underestimated in this optimistic view");
-            } else if (sentiment < 0.3) {
+            } else if (analysis.sentiment < 0.3) {
                 // Very negative - challenge pessimism
                 counterpoints.push("potential upsides being overlooked in this negative assessment");
             }
             
-            return counterpoints;
+            if (analysis.strength < 0.3) {
+                counterpoints.push("the lack of substantial evidence supporting this claim");
+            }
+            
+            if (analysis.consistency < 0.4) {
+                counterpoints.push("the logical inconsistencies in this line of reasoning");
+            }
+            
+            return counterpoints.slice(0, numPoints); // Ensure we don't exceed max
+        }
+
+        function generateCounterargumentSection(counterpoints, personality) {
+            const sectionHeaders = {
+                neutral: "Several aspects deserve consideration:",
+                socratic: "Important questions arise:",
+                devil: "Serious flaws in this argument include:",
+                scholar: "The research suggests alternative perspectives:",
+                passionate: "This argument fails because:"
+            };
+            
+            let section = sectionHeaders[personality] || sectionHeaders.neutral;
+            
+            counterpoints.forEach((point, i) => {
+                section += `\n${i+1}. ${capitalizeFirstLetter(point)}`;
+                
+                // Add personality-specific emphasis
+                if (personality === "devil") {
+                    section += " - this is a critical oversight!";
+                } else if (personality === "passionate") {
+                    section += " - how can you ignore this?";
+                } else if (personality === "scholar") {
+                    section += " (see Smith et al., 2020)";
+                }
+            });
+            
+            return section;
+        }
+
+        function generateQuestion(analysis, personality) {
+            const questions = {
+                neutral: [
+                    "What evidence most strongly supports your position?",
+                    "How would you respond to these counterpoints?",
+                    "Could there be exceptions to this view?"
+                ],
+                socratic: [
+                    "What is the basis for that conclusion?",
+                    "Could you define your terms more precisely?",
+                    "What would change your mind about this?"
+                ],
+                devil: [
+                    "How can you possibly ignore these issues?",
+                    "Isn't it obvious that this position is flawed?",
+                    "Don't you see the problem with this reasoning?"
+                ],
+                scholar: [
+                    "How does this align with the existing research?",
+                    "What methodology led you to this conclusion?",
+                    "Have you accounted for the peer-reviewed findings?"
+                ],
+                passionate: [
+                    "How can you sleep at night believing this?",
+                    "Don't you care about these consequences?",
+                    "What kind of person would maintain this view?"
+                ]
+            };
+            
+            // Select based on personality
+            const options = questions[personality] || questions.neutral;
+            
+            // Adjust based on analysis
+            if (analysis.similarity < 0.3 && analysis.topicDrift > 0.7) {
+                return "We seem to be drifting from the original topic. Should we refocus?";
+            }
+            
+            if (analysis.strength < 0.3) {
+                return "What stronger evidence could you provide to support this claim?";
+            }
+            
+            return randomFromArray(options);
+        }
+
+        function generateClosing(personality) {
+            const closings = {
+                neutral: "I look forward to your response on these points.",
+                socratic: "Your answers to these questions would help clarify your position.",
+                devil: "These points seem to undermine your argument completely.",
+                scholar: "These academic perspectives merit serious consideration.",
+                passionate: "I can't believe anyone would maintain this view!"
+            };
+            
+            return closings[personality] || closings.neutral;
         }
 
         function generateFallbackResponse(topic, argument, personality, intensity) {
             // Simple fallback when ML features fail
             const personalities = {
-                neutral: "Your perspective on {TOPIC} is interesting. Could you elaborate on {ARGUMENT}?",
-                socratic: "What do you mean exactly by {ARGUMENT} when discussing {TOPIC}?",
-                devil: "That's a questionable position on {TOPIC}! How do you justify {ARGUMENT}?",
-                scholar: "The academic literature might challenge your view that {ARGUMENT} regarding {TOPIC}.",
-                passionate: "I strongly disagree with your take on {TOPIC}! {ARGUMENT} is completely wrong!"
+                neutral: `Your perspective on "${topic.substring(0, 50)}" is interesting. Could you elaborate on "${argument.substring(0, 50)}"?`,
+                socratic: `What do you mean exactly by "${argument.substring(0, 50)}" when discussing "${topic.substring(0, 50)}"?`,
+                devil: `That's a questionable position on "${topic.substring(0, 50)}"! How do you justify "${argument.substring(0, 50)}"?`,
+                scholar: `The academic literature might challenge your view that "${argument.substring(0, 50)}" regarding "${topic.substring(0, 50)}".`,
+                passionate: `I strongly disagree with your take on "${topic.substring(0, 50)}"! "${argument.substring(0, 50)}" is completely wrong!`
             };
             
-            const template = personalities[personality] || personalities.neutral;
-            return template
-                .replace("{TOPIC}", topic.substring(0, 50))
-                .replace("{ARGUMENT}", argument.substring(0, 50) + (argument.length > 50 ? "..." : ""));
+            return personalities[personality] || personalities.neutral;
         }
 
         // ===== Debate History =====
@@ -1300,8 +1746,32 @@
             return array[Math.floor(Math.random() * array.length)];
         }
 
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
         function showError(message) {
-            alert(`Error: ${message}`);
+            const toast = document.createElement("div");
+            toast.textContent = message;
+            toast.style.position = "fixed";
+            toast.style.bottom = "20px";
+            toast.style.right = "20px";
+            toast.style.backgroundColor = "var(--color-error)";
+            toast.style.color = "white";
+            toast.style.padding = "var(--space-sm) var(--space-md)";
+            toast.style.borderRadius = "var(--radius-sm)";
+            toast.style.boxShadow = "var(--shadow-md)";
+            toast.style.zIndex = "1000";
+            toast.style.animation = "fadeIn 0.3s ease";
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = "fadeOut 0.3s ease";
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
         }
 
         function showSuccess(message) {
