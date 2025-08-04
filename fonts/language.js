@@ -1,4 +1,4 @@
-// language.js - Multilingual Support for Countify+
+// language.js - Enhanced Multilingual Support for Countify+
 window.CountifyLanguage = (function() {
     'use strict';
 
@@ -34,6 +34,7 @@ window.CountifyLanguage = (function() {
             'text_size': 'Text Size',
             'app_theme': 'App Theme',
             'about': 'ABOUT',
+            'license': 'License',
             'privacy_policy': 'Privacy Policy',
             'terms_service': 'Terms of Service',
             'version': 'Version',
@@ -218,6 +219,7 @@ VOICE MODE:
             'text_size': 'Tamaño de Texto',
             'app_theme': 'Tema de la App',
             'about': 'ACERCA DE',
+            'license': 'Licencia',
             'privacy_policy': 'Política de Privacidad',
             'terms_service': 'Términos de Servicio',
             'version': 'Versión',
@@ -402,6 +404,7 @@ MODO DE VOZ:
             'text_size': 'Taille du Texte',
             'app_theme': 'Thème de l\'App',
             'about': 'À PROPOS',
+            'license': 'License',
             'privacy_policy': 'Politique de Confidentialité',
             'terms_service': 'Conditions d\'Utilisation',
             'version': 'Version',
@@ -586,6 +589,7 @@ MODE VOCAL:
             'text_size': 'Textgröße',
             'app_theme': 'App-Design',
             'about': 'ÜBER',
+            'license': 'Lizenz',
             'privacy_policy': 'Datenschutzrichtlinie',
             'terms_service': 'Nutzungsbedingungen',
             'version': 'Version',
@@ -770,6 +774,7 @@ SPRACHMODUS:
             'text_size': 'Laki ng Teksto',
             'app_theme': 'Tema ng App',
             'about': 'TUNGKOL SA',
+            'license': 'Lisensiya',
             'privacy_policy': 'Patakaran sa Privacy',
             'terms_service': 'Mga Tuntunin ng Serbisyo',
             'version': 'Bersyon',
@@ -954,6 +959,7 @@ VOICE MODE:
 'text_size': 'Kadako han Teksto',
 'app_theme': 'Tema han App',
 'about': 'MAHITUNGOD',
+            'license': 'Lisensya',
 'privacy_policy': 'Polisiya ha Pagkapribado',
 'terms_service': 'Mga Termino han Serbisyo',
 'version': 'Bersyon',
