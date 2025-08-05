@@ -11,6 +11,7 @@ yarn-error.log*
 # Environment and private configuration files
 .env
 config.private.js
+config.js
 
 # Editor and IDE settings
 .vscode/
