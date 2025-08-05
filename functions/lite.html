@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NearCheck Lite - Geolocation Attendance System</title>
+    
+    <!-- Design Sources -->
+    <link rel="stylesheet" type="text/css" href="https://countify-black.vercel.app/css/waves.min.css" />
+    <script src="https://countify-black.vercel.app/css/waves.min.js"></script>
+    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
+    <script src="https://countify-black.vercel.app/css/mdui.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    
+    <!-- Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #6200ee;
+            --primary-dark: #3700b3;
+            --primary-light: #bb86fc;
+            --secondary-color: #03dac6;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --error: #b00020;
+            --on-primary: #ffffff;
+            --on-secondary: #000000;
+            --on-background: #000000;
+            --on-surface: #000000;
+            --on-error: #ffffff;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--on-background);
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Header Styles */
+        .app-header {
+            background-color: var(--primary-color);
+            color: var(--on-primary);
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1000;
+            position: sticky;
+            top: 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Auth Container */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .auth-title {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+        
+        .auth-subtitle {
+            font-size: 1rem;
+            margin-bottom: 24px;
+            color: var(--on-surface);
+            opacity: 0.8;
+        }
+        
+        .role-selector {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .role-btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            background-color: transparent;
+            color: var(--primary-color);
+        }
+        
+        .role-btn.active {
+            background-color: var(--primary-color);
+            color: var(--on-primary);
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            padding: 12px 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .auth-btn {
+            background-color: var(--primary-color);
+            color: var(--on-primary);
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .auth-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .auth-footer {
+            margin-top: 24px;
+            font-size: 0.9rem;
+        }
+        
+        .auth-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .greeting {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .section-carousel {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+            scrollbar-width: thin;
+        }
+        
+        .section-card {
+            min-width: 280px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .section-card h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        .section-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--on-surface);
+            opacity: 0.8;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .primary-btn {
+            background-color: var(--primary-color);
+            color: var(--on-primary);
+        }
+        
+        .secondary-btn {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        /* Bottom Sheet Styles */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--surface);
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.2);
+            padding: 24px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+        
+        .bottom-sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .bottom-sheet-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--on-surface);
+        }
+        
+        .bottom-sheet-content {
+            margin-bottom: 16px;
+        }
+        
+        .bottom-sheet-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        /* Profile Avatar */
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Responsive Layout */
+        @media (min-width: 768px) {
+            .app-container {
+                flex-direction: row;
+            }
+            
+            .sidebar {
+                width: 280px;
+                height: 100vh;
+                position: sticky;
+                top: 0;
+                border-right: 1px solid #eee;
+            }
+            
+            .main-content {
+                flex: 1;
+                padding: 24px;
+            }
+            
+            .split-view {
+                display: flex;
+                gap: 24px;
+            }
+            
+            .split-view-left {
+                flex: 1;
+            }
+            
+            .split-view-right {
+                width: 350px;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--on-surface);
+            opacity: 0.7;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            color: var(--primary-light);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1002;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* Check-in Button Animation */
+        .check-in-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .check-in-btn:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .check-in-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Confetti Canvas */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1003;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>NearCheck Lite</span>
+                </div>
+                <div class="profile-avatar" style="background-color: #6200ee;" id="profileAvatar">
+                    <span>U</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Authentication Screen (Initial View) -->
+            <div class="auth-container" id="authContainer">
+                <div class="auth-card">
+                    <h1 class="auth-title">Hi there!</h1>
+                    <p class="auth-subtitle">Attendance. Smarter than ever.</p>
+                    
+                    <div class="role-selector">
+                        <button class="role-btn active" id="teacherRoleBtn">Teacher</button>
+                        <button class="role-btn" id="studentRoleBtn">Student</button>
+                    </div>
+                    
+                    <form class="auth-form" id="signUpForm">
+                        <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" class="form-control" required minlength="8">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" required minlength="8">
+                        </div>
+                        
+                        <div class="form-group" id="sectionIdGroup" style="display: none;">
+                            <label for="sectionId">Section ID (Optional)</label>
+                            <input type="text" id="sectionId" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="usernameLabel">Your Username</label>
+                            <input type="text" id="username" class="form-control" readonly>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 16px;">
+                            <label style="font-size: 0.8rem;">
+                                <input type="checkbox" id="termsCheckbox" required> 
+                                By continuing to NearCheck Lite, you agree with our <a href="#" class="auth-link">Terms</a> and <a href="#" class="auth-link">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="auth-btn" id="signUpBtn">Continue</button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        Already have an account? <a href="#" class="auth-link" id="switchToSignIn">Sign In</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard (Hidden Initially) -->
+            <div class="dashboard" id="dashboard" style="display: none;">
+                <h1 class="greeting" id="greetingText">Good morning, User</h1>
+                
+                <div class="section-carousel" id="sectionCarousel">
+                    <!-- Sections will be populated here -->
+                </div>
+                
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>No Sections Yet</h3>
+                    <p id="emptyStateMessage">Create your first section to get started</p>
+                    <button class="auth-btn" id="createFirstSectionBtn">Create Section</button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Bottom Sheets -->
+        <div class="bottom-sheet" id="createSectionSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Create New Section</h3>
+                <button class="close-btn" id="closeCreateSection">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <form id="createSectionForm">
+                    <div class="form-group">
+                        <label for="sectionName">Section Name</label>
+                        <input type="text" id="sectionName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subjectName">Subject</label>
+                        <input type="text" id="subjectName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sectionSchedule">Schedule</label>
+                        <input type="datetime-local" id="sectionSchedule" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sectionRadius">Check-in Radius</label>
+                        <select id="sectionRadius" class="form-control" required>
+                            <option value="5">NearSnap (5m)</option>
+                            <option value="10" selected>NearStandard (10m)</option>
+                            <option value="20">NearFlex (20m)</option>
+                            <option value="50">NearMax (50m)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="enableNearID" checked> Enable NearID+ (Auto Check-in)
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="enablePlusPoints"> Enable Plus Points (Bonus for early check-in)
+                        </label>
+                    </div>
+                    
+                    <div class="form-group" id="locationGroup">
+                        <label>Section Location</label>
+                        <button type="button" class="auth-btn" id="getLocationBtn">
+                            <i class="fas fa-map-marker-alt"></i> Use Current Location
+                        </button>
+                        <div id="locationStatus" style="margin-top: 8px; font-size: 0.9rem;"></div>
+                        <input type="hidden" id="sectionLatitude">
+                        <input type="hidden" id="sectionLongitude">
+                    </div>
+                </form>
+            </div>
+            <div class="bottom-sheet-actions">
+                <button class="secondary-btn" id="cancelCreateSection">Cancel</button>
+                <button class="primary-btn" id="confirmCreateSection">Create Section</button>
+            </div>
+        </div>
+        
+        <!-- Check-in Bottom Sheet -->
+        <div class="bottom-sheet" id="checkInSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Check In</h3>
+                <button class="close-btn" id="closeCheckIn">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <p id="checkInStatus">You are currently near your teacher's section during an active session</p>
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="checkInNote">Note (Optional)</label>
+                    <input type="text" id="checkInNote" class="form-control" placeholder="Add any notes for your teacher">
+                </div>
+            </div>
+            <div class="bottom-sheet-actions">
+                <button class="secondary-btn" id="cancelCheckIn">Not now</button>
+                <button class="primary-btn check-in-btn" id="confirmCheckIn">Check In</button>
+            </div>
+        </div>
+        
+        <!-- Location Permission Bottom Sheet -->
+        <div class="bottom-sheet" id="locationPermissionSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">📍 NearCheck Lite — Location Permission</h3>
+                <button class="close-btn" id="closeLocationPermission">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <h4>Prompt Description</h4>
+                <p>NearCheck Lite requires permission to access your current device location to securely verify attendance for your assigned sections. Manage your location access below without needing to navigate complicated browser site settings.</p>
+                
+                <h4 style="margin-top: 16px;">Permission Status</h4>
+                <div id="permissionStatus" style="padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-top: 8px;">
+                    <i class="fas fa-circle" style="color: #ff9800;"></i> Permission not determined
+                </div>
+                
+                <div id="browserNotSupported" style="display: none; margin-top: 16px;">
+                    <p>This browser doesn't support location access. To continue using NearCheck Lite, please switch to a browser that allows location permissions.</p>
+                    <div id="browserDownloadButtons" style="margin-top: 12px;">
+                        <button class="secondary-btn" style="margin-right: 8px;">
+                            <i class="fab fa-chrome"></i> Download Chrome
+                        </button>
+                        <button class="secondary-btn">
+                            <i class="fab fa-edge"></i> Download Edge
+                        </button>
+                    </div>
+                    <p style="margin-top: 12px;">You can continue with limited features</p>
+                </div>
+            </div>
+            <div class="bottom-sheet-actions" id="locationPermissionActions">
+                <button class="secondary-btn" id="enableLocationLater">Later</button>
+                <button class="primary-btn" id="enableLocationNow">Enable</button>
+            </div>
+        </div>
+        
+        <!-- Age Confirmation Bottom Sheet -->
+        <div class="bottom-sheet" id="ageConfirmationSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Age Confirmation</h3>
+                <button class="close-btn" id="closeAgeConfirmation">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <p id="ageConfirmationText">To continue, please confirm that you are 20 years old or above. This helps us verify teacher accounts and maintain a safe, trusted educational environment for students and staff on NearCheck Lite.</p>
+            </div>
+            <div class="bottom-sheet-actions">
+                <button class="secondary-btn" id="cancelAgeConfirmation">Cancel</button>
+                <button class="primary-btn" id="confirmAge">I Confirm</button>
+            </div>
+        </div>
+        
+        <!-- Profile Bottom Sheet -->
+        <div class="bottom-sheet" id="profileSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Your Profile</h3>
+                <button class="close-btn" id="closeProfile">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div class="profile-avatar" id="profileAvatarLarge" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <span>U</span>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0;" id="profileName">User Name</h3>
+                        <p style="margin: 4px 0 0; font-size: 0.9rem;" id="profileUsername">username@nearcheck/teacher123</p>
+                        <p style="margin: 4px 0 0; font-size: 0.9rem;" id="profileRole">Teacher</p>
+                        <p style="margin: 4px 0 0; font-size: 0.9rem;" id="profileJoinDate">Joined on Jan 1, 2023</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Change Display Identity</label>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <button class="secondary-btn" id="changeToEmoji">Emoji</button>
+                        <button class="secondary-btn" id="changeToText">Text (1-2 chars)</button>
+                    </div>
+                    <p style="font-size: 0.8rem; margin-top: 8px; color: #666;">Changes can only be made once every 24 hours</p>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="currentEmail">Email</label>
+                    <input type="email" id="currentEmail" class="form-control" readonly>
+                </div>
+                
+                <button class="secondary-btn" style="width: 100%; margin-top: 8px;" id="changePasswordBtn">Change Password</button>
+                <button class="secondary-btn" style="width: 100%; margin-top: 8px;" id="changeEmailBtn">Change Email</button>
+                
+                <div style="margin-top: 24px; border-top: 1px solid #eee; padding-top: 16px;">
+                    <button class="secondary-btn" style="width: 100%;" id="locationSettingsBtn">Location Settings</button>
+                    <button class="secondary-btn" style="width: 100%; margin-top: 8px;" id="privacySettingsBtn">Privacy Settings</button>
+                </div>
+                
+                <button class="auth-btn" style="width: 100%; margin-top: 24px; background-color: #f44336;" id="signOutBtn">Sign Out</button>
+            </div>
+        </div>
+        
+        <!-- Section Details Bottom Sheet -->
+        <div class="bottom-sheet" id="sectionDetailsSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title" id="sectionDetailsTitle">Section Details</h3>
+                <button class="close-btn" id="closeSectionDetails">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Subject</h4>
+                    <p style="margin: 0;" id="sectionDetailsSubject">Mathematics</p>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Schedule</h4>
+                    <p style="margin: 0;" id="sectionDetailsSchedule">Mon, Wed, Fri at 9:00 AM</p>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Location</h4>
+                    <p style="margin: 0;" id="sectionDetailsLocation">Room 101, Building A</p>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Check-in Radius</h4>
+                    <p style="margin: 0;" id="sectionDetailsRadius">10 meters</p>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Created On</h4>
+                    <p style="margin: 0;" id="sectionDetailsCreated">January 1, 2023</p>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px;">Students</h4>
+                    <p style="margin: 0;" id="sectionDetailsStudents">15 enrolled</p>
+                </div>
+                
+                <div id="teacherSectionActions" style="display: none;">
+                    <h4 style="margin: 16px 0 8px;">Teacher Actions</h4>
+                    <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" id="startSessionBtn">Start Session</button>
+                    <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" id="inviteStudentsBtn">Invite Students</button>
+                    <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" id="manageStudentsBtn">Manage Students</button>
+                    <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" id="viewAttendanceBtn">View Attendance</button>
+                    <button class="secondary-btn" style="width: 100%; margin-bottom: 8px;" id="downloadAttendanceBtn">Download Attendance</button>
+                    <button class="auth-btn" style="width: 100%; background-color: #f44336;" id="deleteSectionBtn">Delete Section</button>
+                </div>
+                
+                <div id="studentSectionActions" style="display: none;">
+                    <h4 style="margin: 16px 0 8px;">Student Actions</h4>
+                    <button class="primary-btn" style="width: 100%; margin-bottom: 8px;" id="checkInBtn">Check In</button>
+                    <button class="secondary-btn" style="width: 100%;" id="viewMyAttendanceBtn">View My Attendance</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Invite Students Bottom Sheet -->
+        <div class="bottom-sheet" id="inviteStudentsSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Invite Students</h3>
+                <button class="close-btn" id="closeInviteStudents">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <div class="form-group">
+                    <label>Invite Link</label>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <input type="text" id="inviteLink" class="form-control" readonly>
+                        <button class="primary-btn" id="copyInviteLinkBtn">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>Section ID</label>
+                    <div style="display: flex; gap: 8px; margin-top: 8px;">
+                        <input type="text" id="sectionIdDisplay" class="form-control" readonly>
+                        <button class="primary-btn" id="copySectionIdBtn">Copy</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px; text-align: center;">
+                    <p>Or share via QR code</p>
+                    <div id="qrCodeContainer" style="margin: 16px auto; width: 200px; height: 200px; display: flex; justify-content: center; align-items: center; background-color: white; padding: 16px;">
+                        <!-- QR code will be generated here -->
+                    </div>
+                    <button class="secondary-btn" id="downloadQrCodeBtn">Download QR Code</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Bottom Sheet -->
+        <div class="bottom-sheet" id="deleteConfirmationSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title">Confirm Deletion</h3>
+                <button class="close-btn" id="closeDeleteConfirmation">&times;</button>
+            </div>
+            <div class="bottom-sheet-content">
+                <p id="deleteConfirmationText">Are you sure you want to delete this section? This action cannot be undone. All associated data will be permanently removed.</p>
+                
+                <div class="form-group" style="margin-top: 16px;">
+                    <label for="currentPassword">Enter your current password to confirm</label>
+                    <input type="password" id="currentPassword" class="form-control" required>
+                </div>
+                
+                <div style="margin-top: 16px; padding: 12px; background-color: #fff8e1; border-radius: 4px;">
+                    <p style="margin: 0; font-size: 0.9rem;">For security reasons, we require password confirmation for this action. The section will be marked for deletion and can be restored within 30 days.</p>
+                </div>
+                
+                <div id="downloadBeforeDelete" style="margin-top: 16px; display: none;">
+                    <label>
+                        <input type="checkbox" id="downloadAttendanceCheckbox"> Download attendance records before deleting
+                    </label>
+                </div>
+            </div>
+            <div class="bottom-sheet-actions">
+                <button class="secondary-btn" id="cancelDeleteBtn">Cancel</button>
+                <button class="auth-btn" style="background-color: #f44336;" id="confirmDeleteBtn">Delete Section</button>
+            </div>
+        </div>
+        
+        <!-- Toast Notification -->
+        <div class="toast" id="toastNotification"></div>
+        
+        <!-- Confetti Canvas (Hidden) -->
+        <canvas id="confettiCanvas"></canvas>
+    </div>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVP8zaUj2iDrooLbRQNypHqB8QNTLhGDE",
+            authDomain: "attendance-fe1c8.firebaseapp.com",
+            projectId: "attendance-fe1c8",
+            storageBucket: "attendance-fe1c8.appspot.com",
+            messagingSenderId: "903463376704",
+            appId: "1:903463376704:web:d004c563d56aa286df8ca5",
+            measurementId: "G-YY5GQZPSRK"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const realtimeDb = firebase.database();
+        
+        // DOM Elements
+        const authContainer = document.getElementById('authContainer');
+        const dashboard = document.getElementById('dashboard');
+        const mainContent = document.getElementById('mainContent');
+        const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+        const studentRoleBtn = document.getElementById('studentRoleBtn');
+        const signUpForm = document.getElementById('signUpForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const sectionIdInput = document.getElementById('sectionId');
+        const sectionIdGroup = document.getElementById('sectionIdGroup');
+        const usernameInput = document.getElementById('username');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        const signUpBtn = document.getElementById('signUpBtn');
+        const switchToSignIn = document.getElementById('switchToSignIn');
+        const greetingText = document.getElementById('greetingText');
+        const sectionCarousel = document.getElementById('sectionCarousel');
+        const emptyState = document.getElementById('emptyState');
+        const emptyStateMessage = document.getElementById('emptyStateMessage');
+        const createFirstSectionBtn = document.getElementById('createFirstSectionBtn');
+        const profileAvatar = document.getElementById('profileAvatar');
+        
+        // Bottom Sheets
+        const createSectionSheet = document.getElementById('createSectionSheet');
+        const closeCreateSection = document.getElementById('closeCreateSection');
+        const cancelCreateSection = document.getElementById('cancelCreateSection');
+        const confirmCreateSection = document.getElementById('confirmCreateSection');
+        const sectionNameInput = document.getElementById('sectionName');
+        const subjectNameInput = document.getElementById('subjectName');
+        const sectionScheduleInput = document.getElementById('sectionSchedule');
+        const sectionRadiusSelect = document.getElementById('sectionRadius');
+        const enableNearIDCheckbox = document.getElementById('enableNearID');
+        const enablePlusPointsCheckbox = document.getElementById('enablePlusPoints');
+        const getLocationBtn = document.getElementById('getLocationBtn');
+        const locationStatus = document.getElementById('locationStatus');
+        const sectionLatitudeInput = document.getElementById('sectionLatitude');
+        const sectionLongitudeInput = document.getElementById('sectionLongitude');
+        
+        const checkInSheet = document.getElementById('checkInSheet');
+        const closeCheckIn = document.getElementById('closeCheckIn');
+        const checkInStatus = document.getElementById('checkInStatus');
+        const checkInNoteInput = document.getElementById('checkInNote');
+        const cancelCheckIn = document.getElementById('cancelCheckIn');
+        const confirmCheckIn = document.getElementById('confirmCheckIn');
+        
+        const locationPermissionSheet = document.getElementById('locationPermissionSheet');
+        const closeLocationPermission = document.getElementById('closeLocationPermission');
+        const permissionStatus = document.getElementById('permissionStatus');
+        const browserNotSupported = document.getElementById('browserNotSupported');
+        const locationPermissionActions = document.getElementById('locationPermissionActions');
+        const enableLocationLater = document.getElementById('enableLocationLater');
+        const enableLocationNow = document.getElementById('enableLocationNow');
+        
+        const ageConfirmationSheet = document.getElementById('ageConfirmationSheet');
+        const closeAgeConfirmation = document.getElementById('closeAgeConfirmation');
+        const ageConfirmationText = document.getElementById('ageConfirmationText');
+        const cancelAgeConfirmation = document.getElementById('cancelAgeConfirmation');
+        const confirmAge = document.getElementById('confirmAge');
+        
+        const profileSheet = document.getElementById('profileSheet');
+        const closeProfile = document.getElementById('closeProfile');
+        const profileAvatarLarge = document.getElementById('profileAvatarLarge');
+        const profileName = document.getElementById('profileName');
+        const profileUsername = document.getElementById('profileUsername');
+        const profileRole = document.getElementById('profileRole');
+        const profileJoinDate = document.getElementById('profileJoinDate');
+        const changeToEmoji = document.getElementById('changeToEmoji');
+        const changeToText = document.getElementById('changeToText');
+        const currentEmail = document.getElementById('currentEmail');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changeEmailBtn = document.getElementById('changeEmailBtn');
+        const locationSettingsBtn = document.getElementById('locationSettingsBtn');
+        const privacySettingsBtn = document.getElementById('privacySettingsBtn');
+        const signOutBtn = document.getElementById('signOutBtn');
+        
+        const sectionDetailsSheet = document.getElementById('sectionDetailsSheet');
+        const closeSectionDetails = document.getElementById('closeSectionDetails');
+        const sectionDetailsTitle = document.getElementById('sectionDetailsTitle');
+        const sectionDetailsSubject = document.getElementById('sectionDetailsSubject');
+        const sectionDetailsSchedule = document.getElementById('sectionDetailsSchedule');
+        const sectionDetailsLocation = document.getElementById('sectionDetailsLocation');
+        const sectionDetailsRadius = document.getElementById('sectionDetailsRadius');
+        const sectionDetailsCreated = document.getElementById('sectionDetailsCreated');
+        const sectionDetailsStudents = document.getElementById('sectionDetailsStudents');
+        const teacherSectionActions = document.getElementById('teacherSectionActions');
+        const studentSectionActions = document.getElementById('studentSectionActions');
+        const startSessionBtn = document.getElementById('startSessionBtn');
+        const inviteStudentsBtn = document.getElementById('inviteStudentsBtn');
+        const manageStudentsBtn = document.getElementById('manageStudentsBtn');
+        const viewAttendanceBtn = document.getElementById('viewAttendanceBtn');
+        const downloadAttendanceBtn = document.getElementById('downloadAttendanceBtn');
+        const deleteSectionBtn = document.getElementById('deleteSectionBtn');
+        const checkInBtn = document.getElementById('checkInBtn');
+        const viewMyAttendanceBtn = document.getElementById('viewMyAttendanceBtn');
+        
+        const inviteStudentsSheet = document.getElementById('inviteStudentsSheet');
+        const closeInviteStudents = document.getElementById('closeInviteStudents');
+        const inviteLinkInput = document.getElementById('inviteLink');
+        const copyInviteLinkBtn = document.getElementById('copyInviteLinkBtn');
+        const sectionIdDisplay = document.getElementById('sectionIdDisplay');
+        const copySectionIdBtn = document.getElementById('copySectionIdBtn');
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
+        const downloadQrCodeBtn = document.getElementById('downloadQrCodeBtn');
+        
+        const deleteConfirmationSheet = document.getElementById('deleteConfirmationSheet');
+        const closeDeleteConfirmation = document.getElementById('closeDeleteConfirmation');
+        const deleteConfirmationText = document.getElementById('deleteConfirmationText');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const downloadBeforeDelete = document.getElementById('downloadBeforeDelete');
+        const downloadAttendanceCheckbox = document.getElementById('downloadAttendanceCheckbox');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        const toastNotification = document.getElementById('toastNotification');
+        const confettiCanvas = document.getElementById('confettiCanvas');
+        
+        // App State
+        let currentUser = null;
+        let isTeacher = true;
+        let userSections = [];
+        let currentSection = null;
+        let currentLocation = null;
+        let locationPermissionGranted = false;
+        let geolocationSupported = true;
+        
+        // Initialize the app
+        function initApp() {
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Check auth state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    currentUser = user;
+                    loadUserData();
+                    showDashboard();
+                } else {
+                    // User is signed out
+                    currentUser = null;
+                    showAuthScreen();
+                }
+            });
+            
+            // Check geolocation support
+            if (!navigator.geolocation) {
+                geolocationSupported = false;
+                browserNotSupported.style.display = 'block';
+                locationPermissionActions.style.display = 'none';
+            }
+            
+            // Generate username when name changes
+            fullNameInput.addEventListener('input', generateUsername);
+            
+            // Initialize waves effect
+            Waves.attach('.auth-btn', ['waves-light']);
+            Waves.attach('.role-btn', ['waves-light']);
+            Waves.attach('.action-btn', ['waves-light']);
+            Waves.init();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Role selection
+            teacherRoleBtn.addEventListener('click', () => {
+                isTeacher = true;
+                teacherRoleBtn.classList.add('active');
+                studentRoleBtn.classList.remove('active');
+                sectionIdGroup.style.display = 'none';
+                emptyStateMessage.textContent = 'Create your first section to get started';
+            });
+            
+            studentRoleBtn.addEventListener('click', () => {
+                isTeacher = false;
+                studentRoleBtn.classList.add('active');
+                teacherRoleBtn.classList.remove('active');
+                sectionIdGroup.style.display = 'block';
+                emptyStateMessage.textContent = 'Join a section to get started';
+            });
+            
+            // Sign up form
+            signUpForm.addEventListener('submit', handleSignUp);
+            switchToSignIn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('Sign in functionality coming soon');
+            });
+            
+            // Create first section button
+            createFirstSectionBtn.addEventListener('click', showCreateSectionSheet);
+            
+            // Profile avatar
+            profileAvatar.addEventListener('click', showProfileSheet);
+            
+            // Create section sheet
+            closeCreateSection.addEventListener('click', hideCreateSectionSheet);
+            cancelCreateSection.addEventListener('click', hideCreateSectionSheet);
+            confirmCreateSection.addEventListener('click', createNewSection);
+            getLocationBtn.addEventListener('click', getCurrentLocation);
+            
+            // Check-in sheet
+            closeCheckIn.addEventListener('click', hideCheckInSheet);
+            cancelCheckIn.addEventListener('click', hideCheckInSheet);
+            confirmCheckIn.addEventListener('click', performCheckIn);
+            
+            // Location permission sheet
+            closeLocationPermission.addEventListener('click', hideLocationPermissionSheet);
+            enableLocationLater.addEventListener('click', hideLocationPermissionSheet);
+            enableLocationNow.addEventListener('click', requestLocationPermission);
+            
+            // Age confirmation sheet
+            closeAgeConfirmation.addEventListener('click', hideAgeConfirmationSheet);
+            cancelAgeConfirmation.addEventListener('click', hideAgeConfirmationSheet);
+            confirmAge.addEventListener('click', confirmAgeVerification);
+            
+            // Profile sheet
+            closeProfile.addEventListener('click', hideProfileSheet);
+            changeToEmoji.addEventListener('click', () => changeDisplayIdentity('emoji'));
+            changeToText.addEventListener('click', () => changeDisplayIdentity('text'));
+            signOutBtn.addEventListener('click', signOut);
+            
+            // Section details sheet
+            closeSectionDetails.addEventListener('click', hideSectionDetailsSheet);
+            startSessionBtn.addEventListener('click', startSession);
+            inviteStudentsBtn.addEventListener('click', showInviteStudentsSheet);
+            manageStudentsBtn.addEventListener('click', manageStudents);
+            viewAttendanceBtn.addEventListener('click', viewAttendance);
+            downloadAttendanceBtn.addEventListener('click', downloadAttendance);
+            deleteSectionBtn.addEventListener('click', showDeleteConfirmationSheet);
+            checkInBtn.addEventListener('click', showCheckInSheet);
+            viewMyAttendanceBtn.addEventListener('click', viewMyAttendance);
+            
+            // Invite students sheet
+            closeInviteStudents.addEventListener('click', hideInviteStudentsSheet);
+            copyInviteLinkBtn.addEventListener('click', copyInviteLink);
+            copySectionIdBtn.addEventListener('click', copySectionId);
+            downloadQrCodeBtn.addEventListener('click', downloadQrCode);
+            
+            // Delete confirmation sheet
+            closeDeleteConfirmation.addEventListener('click', hideDeleteConfirmationSheet);
+            cancelDeleteBtn.addEventListener('click', hideDeleteConfirmationSheet);
+            confirmDeleteBtn.addEventListener('click', deleteSection);
+        }
+        
+        // Generate username based on full name
+        function generateUsername() {
+            const fullName = fullNameInput.value.trim();
+            if (!fullName) return;
+            
+            // Simple username generation (in a real app, this would be more robust)
+            const nameParts = fullName.toLowerCase().split(' ');
+            let username = '';
+            
+            if (nameParts.length === 1) {
+                username = nameParts[0];
+            } else {
+                username = nameParts[0].charAt(0) + nameParts[nameParts.length - 1];
+            }
+            
+            // Add random numbers to ensure uniqueness
+            const randomNum = Math.floor(100 + Math.random() * 900);
+            username += randomNum;
+            
+            // Add role suffix
+            if (isTeacher) {
+                username += '@nearcheck/teacher';
+            } else {
+                username += '@nearcheck/student';
+            }
+            
+            usernameInput.value = username;
+        }
+        
+        // Handle sign up
+        async function handleSignUp(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!termsCheckbox.checked) {
+                showToast('Please agree to the terms and privacy policy');
+                return;
+            }
+            
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                showToast('Passwords do not match');
+                return;
+            }
+            
+            if (passwordInput.value.length < 8) {
+                showToast('Password must be at least 8 characters');
+                return;
+            }
+            
+            try {
+                // Create user with email and password
+                const userCredential = await auth.createUserWithEmailAndPassword(
+                    emailInput.value,
+                    passwordInput.value
+                );
+                
+                // Save additional user data to Firestore
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    fullName: fullNameInput.value.trim(),
+                    username: usernameInput.value,
+                    isTeacher: isTeacher,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    displayIdentity: {
+                        type: 'text',
+                        value: fullNameInput.value.trim().charAt(0).toUpperCase(),
+                        lastChanged: null
+                    },
+                    avatarColor: getRandomColor(),
+                    sections: [],
+                    ...(isTeacher ? {} : { sectionId: sectionIdInput.value.trim() || null })
+                });
+                
+                // Show age confirmation if teacher
+                if (isTeacher) {
+                    ageConfirmationText.textContent = 'To continue, please confirm that you are 20 years old or above. This helps us verify teacher accounts and maintain a safe, trusted educational environment for students and staff on NearCheck Lite.';
+                    showAgeConfirmationSheet();
+                } else {
+                    // For students, confirm they're 13+
+                    ageConfirmationText.textContent = 'To continue, please confirm that you are 13 years old or above. This helps us maintain a safe, secure, and appropriate experience for all NearCheck Lite students.';
+                    showAgeConfirmationSheet();
+                }
+                
+            } catch (error) {
+                console.error('Sign up error:', error);
+                showToast(error.message);
+            }
+        }
+        
+        // Confirm age verification
+        function confirmAgeVerification() {
+            hideAgeConfirmationSheet();
+            showToast('Account created successfully!');
+        }
+        
+        // Load user data
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    isTeacher = userData.isTeacher;
+                    
+                    // Update profile display
+                    updateProfileDisplay(userData);
+                    
+                    // Load user's sections
+                    if (isTeacher) {
+                        // Load teacher's created sections
+                        const sectionsQuery = await db.collection('sections')
+                            .where('teacherId', '==', currentUser.uid)
+                            .get();
+                            
+                        userSections = sectionsQuery.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data()
+                        }));
+                    } else {
+                        // Load student's enrolled sections
+                        const sectionIds = userData.sections || [];
+                        if (sectionIds.length > 0) {
+                            const sectionsQuery = await db.collection('sections')
+                                .where(firebase.firestore.FieldPath.documentId(), 'in', sectionIds)
+                                .get();
+                                
+                            userSections = sectionsQuery.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                        }
+                    }
+                    
+                    // Update sections display
+                    updateSectionsDisplay();
+                    
+                    // Update greeting based on time of day
+                    updateGreeting();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('Error loading user data');
+            }
+        }
+        
+        // Update profile display
+        function updateProfileDisplay(userData) {
+            // Set profile avatar
+            const avatarColor = userData.avatarColor || '#6200ee';
+            const displayIdentity = userData.displayIdentity || { type: 'text', value: 'U' };
+            
+            profileAvatar.style.backgroundColor = avatarColor;
+            profileAvatar.innerHTML = `<span>${displayIdentity.value}</span>`;
+            
+            profileAvatarLarge.style.backgroundColor = avatarColor;
+            profileAvatarLarge.innerHTML = `<span>${displayIdentity.value}</span>`;
+            
+            // Set profile details
+            profileName.textContent = userData.fullName || 'User Name';
+            profileUsername.textContent = userData.username || 'username@nearcheck/teacher123';
+            profileRole.textContent = userData.isTeacher ? 'Teacher' : 'Student';
+            
+            if (userData.createdAt) {
+                const joinDate = userData.createdAt.toDate();
+                profileJoinDate.textContent = `Joined on ${joinDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+            } else {
+                profileJoinDate.textContent = 'Joined date not available';
+            }
+            
+            currentEmail.value = currentUser.email;
+        }
+        
+        // Update sections display
+        function updateSectionsDisplay() {
+            sectionCarousel.innerHTML = '';
+            
+            if (userSections.length === 0) {
+                emptyState.style.display = 'block';
+                sectionCarousel.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            sectionCarousel.style.display = 'flex';
+            
+            userSections.forEach(section => {
+                const sectionCard = document.createElement('div');
+                sectionCard.className = 'section-card';
+                sectionCard.innerHTML = `
+                    <h3>${section.name}</h3>
+                    <p>${section.subject}</p>
+                    <p>${section.schedule ? formatSchedule(section.schedule) : 'No schedule set'}</p>
+                    <div class="section-actions">
+                        <button class="action-btn primary-btn view-section-btn" data-section-id="${section.id}">View</button>
+                        ${isTeacher ? `<button class="action-btn secondary-btn edit-section-btn" data-section-id="${section.id}">Edit</button>` : ''}
+                    </div>
+                `;
+                
+                sectionCarousel.appendChild(sectionCard);
+            });
+            
+            // Add event listeners to section buttons
+            document.querySelectorAll('.view-section-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewSectionDetails(btn.dataset.sectionId));
+            });
+            
+            if (isTeacher) {
+                document.querySelectorAll('.edit-section-btn').forEach(btn => {
+                    btn.addEventListener('click', () => editSection(btn.dataset.sectionId));
+                });
+            }
+        }
+        
+        // Format schedule for display
+        function formatSchedule(schedule) {
+            if (!schedule) return 'No schedule';
+            
+            try {
+                const date = schedule.toDate();
+                return date.toLocaleString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return 'Schedule not set';
+            }
+        }
+        
+        // Update greeting based on time of day
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = '';
+            
+            if (hour < 12) {
+                greeting = 'Good morning';
+            } else if (hour < 18) {
+                greeting = 'Good afternoon';
+            } else {
+                greeting = 'Good evening';
+            }
+            
+            const userDoc = db.collection('users').doc(currentUser.uid);
+            userDoc.get().then(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    greetingText.textContent = `${greeting}, ${userData.fullName.split(' ')[0]}`;
+                } else {
+                    greetingText.textContent = `${greeting}, User`;
+                }
+            }).catch(error => {
+                console.error('Error getting user data:', error);
+                greetingText.textContent = `${greeting}, User`;
+            });
+        }
+        
+        // View section details
+        function viewSectionDetails(sectionId) {
+            currentSection = userSections.find(section => section.id === sectionId);
+            if (!currentSection) return;
+            
+            sectionDetailsTitle.textContent = currentSection.name;
+            sectionDetailsSubject.textContent = currentSection.subject || 'No subject specified';
+            sectionDetailsSchedule.textContent = currentSection.schedule ? formatSchedule(currentSection.schedule) : 'No schedule set';
+            sectionDetailsLocation.textContent = currentSection.location ? `${currentSection.location.latitude}, ${currentSection.location.longitude}` : 'Location not set';
+            sectionDetailsRadius.textContent = `${currentSection.radius || 10}m`;
+            sectionDetailsCreated.textContent = currentSection.createdAt ? currentSection.createdAt.toDate().toLocaleDateString() : 'Date not available';
+            sectionDetailsStudents.textContent = currentSection.students ? `${currentSection.students.length} enrolled` : '0 enrolled';
+            
+            // Show appropriate actions based on user role
+            if (isTeacher) {
+                teacherSectionActions.style.display = 'block';
+                studentSectionActions.style.display = 'none';
+            } else {
+                teacherSectionActions.style.display = 'none';
+                studentSectionActions.style.display = 'block';
+            }
+            
+            showSectionDetailsSheet();
+        }
+        
+        // Edit section (for teachers)
+        function editSection(sectionId) {
+            currentSection = userSections.find(section => section.id === sectionId);
+            if (!currentSection) return;
+            
+            // Populate form with section data
+            sectionNameInput.value = currentSection.name;
+            subjectNameInput.value = currentSection.subject || '';
+            
+            if (currentSection.schedule) {
+                const date = currentSection.schedule.toDate();
+                const formattedDate = date.toISOString().slice(0, 16);
+                sectionScheduleInput.value = formattedDate;
+            }
+            
+            sectionRadiusSelect.value = currentSection.radius || 10;
+            enableNearIDCheckbox.checked = currentSection.enableNearID !== false;
+            enablePlusPointsCheckbox.checked = currentSection.enablePlusPoints || false;
+            
+            if (currentSection.location) {
+                locationStatus.textContent = `Location set: ${currentSection.location.latitude}, ${currentSection.location.longitude}`;
+                sectionLatitudeInput.value = currentSection.location.latitude;
+                sectionLongitudeInput.value = currentSection.location.longitude;
+            } else {
+                locationStatus.textContent = 'No location set';
+            }
+            
+            showCreateSectionSheet();
+        }
+        
+        // Start session (for teachers)
+        function startSession() {
+            showToast('Starting session...');
+            // In a real implementation, this would create a session in Firebase
+            // and enable check-ins for students in this section
+            hideSectionDetailsSheet();
+        }
+        
+        // Manage students (for teachers)
+        function manageStudents() {
+            showToast('Manage students functionality coming soon');
+            hideSectionDetailsSheet();
+        }
+        
+        // View attendance (for teachers)
+        function viewAttendance() {
+            showToast('View attendance functionality coming soon');
+            hideSectionDetailsSheet();
+        }
+        
+        // Download attendance (for teachers)
+        function downloadAttendance() {
+            showToast('Downloading attendance data...');
+            
+            // Create a simple Excel file with sample data
+            const data = [
+                ['Student Name', 'Check-in Time', 'Status', 'Points'],
+                ['Student 1', '2023-06-01 09:00', 'Present', '10'],
+                ['Student 2', '2023-06-01 09:05', 'Present', '8'],
+                ['Student 3', '2023-06-01 09:15', 'Late', '5'],
+                ['Student 4', '2023-06-01', 'Absent', '0']
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+            
+            // Generate file name
+            const fileName = `${currentSection.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_attendance.xlsx`;
+            
+            // Download the file
+            XLSX.writeFile(wb, fileName);
+            
+            hideSectionDetailsSheet();
+        }
+        
+        // View my attendance (for students)
+        function viewMyAttendance() {
+            showToast('View my attendance functionality coming soon');
+            hideSectionDetailsSheet();
+        }
+        
+        // Show invite students sheet
+        function showInviteStudentsSheet() {
+            if (!currentSection) return;
+            
+            // Generate invite link
+            const inviteLink = `${window.location.origin}?sectionId=${currentSection.id}`;
+            inviteLinkInput.value = inviteLink;
+            sectionIdDisplay.value = currentSection.id;
+            
+            // Generate QR code
+            qrCodeContainer.innerHTML = '';
+            QRCode.toCanvas(qrCodeContainer, inviteLink, { width: 180 }, (error) => {
+                if (error) {
+                    console.error('QR code generation error:', error);
+                    qrCodeContainer.innerHTML = '<p>Could not generate QR code</p>';
+                }
+            });
+            
+            hideSectionDetailsSheet();
+            showInviteStudentsSheet();
+        }
+        
+        // Copy invite link
+        function copyInviteLink() {
+            inviteLinkInput.select();
+            document.execCommand('copy');
+            showToast('Invite link copied to clipboard');
+        }
+        
+        // Copy section ID
+        function copySectionId() {
+            sectionIdDisplay.select();
+            document.execCommand('copy');
+            showToast('Section ID copied to clipboard');
+        }
+        
+        // Download QR code
+        function downloadQrCode() {
+            const canvas = qrCodeContainer.querySelector('canvas');
+            if (!canvas) {
+                showToast('QR code not available');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = `${currentSection.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_qrcode.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // Show delete confirmation sheet
+        function showDeleteConfirmationSheet() {
+            if (!currentSection) return;
+            
+            deleteConfirmationText.textContent = `Are you sure you want to delete the section "${currentSection.name}"? This action cannot be undone. All associated data will be permanently removed.`;
+            
+            // Show download option if there are attendance records
+            if (currentSection.students && currentSection.students.length > 0) {
+                downloadBeforeDelete.style.display = 'block';
+                downloadAttendanceCheckbox.checked = true;
+            } else {
+                downloadBeforeDelete.style.display = 'none';
+            }
+            
+            hideSectionDetailsSheet();
+            showDeleteConfirmationSheet();
+        }
+        
+        // Delete section
+        async function deleteSection() {
+            if (!currentSection || !currentPasswordInput.value) return;
+            
+            try {
+                // Reauthenticate user
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    currentPasswordInput.value
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                
+                // Download attendance if requested
+                if (downloadAttendanceCheckbox.checked) {
+                    downloadAttendance();
+                }
+                
+                // Delete section from Firestore
+                await db.collection('sections').doc(currentSection.id).delete();
+                
+                // Remove section from user's sections
+                await db.collection('users').doc(currentUser.uid).update({
+                    sections: firebase.firestore.FieldValue.arrayRemove(currentSection.id)
+                });
+                
+                showToast('Section deleted successfully');
+                hideDeleteConfirmationSheet();
+                
+                // Reload user data to update sections list
+                loadUserData();
+                
+            } catch (error) {
+                console.error('Error deleting section:', error);
+                showToast(error.message);
+            }
+        }
+        
+        // Show check-in sheet
+        function showCheckInSheet() {
+            if (!currentSection) return;
+            
+            checkInStatus.textContent = 'You are currently near your teacher\'s section during an active session';
+            checkInNoteInput.value = '';
+            
+            showCheckInSheet();
+        }
+        
+        // Perform check-in
+        async function performCheckIn() {
+            showToast('Checking in...');
+            
+            // In a real implementation, this would:
+            // 1. Get current location
+            // 2. Verify proximity to section location
+            // 3. Record check-in in Firestore
+            // 4. Update student's attendance record
+            
+            hideCheckInSheet();
+            hideSectionDetailsSheet();
+            
+            // Simulate successful check-in with confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            
+            showToast('Checked in successfully!');
+        }
+        
+        // Change display identity (emoji or text)
+        async function changeDisplayIdentity(type) {
+            const userDoc = db.collection('users').doc(currentUser.uid);
+            const doc = await userDoc.get();
+            
+            if (!doc.exists) return;
+            
+            const userData = doc.data();
+            const lastChanged = userData.displayIdentity?.lastChanged;
+            const now = new Date();
+            
+            // Check if 24 hours have passed since last change
+            if (lastChanged) {
+                const lastChangedDate = lastChanged.toDate();
+                const hoursSinceLastChange = (now - lastChangedDate) / (1000 * 60 * 60);
+                
+                if (hoursSinceLastChange < 24) {
+                    const hoursRemaining = Math.ceil(24 - hoursSinceLastChange);
+                    showToast(`You can change your display identity again in ${hoursRemaining} hours`);
+                    return;
+                }
+            }
+            
+            let newValue = '';
+            
+            if (type === 'emoji') {
+                // In a real app, this would show an emoji picker
+                newValue = '😊';
+            } else {
+                // In a real app, this would show a text input
+                newValue = userData.fullName.charAt(0).toUpperCase();
+            }
+            
+            try {
+                await userDoc.update({
+                    'displayIdentity.type': type,
+                    'displayIdentity.value': newValue,
+                    'displayIdentity.lastChanged': firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Update profile display
+                profileAvatarLarge.innerHTML = `<span>${newValue}</span>`;
+                profileAvatar.innerHTML = `<span>${newValue}</span>`;
+                
+                showToast('Display identity updated');
+            } catch (error) {
+                console.error('Error updating display identity:', error);
+                showToast('Failed to update display identity');
+            }
+        }
+        
+        // Sign out
+        function signOut() {
+            auth.signOut().then(() => {
+                showToast('Signed out successfully');
+                hideProfileSheet();
+            }).catch(error => {
+                console.error('Sign out error:', error);
+                showToast('Error signing out');
+            });
+        }
+        
+        // Create new section
+        async function createNewSection() {
+            if (!sectionNameInput.value || !subjectNameInput.value || !sectionScheduleInput.value) {
+                showToast('Please fill all required fields');
+                return;
+            }
+            
+            if (!sectionLatitudeInput.value || !sectionLongitudeInput.value) {
+                showToast('Please set a location for the section');
+                return;
+            }
+            
+            try {
+                const sectionData = {
+                    name: sectionNameInput.value.trim(),
+                    subject: subjectNameInput.value.trim(),
+                    schedule: new Date(sectionScheduleInput.value),
+                    location: {
+                        latitude: parseFloat(sectionLatitudeInput.value),
+                        longitude: parseFloat(sectionLongitudeInput.value)
+                    },
+                    radius: parseInt(sectionRadiusSelect.value),
+                    enableNearID: enableNearIDCheckbox.checked,
+                    enablePlusPoints: enablePlusPointsCheckbox.checked,
+                    teacherId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    students: []
+                };
+                
+                // Add section to Firestore
+                const docRef = await db.collection('sections').add(sectionData);
+                
+                // Add section to teacher's sections list
+                await db.collection('users').doc(currentUser.uid).update({
+                    sections: firebase.firestore.FieldValue.arrayUnion(docRef.id)
+                });
+                
+                showToast('Section created successfully');
+                hideCreateSectionSheet();
+                
+                // Reload user data to show new section
+                loadUserData();
+                
+            } catch (error) {
+                console.error('Error creating section:', error);
+                showToast(error.message);
+            }
+        }
+        
+        // Get current location
+        function getCurrentLocation() {
+            if (!geolocationSupported) {
+                showToast('Geolocation is not supported by your browser');
+                return;
+            }
+            
+            getLocationBtn.disabled = true;
+            locationStatus.textContent = 'Getting location...';
+            
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    
+                    sectionLatitudeInput.value = latitude;
+                    sectionLongitudeInput.value = longitude;
+                    locationStatus.textContent = `Location set: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+                    getLocationBtn.disabled = false;
+                    currentLocation = { latitude, longitude };
+                },
+                error => {
+                    console.error('Geolocation error:', error);
+                    locationStatus.textContent = 'Error getting location';
+                    getLocationBtn.disabled = false;
+                    showToast('Could not get your location');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+        
+        // Request location permission
+        function requestLocationPermission() {
+            if (!geolocationSupported) {
+                showToast('Geolocation is not supported by your browser');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                () => {
+                    locationPermissionGranted = true;
+                    updatePermissionStatus();
+                    showToast('Location access granted');
+                    hideLocationPermissionSheet();
+                },
+                error => {
+                    console.error('Location permission error:', error);
+                    locationPermissionGranted = false;
+                    updatePermissionStatus();
+                    showToast('Location access denied');
+                }
+            );
+        }
+        
+        // Update permission status display
+        function updatePermissionStatus() {
+            if (!geolocationSupported) {
+                permissionStatus.innerHTML = '<i class="fas fa-circle" style="color: #f44336;"></i> Geolocation not supported';
+                return;
+            }
+            
+            if (locationPermissionGranted) {
+                permissionStatus.innerHTML = '<i class="fas fa-circle" style="color: #4caf50;"></i> Granted — Location permission is active and accessible';
+            } else {
+                permissionStatus.innerHTML = '<i class="fas fa-circle" style="color: #f44336;"></i> Denied — User declined permission';
+            }
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            toastNotification.textContent = message;
+            toastNotification.classList.add('show');
+            
+            setTimeout(() => {
+                toastNotification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Get random color for avatar
+        function getRandomColor() {
+            const colors = [
+                '#6200ee', '#03dac6', '#018786', '#3700b3', 
+                '#03dac6', '#018786', '#6200ee', '#3700b3',
+                '#bb86fc', '#cf6679', '#b00020', '#000000'
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Show/hide functions for bottom sheets
+        function showCreateSectionSheet() {
+            createSectionSheet.classList.add('active');
+        }
+        
+        function hideCreateSectionSheet() {
+            createSectionSheet.classList.remove('active');
+        }
+        
+        function showCheckInSheet() {
+            checkInSheet.classList.add('active');
+        }
+        
+        function hideCheckInSheet() {
+            checkInSheet.classList.remove('active');
+        }
+        
+        function showLocationPermissionSheet() {
+            updatePermissionStatus();
+            locationPermissionSheet.classList.add('active');
+        }
+        
+        function hideLocationPermissionSheet() {
+            locationPermissionSheet.classList.remove('active');
+        }
+        
+        function showAgeConfirmationSheet() {
+            ageConfirmationSheet.classList.add('active');
+        }
+        
+        function hideAgeConfirmationSheet() {
+            ageConfirmationSheet.classList.remove('active');
+        }
+        
+        function showProfileSheet() {
+            profileSheet.classList.add('active');
+        }
+        
+        function hideProfileSheet() {
+            profileSheet.classList.remove('active');
+        }
+        
+        function showSectionDetailsSheet() {
+            sectionDetailsSheet.classList.add('active');
+        }
+        
+        function hideSectionDetailsSheet() {
+            sectionDetailsSheet.classList.remove('active');
+        }
+        
+        function showInviteStudentsSheet() {
+            inviteStudentsSheet.classList.add('active');
+        }
+        
+        function hideInviteStudentsSheet() {
+            inviteStudentsSheet.classList.remove('active');
+        }
+        
+        function showDeleteConfirmationSheet() {
+            deleteConfirmationSheet.classList.add('active');
+        }
+        
+        function hideDeleteConfirmationSheet() {
+            deleteConfirmationSheet.classList.remove('active');
+            currentPasswordInput.value = '';
+        }
+        
+        // Show auth screen
+        function showAuthScreen() {
+            authContainer.style.display = 'flex';
+            dashboard.style.display = 'none';
+        }
+        
+        // Show dashboard
+        function showDashboard() {
+            authContainer.style.display = 'none';
+            dashboard.style.display = 'block';
+        }
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
