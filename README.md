@@ -1,6 +1,6 @@
 ## 📄 License Information
 
-**🧠 Product:** Countify+  
+**🟣 Product:** Countify+  
 **🔐 License Type:** Landecs Proprietary Software License (LPSL) v1.0.2  
 **📁 File:** [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE.txt)  
 **🏢 Issued by:** Landecs  
