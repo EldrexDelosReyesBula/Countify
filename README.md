@@ -2,7 +2,7 @@
 
 **🟣 Product:** Countify+  
 **🔐 License Type:** Landecs Proprietary Software License (LPSL) v1.0.2  
-**📁 File:** [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE)  
+**📁 File:** [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE.txt)  
 **🏢 Issued by:** Landecs  
 **🗓️ Last Updated:** August 6, 2025  
 
@@ -29,7 +29,7 @@ Any use outside this scope requires **written authorization** from Landecs.
 All **intellectual property rights, source code, system architecture, and visual materials** belong exclusively to **Landecs**. The software and its components are protected by applicable **copyright, trademark, and digital rights laws**.
 
 To view full legal terms, responsibilities, and enforcement policies:  
-🔗 [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE)
+🔗 [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE.txt)
 
 ---
 
