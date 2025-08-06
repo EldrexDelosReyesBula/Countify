@@ -23,8 +23,7 @@ All intellectual property rights, visual assets, codebases, and features are the
   
 To view the complete terms, restrictions, and your legal rights, refer to:  
 👉 [`LICENSE.txt`](https://countify-black.vercel.app/LICENSE.txt)  
-👉 [`https://countify-black.vercel.app/docs/license.html`](docs/license.html)  
-  
+
 For commercial inquiries, licensing requests, or legal concerns, contact: **landecs.org@gmail.com**  
   
 ---  
