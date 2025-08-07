@@ -1,0 +1,62 @@
+{
+  "name": "Countify Plus",
+  "version": "2.0.1.27",
+  "buildDate": "2025-12-16T12:00:00Z",
+  "buildType": "release",
+  "changelog": {
+    "3.0.0": [
+      "Complete MDUI redesign",
+      "Improved performance",
+      "New counting algorithms",
+      "Enhanced offline capabilities"
+    ],
+    "2.0.1.27": [
+      "Complete L3UI redesign",
+      "Added multi-language support",
+      "Fixed calculation bugs",
+      "Fixed voice mode bugs",
+      "Enhanced functionalities",
+      "New algorithms",
+      "Fixed Waray-Waray translations",
+      "Improved accessibility"
+    ],
+    "2.0.0": [
+      "Initial stable release",
+      "Core counting features",
+      "Basic offline support"
+    ]
+  },
+  "minimumBrowserRequirements": {
+    "chrome": "80",
+    "firefox": "78",
+    "safari": "14",
+    "edge": "80",
+    "opera": "67",
+    "samsungInternet": "13.0"
+  },
+  "serviceWorker": {
+    "cacheStrategy": "stale-while-revalidate",
+    "offlineSupport": true,
+    "backgroundSync": true,
+    "pushNotifications": true,
+    "precacheVersion": "3.2.1"
+  },
+  "apiCompatibility": {
+    "current": "v2.1",
+    "supported": ["v1.5", "v2.0", "v2.1"],
+    "deprecationNotice": "v1.5 will be discontinued on 2026-03-01"
+  },
+  "links": {
+    "privacyPolicy": "/docs/privacy.html",
+    "termsOfService": "/docs/terms.html",
+    "license": "/docs/license.html",
+    "documentation": "/docs/",
+    "feedback": "https://feedback.countify.plus",
+    "support": "mailto:support@countify.plus"
+  },
+  "localization": {
+    "supportedLanguages": ["en", "es", "tl", "war"],
+    "defaultLanguage": "en",
+    "translationVersion": "1.2.3"
+  }
+}
