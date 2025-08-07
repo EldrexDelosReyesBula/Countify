@@ -83,37 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }, { passive: true });
 });
 </script>
-<script>
-const fab = document.getElementById('fab');
-let longPressTimer;
 
-fab.addEventListener('mousedown', startPress);
-fab.addEventListener('touchstart', startPress);
-fab.addEventListener('mouseup', endPress);
-fab.addEventListener('mouseleave', endPress);
-fab.addEventListener('touchend', endPress);
-
-function startPress(e) {
-    e.preventDefault();
-    longPressTimer = setTimeout(() => {
-        fab.classList.add('long-press');
-        // Trigger your long-press action here
-        console.log('Long press activated');
-    }, 800); // 800ms for long press
-}
-
-function endPress(e) {
-    e.preventDefault();
-    clearTimeout(longPressTimer);
-    fab.classList.remove('long-press');
-    
-    // Only trigger click if it wasn't a long press
-    if (!fab.classList.contains('long-press')) {
-        console.log('Regular click');
-        // Trigger your click action here
-    }
-}
-</script>
 <body>
     <div class="app">
     </div>
@@ -304,75 +274,52 @@ function endPress(e) {
         });
     </script>
 
-    <script>
-        // Main App Class
-        class CountifyApp {
-            constructor() {
-                this.state = {
-                    activities: [],
-                    currentActivityId: null,
-                    isEditing: false,
-                    pendingAction: null,
-                    activeView: 'dashboard',
-                    searchQuery: '',
-                    selectedFolder: 'all',
-                    theme: 'system',
-                    font: 'Poppins',
-                    textSize: 'normal',
-                    isSearching: false,
-                    showSearchResults: false,
-                    wattConsent: localStorage.getItem('watt-consent') === 'true',
-                    wattAsked: localStorage.getItem('watt-asked') === 'true',
-                    voiceRecognition: null,
-                    isVoiceModeActive: false,
-                    historyStack: {},
-                    futureStack: {},
-                    lastSaveTime: null,
-                    autoSaveInterval: null,
-                    currentLanguage: 'en'
-                };
+<script>
+    // Main App Class
+    class CountifyApp {
+        constructor() {
+            this.state = {
+                activities: [],
+                currentActivityId: null,
+                isEditing: false,
+                pendingAction: null,
+                activeView: 'dashboard',
+                searchQuery: '',
+                selectedFolder: 'all',
+                theme: 'system',
+                font: 'Poppins',
+                textSize: 'normal',
+                isSearching: false,
+                showSearchResults: false,
+                wattConsent: localStorage.getItem('watt-consent') === 'true',
+                wattAsked: localStorage.getItem('watt-asked') === 'true',
+                voiceRecognition: null,
+                isVoiceModeActive: false,
+                isVoiceListening: false,
+                historyStack: {},
+                futureStack: {},
+                lastSaveTime: null,
+                autoSaveInterval: null,
+                currentLanguage: 'en',
+                visualizerInterval: null
+            };
 
-                this.views = ['dashboard', 'yesterday', 'deleted', 'archived', 'history'];
-                this.tutorialActivities = this.getTutorialActivities();
+            this.views = ['dashboard', 'yesterday', 'deleted', 'archived', 'history'];
+            this.tutorialActivities = this.getTutorialActivities();
 
-                this.init();
-            }
+            this.init();
+        }
 
-            getTutorialActivities() {
-                if (window.CountifyLanguage) {
-                    const tutorial1 = window.CountifyLanguage.getTutorialContent(1);
-                    const tutorial2 = window.CountifyLanguage.getTutorialContent(2);
-
-                    return [{
-                            id: 'tutorial-2',
-                            title: tutorial2.title,
-                            content: tutorial2.content,
-                            wordCount: this.countWords(tutorial2.content),
-                            createdAt: new Date().toISOString(),
-                            updatedAt: new Date().toISOString(),
-                            deleted: false,
-                            archived: false,
-                            isTutorial: true
-                        },
-                        {
-                            id: 'tutorial-1',
-                            title: tutorial1.title,
-                            content: tutorial1.content,
-                            wordCount: this.countWords(tutorial1.content),
-                            createdAt: new Date().toISOString(),
-                            updatedAt: new Date().toISOString(),
-                            deleted: false,
-                            archived: false,
-                            isTutorial: true
-                        }
-                    ];
-                }
+        getTutorialActivities() {
+            if (window.CountifyLanguage) {
+                const tutorial1 = window.CountifyLanguage.getTutorialContent(1);
+                const tutorial2 = window.CountifyLanguage.getTutorialContent(2);
 
                 return [{
                         id: 'tutorial-2',
-                        title: 'Mastering the Countify+ Editor',
-                        content: `The Countify+ editor provides a powerful yet distraction-free environment...`,
-                        wordCount: 145,
+                        title: tutorial2.title,
+                        content: tutorial2.content,
+                        wordCount: this.countWords(tutorial2.content),
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         deleted: false,
@@ -381,9 +328,9 @@ function endPress(e) {
                     },
                     {
                         id: 'tutorial-1',
-                        title: 'Welcome to Countify+ - Your Writing Analytics Hub',
-                        content: `Countify+ is your comprehensive writing analytics tool...`,
-                        wordCount: 178,
+                        title: tutorial1.title,
+                        content: tutorial1.content,
+                        wordCount: this.countWords(tutorial1.content),
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
                         deleted: false,
@@ -393,148 +340,173 @@ function endPress(e) {
                 ];
             }
 
-            async init() {
-                this.renderAppShell();
-                this.setupEventListeners();
-                await this.loadSettings();
-                await this.loadActivities();
-                this.ensureTutorialActivities();
-                this.renderView();
-                this.watchSystemTheme();
-                this.setupRippleEffects();
-
-                if (!this.state.wattAsked) {
-                    setTimeout(() => this.showWATTBanner(), 2000);
+            return [{
+                    id: 'tutorial-2',
+                    title: 'Mastering the Countify+ Editor',
+                    content: `The Countify+ editor provides a powerful yet distraction-free environment...`,
+                    wordCount: 145,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    deleted: false,
+                    archived: false,
+                    isTutorial: true
+                },
+                {
+                    id: 'tutorial-1',
+                    title: 'Welcome to Countify+ - Your Writing Analytics Hub',
+                    content: `Countify+ is your comprehensive writing analytics tool...`,
+                    wordCount: 178,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    deleted: false,
+                    archived: false,
+                    isTutorial: true
                 }
+            ];
+        }
 
-                this.registerServiceWorker();
-                this.initializeHistoryStack();
-                this.startAutoSave();
+        async init() {
+            this.renderAppShell();
+            this.setupEventListeners();
+            await this.loadSettings();
+            await this.loadActivities();
+            this.ensureTutorialActivities();
+            this.renderView();
+            this.watchSystemTheme();
+            this.setupRippleEffects();
 
-                // Initialize language support
-                if (window.CountifyLanguage) {
-                    window.CountifyLanguage.onLanguageChange = (newLang) => {
-                        this.state.currentLanguage = newLang;
-                        this.updateUITexts();
-                        this.saveSettings();
-                    };
+            if (!this.state.wattAsked) {
+                setTimeout(() => this.showWATTBanner(), 2000);
+            }
+
+            this.registerServiceWorker();
+            this.initializeHistoryStack();
+            this.startAutoSave();
+
+            // Initialize language support
+            if (window.CountifyLanguage) {
+                window.CountifyLanguage.onLanguageChange = (newLang) => {
+                    this.state.currentLanguage = newLang;
                     this.updateUITexts();
-                }
+                    this.saveSettings();
+                };
+                this.updateUITexts();
             }
+        }
 
-            updateUITexts() {
-                if (!window.CountifyLanguage) return;
+        updateUITexts() {
+            if (!window.CountifyLanguage) return;
 
-                // Update all translatable elements
-                const elements = document.querySelectorAll('[data-translate]');
-                elements.forEach(el => {
-                    const key = el.getAttribute('data-translate');
-                    const translation = window.CountifyLanguage.getTranslation(key);
-                    if (translation) {
-                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                            el.placeholder = translation;
-                        } else {
-                            el.textContent = translation;
+            // Update all translatable elements
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                const translation = window.CountifyLanguage.getTranslation(key);
+                if (translation) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.placeholder = translation;
+                    } else {
+                        el.textContent = translation;
+                    }
+                }
+            });
+
+            // Update select options
+            const selectElements = document.querySelectorAll('select[data-translate-options]');
+            selectElements.forEach(select => {
+                const options = select.querySelectorAll('option');
+                options.forEach(option => {
+                    const key = option.getAttribute('data-translate-key');
+                    if (key) {
+                        const translation = window.CountifyLanguage.getTranslation(key);
+                        if (translation) {
+                            option.textContent = translation;
                         }
                     }
                 });
+            });
 
-                // Update select options
-                const selectElements = document.querySelectorAll('select[data-translate-options]');
-                selectElements.forEach(select => {
-                    const options = select.querySelectorAll('option');
-                    options.forEach(option => {
-                        const key = option.getAttribute('data-translate-key');
-                        if (key) {
-                            const translation = window.CountifyLanguage.getTranslation(key);
-                            if (translation) {
-                                option.textContent = translation;
-                            }
-                        }
+            // Update tutorial activities if they exist
+            const tutorial1 = this.state.activities.find(a => a.id === 'tutorial-1');
+            const tutorial2 = this.state.activities.find(a => a.id === 'tutorial-2');
+
+            if (tutorial1) {
+                const tutorialContent = window.CountifyLanguage.getTutorialContent(1);
+                tutorial1.title = tutorialContent.title;
+                tutorial1.content = tutorialContent.content;
+                tutorial1.wordCount = this.countWords(tutorialContent.content);
+            }
+
+            if (tutorial2) {
+                const tutorialContent = window.CountifyLanguage.getTutorialContent(2);
+                tutorial2.title = tutorialContent.title;
+                tutorial2.content = tutorialContent.content;
+                tutorial2.wordCount = this.countWords(tutorialContent.content);
+            }
+        }
+
+        initializeHistoryStack() {
+            this.state.historyStack = {};
+            this.state.futureStack = {};
+        }
+
+        startAutoSave() {
+            if (this.state.autoSaveInterval) {
+                clearInterval(this.state.autoSaveInterval);
+            }
+
+            this.state.autoSaveInterval = setInterval(() => {
+                if (this.state.currentActivityId && document.getElementById('editorContent')) {
+                    this.saveActivity(true);
+                }
+            }, 5000);
+        }
+
+        showAutoSaveIndicator() {
+            const indicator = document.getElementById('autoSaveIndicator');
+            if (!indicator) return;
+
+            indicator.classList.add('visible');
+            setTimeout(() => {
+                indicator.classList.remove('visible');
+            }, 2000);
+        }
+
+        registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    }).catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
                     });
                 });
+            }
+        }
 
-                // Update tutorial activities if they exist
-                const tutorial1 = this.state.activities.find(a => a.id === 'tutorial-1');
-                const tutorial2 = this.state.activities.find(a => a.id === 'tutorial-2');
+        ensureTutorialActivities() {
+            const hasTutorial1 = this.state.activities.some(a => a.id === 'tutorial-1');
+            const hasTutorial2 = this.state.activities.some(a => a.id === 'tutorial-2');
 
-                if (tutorial1) {
-                    const tutorialContent = window.CountifyLanguage.getTutorialContent(1);
-                    tutorial1.title = tutorialContent.title;
-                    tutorial1.content = tutorialContent.content;
-                    tutorial1.wordCount = this.countWords(tutorialContent.content);
-                }
-
-                if (tutorial2) {
-                    const tutorialContent = window.CountifyLanguage.getTutorialContent(2);
-                    tutorial2.title = tutorialContent.title;
-                    tutorial2.content = tutorialContent.content;
-                    tutorial2.wordCount = this.countWords(tutorialContent.content);
-                }
+            if (!hasTutorial1) {
+                this.state.activities.unshift(this.tutorialActivities[1]);
             }
 
-            initializeHistoryStack() {
-                this.state.historyStack = {};
-                this.state.futureStack = {};
+            if (!hasTutorial2) {
+                this.state.activities.unshift(this.tutorialActivities[0]);
             }
+        }
 
-            startAutoSave() {
-                if (this.state.autoSaveInterval) {
-                    clearInterval(this.state.autoSaveInterval);
-                }
-
-                this.state.autoSaveInterval = setInterval(() => {
-                    if (this.state.currentActivityId && document.getElementById('editorContent')) {
-                        this.saveActivity(true);
-                    }
-                }, 5000);
-            }
-
-            showAutoSaveIndicator() {
-                const indicator = document.getElementById('autoSaveIndicator');
-                if (!indicator) return;
-
-                indicator.classList.add('visible');
-                setTimeout(() => {
-                    indicator.classList.remove('visible');
-                }, 2000);
-            }
-
-            registerServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', () => {
-                        navigator.serviceWorker.register('/sw.js').then(registration => {
-                            console.log('ServiceWorker registration successful');
-                        }).catch(err => {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
-                    });
-                }
-            }
-
-            ensureTutorialActivities() {
-                const hasTutorial1 = this.state.activities.some(a => a.id === 'tutorial-1');
-                const hasTutorial2 = this.state.activities.some(a => a.id === 'tutorial-2');
-
-                if (!hasTutorial1) {
-                    this.state.activities.unshift(this.tutorialActivities[1]);
-                }
-
-                if (!hasTutorial2) {
-                    this.state.activities.unshift(this.tutorialActivities[0]);
-                }
-            }
-
-            renderAppShell() {
-                document.querySelector('.app').innerHTML = `
+        renderAppShell() {
+            document.querySelector('.app').innerHTML = `
                 <!-- Header -->
                 <header class="header">
                     <button id="drawerToggle" class="btn-icon haptic-link" aria-label="Open menu" style="border: none;">
                         <span class="material-icons">menu</span>
                     </button>
-<h1 class="header-title" data-translate="app_title" onclick="window.location.href='functions/treasure/owl.html'" style="cursor: pointer;">
-    Countify+
-</h1>
+                    <h1 class="header-title" data-translate="app_title" onclick="window.location.href='functions/treasure/owl.html'" style="cursor: pointer;">
+                        Countify+
+                    </h1>
                     <div class="header-actions">
                         <button id="newActivityBtn" class="btn btn-primary haptic-link">
                             <span class="material-icons">add</span>
@@ -585,10 +557,10 @@ function endPress(e) {
                 </div>
                 <div id="autoSaveIndicator" class="auto-save-indicator" data-translate="saved">Saved</div>
             `;
-            }
+        }
 
-            renderDrawerContent() {
-                return `
+        renderDrawerContent() {
+            return `
                 <div class="drawer-header">
                     <h2 class="drawer-title" data-translate="app_title">Countify+</h2>
                     <button id="drawerClose" class="drawer-close" aria-label="Close menu">
@@ -693,9 +665,6 @@ function endPress(e) {
                         </select>
                     </div>
                 </div>
-
-
-
                 <div class="drawer-section" style="text-decoration: none;">
                     <div class="drawer-section-title" data-translate="about">ABOUT</div>
 <a style="
@@ -760,10 +729,10 @@ rel="noopener noreferrer"
 
                 </div>
             `;
-            }
+        }
 
-            renderEditorContent() {
-                return `
+        renderEditorContent() {
+            return `
                 <div class="editor-header">
                     <div class="editor-header-left">
                         <button id="editorBack" class="editor-back-btn" style="border: 2px solid #919191; border-radius: 20px;">
@@ -843,10 +812,10 @@ rel="noopener noreferrer"
                     </button>
                 </div>
             `;
-            }
+        }
 
-            renderVoiceModeSheet() {
-                return `
+        renderVoiceModeSheet() {
+            return `
                 <div class="voice-mode-sheet-content">
                     <div class="voice-mode-header">
                         <h3 data-translate="voice_mode">Voice Mode</h3>
@@ -882,11 +851,11 @@ rel="noopener noreferrer"
                     </div>
                 </div>
             `;
-            }
+        }
 
-            renderModal(type) {
-                if (type === 'confirm') {
-                    return `
+        renderModal(type) {
+            if (type === 'confirm') {
+                return `
                 <div class="modal-content glass">
                     <h3 class="modal-title" id="confirmModalTitle" data-translate="confirm_action">Confirm Action</h3>
                     <p class="modal-message" id="confirmModalMessage" data-translate="confirm_message">Are you sure you want to perform this action?</p>
@@ -896,8 +865,8 @@ rel="noopener noreferrer"
                     </div>
                 </div>
             `;
-                } else {
-                    return `
+            } else {
+                return `
                 <div class="modal-content glass">
                     <h3 class="modal-title" id="alertModalTitle" data-translate="alert">Alert</h3>
                     <p class="modal-message" id="alertModalMessage" data-translate="alert_message">This is an alert message.</p>
@@ -906,48 +875,48 @@ rel="noopener noreferrer"
                     </div>
                     </div>
                 `;
-                }
+            }
+        }
+
+        renderView() {
+            const mainContent = document.getElementById('mainContent');
+            if (!mainContent) return;
+
+            if (this.state.isSearching) {
+                mainContent.innerHTML = this.renderSearchResults();
+                return;
             }
 
-            renderView() {
-                const mainContent = document.getElementById('mainContent');
-                if (!mainContent) return;
-
-                if (this.state.isSearching) {
-                    mainContent.innerHTML = this.renderSearchResults();
-                    return;
-                }
-
-                switch (this.state.activeView) {
-                    case 'dashboard':
-                        mainContent.innerHTML = this.renderDashboard();
-                        break;
-                    case 'today':
-                        mainContent.innerHTML = this.renderActivitiesView('today');
-                        break;
-                    case 'yesterday':
-                        mainContent.innerHTML = this.renderActivitiesView('yesterday');
-                        break;
-                    case 'deleted':
-                        mainContent.innerHTML = this.renderActivitiesView('deleted');
-                        break;
-                    case 'archived':
-                        mainContent.innerHTML = this.renderActivitiesView('archived');
-                        break;
-                    case 'history':
-                        mainContent.innerHTML = this.renderHistoryView();
-                        break;
-                    default:
-                        mainContent.innerHTML = this.renderDashboard();
-                }
+            switch (this.state.activeView) {
+                case 'dashboard':
+                    mainContent.innerHTML = this.renderDashboard();
+                    break;
+                case 'today':
+                    mainContent.innerHTML = this.renderActivitiesView('today');
+                    break;
+                case 'yesterday':
+                    mainContent.innerHTML = this.renderActivitiesView('yesterday');
+                    break;
+                case 'deleted':
+                    mainContent.innerHTML = this.renderActivitiesView('deleted');
+                    break;
+                case 'archived':
+                    mainContent.innerHTML = this.renderActivitiesView('archived');
+                    break;
+                case 'history':
+                    mainContent.innerHTML = this.renderHistoryView();
+                    break;
+                default:
+                    mainContent.innerHTML = this.renderDashboard();
             }
+        }
 
-            renderDashboard() {
-                const filteredActivities = this.filterActivities();
-                const activitiesToShow = filteredActivities.slice(0, 5);
+        renderDashboard() {
+            const filteredActivities = this.filterActivities();
+            const activitiesToShow = filteredActivities.slice(0, 5);
 
-                if (activitiesToShow.length === 0) {
-                    return `
+            if (activitiesToShow.length === 0) {
+                return `
                 <h2 class="page-title" data-translate="dashboard">Dashboard</h2>
                 <div class="empty-state">
                     <div class="empty-state-icon">
@@ -961,18 +930,18 @@ rel="noopener noreferrer"
                     </button>
                 </div>
             `;
-                }
+            }
 
-                let cardsHTML = '';
-                activitiesToShow.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+            let cardsHTML = '';
+            activitiesToShow.forEach((activity, index) => {
+                const previewText = activity.content.length > 100 ?
+                    activity.content.substring(0, 100) + '...' :
+                    activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+                const cardColorClass = `card-color-${(index % 5) + 1}`;
+                const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+                cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div>
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -984,57 +953,57 @@ rel="noopener noreferrer"
                     </div>
                 </div>
             `;
-                });
+            });
 
-                return `
+            return `
             <h2 class="page-title" data-translate="dashboard">Dashboard</h2>
             <div class="dashboard-grid">
                 ${cardsHTML}
             </div>
         `;
+        }
+
+        renderHistoryView() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const recentActivities = this.state.activities.filter(activity => {
+                const activityDate = new Date(activity.updatedAt);
+                return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
+            });
+
+            const wordsByDate = {};
+            recentActivities.forEach(activity => {
+                const date = new Date(activity.updatedAt).toDateString();
+                if (!wordsByDate[date]) {
+                    wordsByDate[date] = 0;
+                }
+                wordsByDate[date] += this.countWords(activity.content);
+            });
+
+            const dates = [];
+            const wordCounts = [];
+            const maxWords = Math.max(...Object.values(wordsByDate), 0) || 1;
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toDateString();
+                dates.push(dateStr);
+                wordCounts.push(wordsByDate[dateStr] || 0);
             }
 
-            renderHistoryView() {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-                const recentActivities = this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
-                });
-
-                const wordsByDate = {};
-                recentActivities.forEach(activity => {
-                    const date = new Date(activity.updatedAt).toDateString();
-                    if (!wordsByDate[date]) {
-                        wordsByDate[date] = 0;
-                    }
-                    wordsByDate[date] += this.countWords(activity.content);
-                });
-
-                const dates = [];
-                const wordCounts = [];
-                const maxWords = Math.max(...Object.values(wordsByDate), 0) || 1;
-
-                for (let i = 6; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    const dateStr = date.toDateString();
-                    dates.push(dateStr);
-                    wordCounts.push(wordsByDate[dateStr] || 0);
-                }
-
-                let barsHTML = '';
-                dates.forEach((date, index) => {
-                    const height = (wordCounts[index] / maxWords) * 100;
-                    barsHTML += `
+            let barsHTML = '';
+            dates.forEach((date, index) => {
+                const height = (wordCounts[index] / maxWords) * 100;
+                barsHTML += `
                 <div class="history-bar" style="height: ${height}%" data-count="${wordCounts[index]} words">
                     <div class="history-date">${new Date(date).toLocaleDateString(this.state.currentLanguage, { month: 'short', day: 'numeric' })}</div>
                 </div>
             `;
-                });
+            });
 
-                return `
+            return `
             <h2 class="page-title" data-translate="writing_history">Writing History</h2>
             <div class="history-graph-container" style="height: 90%;">
                 <div class="history-graph" style="height: 200px;">
@@ -1056,98 +1025,98 @@ rel="noopener noreferrer"
                 </div>
             </div>
         `;
+        }
+
+        getTotalWordsLast7Days() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const recentActivities = this.state.activities.filter(activity => {
+                const activityDate = new Date(activity.updatedAt);
+                return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
+            });
+
+            return recentActivities.reduce((total, activity) => total + this.countWords(activity.content), 0);
+        }
+
+        getAverageWordsPerDay() {
+            const total = this.getTotalWordsLast7Days();
+            return Math.round(total / 7);
+        }
+
+        getMostProductiveDay() {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const wordsByDay = {};
+            this.state.activities.forEach(activity => {
+                const activityDate = new Date(activity.updatedAt);
+                if (activityDate >= oneWeekAgo && !activity.deleted && !activity.archived) {
+                    const day = activityDate.toLocaleDateString(this.state.currentLanguage, {
+                        weekday: 'long'
+                    });
+                    wordsByDay[day] = (wordsByDay[day] || 0) + this.countWords(activity.content);
+                }
+            });
+
+            let maxDay = '';
+            let maxWords = 0;
+
+            for (const day in wordsByDay) {
+                if (wordsByDay[day] > maxWords) {
+                    maxWords = wordsByDay[day];
+                    maxDay = day;
+                }
             }
 
-            getTotalWordsLast7Days() {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            return maxDay || 'N/A';
+        }
 
-                const recentActivities = this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
-                });
+        renderActivitiesView(viewType) {
+            let title = '';
+            let activities = [];
 
-                return recentActivities.reduce((total, activity) => total + this.countWords(activity.content), 0);
+            switch (viewType) {
+                case 'today':
+                    title = "today_activities";
+                    activities = this.getTodaysActivities();
+                    break;
+                case 'yesterday':
+                    title = "yesterday_activities";
+                    activities = this.getYesterdaysActivities();
+                    break;
+                case 'deleted':
+                    title = "deleted_activities";
+                    activities = this.state.activities.filter(a => a.deleted);
+                    break;
+                case 'archived':
+                    title = "archived_activities";
+                    activities = this.state.activities.filter(a => a.archived);
+                    break;
             }
 
-            getAverageWordsPerDay() {
-                const total = this.getTotalWordsLast7Days();
-                return Math.round(total / 7);
-            }
+            if (activities.length === 0) {
+                let message = '';
+                let icon = 'info';
+                let messageKey = '';
+                let buttonKey = '';
 
-            getMostProductiveDay() {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-                const wordsByDay = {};
-                this.state.activities.forEach(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    if (activityDate >= oneWeekAgo && !activity.deleted && !activity.archived) {
-                        const day = activityDate.toLocaleDateString(this.state.currentLanguage, {
-                            weekday: 'long'
-                        });
-                        wordsByDay[day] = (wordsByDay[day] || 0) + this.countWords(activity.content);
-                    }
-                });
-
-                let maxDay = '';
-                let maxWords = 0;
-
-                for (const day in wordsByDay) {
-                    if (wordsByDay[day] > maxWords) {
-                        maxWords = wordsByDay[day];
-                        maxDay = day;
-                    }
+                if (viewType === 'today') {
+                    messageKey = "no_today_activities";
+                    icon = "today";
+                    buttonKey = "create_today_activity";
+                } else if (viewType === 'yesterday') {
+                    messageKey = "no_yesterday_activities";
+                    icon = "event";
+                } else if (viewType === 'deleted') {
+                    messageKey = "no_deleted_activities";
+                    icon = "delete";
+                } else if (viewType === 'archived') {
+                    messageKey = "no_archived_activities";
+                    icon = "archive";
                 }
 
-                return maxDay || 'N/A';
-            }
-
-            renderActivitiesView(viewType) {
-                let title = '';
-                let activities = [];
-
-                switch (viewType) {
-                    case 'today':
-                        title = "today_activities";
-                        activities = this.getTodaysActivities();
-                        break;
-                    case 'yesterday':
-                        title = "yesterday_activities";
-                        activities = this.getYesterdaysActivities();
-                        break;
-                    case 'deleted':
-                        title = "deleted_activities";
-                        activities = this.state.activities.filter(a => a.deleted);
-                        break;
-                    case 'archived':
-                        title = "archived_activities";
-                        activities = this.state.activities.filter(a => a.archived);
-                        break;
-                }
-
-                if (activities.length === 0) {
-                    let message = '';
-                    let icon = 'info';
-                    let messageKey = '';
-                    let buttonKey = '';
-
-                    if (viewType === 'today') {
-                        messageKey = "no_today_activities";
-                        icon = "today";
-                        buttonKey = "create_today_activity";
-                    } else if (viewType === 'yesterday') {
-                        messageKey = "no_yesterday_activities";
-                        icon = "event";
-                    } else if (viewType === 'deleted') {
-                        messageKey = "no_deleted_activities";
-                        icon = "delete";
-                    } else if (viewType === 'archived') {
-                        messageKey = "no_archived_activities";
-                        icon = "archive";
-                    }
-
-                    return `
+                return `
                 <h2 class="page-title" data-translate="${title}">${window.CountifyLanguage?.getTranslation(title) || title}</h2>
                 <div class="empty-state">
                     <div class="empty-state-icon">
@@ -1163,18 +1132,18 @@ rel="noopener noreferrer"
                     ` : ''}
                 </div>
             `;
-                }
+            }
 
-                let cardsHTML = '';
-                activities.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+            let cardsHTML = '';
+            activities.forEach((activity, index) => {
+                const previewText = activity.content.length > 100 ?
+                    activity.content.substring(0, 100) + '...' :
+                    activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+                const cardColorClass = `card-color-${(index % 5) + 1}`;
+                const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+                cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div>
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -1186,21 +1155,21 @@ rel="noopener noreferrer"
                     </div>
                 </div>
             `;
-                });
+            });
 
-                return `
+            return `
             <h2 class="page-title" data-translate="${title}">${window.CountifyLanguage?.getTranslation(title) || title}</h2>
             <div class="dashboard-grid">
                 ${cardsHTML}
             </div>
         `;
-            }
+        }
 
-            renderSearchResults() {
-                const filteredActivities = this.filterActivities();
+        renderSearchResults() {
+            const filteredActivities = this.filterActivities();
 
-                if (filteredActivities.length === 0) {
-                    return `
+            if (filteredActivities.length === 0) {
+                return `
                 <div class="search-results-header">
                     <h2 class="page-title" data-translate="search_results">Search Results</h2>
                 </div>
@@ -1212,18 +1181,18 @@ rel="noopener noreferrer"
                     <p class="empty-state-description" data-translate="no_match_query">No activities match your search for "${this.state.searchQuery}"</p>
                 </div>
             `;
-                }
+            }
 
-                let cardsHTML = '';
-                filteredActivities.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+            let cardsHTML = '';
+            filteredActivities.forEach((activity, index) => {
+                const previewText = activity.content.length > 100 ?
+                    activity.content.substring(0, 100) + '...' :
+                    activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+                const cardColorClass = `card-color-${(index % 5) + 1}`;
+                const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+                cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div>
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -1235,9 +1204,9 @@ rel="noopener noreferrer"
                     </div>
                 </div>
             `;
-                });
+            });
 
-                return `
+            return `
             <div class="search-results-header">
                 <h2 class="page-title" data-translate="search_results">Search Results</h2>
                 <div class="search-results-count">${filteredActivities.length} <span data-translate="results_for">results for</span> <span class="search-query">"${this.state.searchQuery}"</span></div>
@@ -1246,584 +1215,650 @@ rel="noopener noreferrer"
                 ${cardsHTML}
             </div>
         `;
-            }
+        }
 
-            renderSearchResultsInDrawer() {
-                const filteredActivities = this.filterActivities();
-                const resultsContainer = document.getElementById('drawerSearchResults');
-                if (!resultsContainer) return;
+        renderSearchResultsInDrawer() {
+            const filteredActivities = this.filterActivities();
+            const resultsContainer = document.getElementById('drawerSearchResults');
+            if (!resultsContainer) return;
 
-                if (filteredActivities.length === 0) {
-                    resultsContainer.innerHTML = `
+            if (filteredActivities.length === 0) {
+                resultsContainer.innerHTML = `
                 <div class="drawer-search-result-item">
                     <span data-translate="no_results_found">No results found for</span> "${this.state.searchQuery}"
                 </div>
             `;
-                    resultsContainer.classList.add('show');
-                    return;
-                }
+                resultsContainer.classList.add('show');
+                return;
+            }
 
-                let resultsHTML = '';
-                filteredActivities.slice(0, 5).forEach(activity => {
-                    const previewText = activity.content.length > 50 ?
-                        activity.content.substring(0, 50) + '...' :
-                        activity.content;
+            let resultsHTML = '';
+            filteredActivities.slice(0, 5).forEach(activity => {
+                const previewText = activity.content.length > 50 ?
+                    activity.content.substring(0, 50) + '...' :
+                    activity.content;
 
-                    resultsHTML += `
+                resultsHTML += `
                 <div class="drawer-search-result-item" data-id="${activity.id}">
                     <div class="drawer-search-result-title">${activity.title}</div>
                     <div class="drawer-search-result-preview">${previewText}</div>
                 </div>
             `;
-                });
+            });
 
-                resultsContainer.innerHTML = resultsHTML;
-                resultsContainer.classList.add('show');
+            resultsContainer.innerHTML = resultsHTML;
+            resultsContainer.classList.add('show');
 
-                resultsContainer.querySelectorAll('.drawer-search-result-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        this.openEditor(item.dataset.id);
-                        this.toggleDrawer();
-                        resultsContainer.classList.remove('show');
-                        document.getElementById('searchInput').value = '';
-                        this.state.searchQuery = '';
-                    });
-                });
-            }
-
-            setupEventListeners() {
-                // Drawer toggle
-                document.getElementById('drawerToggle')?.addEventListener('click', () => this.toggleDrawer());
-                document.getElementById('drawerClose')?.addEventListener('click', () => this.toggleDrawer());
-                document.getElementById('drawerOverlay')?.addEventListener('click', () => this.toggleDrawer());
-
-                // Navigation items
-                document.getElementById('dashboardView')?.addEventListener('click', () => {
-                    this.state.activeView = 'dashboard';
-                    this.state.isSearching = false;
-                    this.renderView();
+            resultsContainer.querySelectorAll('.drawer-search-result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    this.openEditor(item.dataset.id);
                     this.toggleDrawer();
+                    resultsContainer.classList.remove('show');
+                    document.getElementById('searchInput').value = '';
+                    this.state.searchQuery = '';
                 });
+            });
+        }
 
-                document.getElementById('todaysActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'today';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.toggleDrawer();
-                });
+        setupEventListeners() {
+            // Drawer toggle
+            document.getElementById('drawerToggle')?.addEventListener('click', () => this.toggleDrawer());
+            document.getElementById('drawerClose')?.addEventListener('click', () => this.toggleDrawer());
+            document.getElementById('drawerOverlay')?.addEventListener('click', () => this.toggleDrawer());
 
-                document.getElementById('yesterdaysActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'yesterday';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.toggleDrawer();
-                });
+            // Navigation items
+            document.getElementById('dashboardView')?.addEventListener('click', () => {
+                this.state.activeView = 'dashboard';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                document.getElementById('writingHistory')?.addEventListener('click', () => {
-                    this.state.activeView = 'history';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.toggleDrawer();
-                });
+            document.getElementById('todaysActivities')?.addEventListener('click', () => {
+                this.state.activeView = 'today';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                document.getElementById('deletedActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'deleted';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.toggleDrawer();
-                });
+            document.getElementById('yesterdaysActivities')?.addEventListener('click', () => {
+                this.state.activeView = 'yesterday';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                document.getElementById('archivedActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'archived';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.toggleDrawer();
-                });
+            document.getElementById('writingHistory')?.addEventListener('click', () => {
+                this.state.activeView = 'history';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                // Language selector
-                document.getElementById('languageSelectorBtn')?.addEventListener('click', () => {
-                    if (window.CountifyLanguage && window.CountifyLanguage.showLanguageSelector) {
-                        window.CountifyLanguage.showLanguageSelector();
-                    }
-                });
+            document.getElementById('deletedActivities')?.addEventListener('click', () => {
+                this.state.activeView = 'deleted';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                // New activity
-                document.getElementById('newActivityBtn')?.addEventListener('click', () => this.openEditor());
-                document.getElementById('fab')?.addEventListener('click', () => this.openEditor());
+            document.getElementById('archivedActivities')?.addEventListener('click', () => {
+                this.state.activeView = 'archived';
+                this.state.isSearching = false;
+                this.renderView();
+                this.toggleDrawer();
+            });
 
-                // Search input
-                const searchInput = document.getElementById('searchInput');
-                searchInput?.addEventListener('input', (e) => {
-                    this.state.searchQuery = e.target.value.toLowerCase();
-                    this.state.isSearching = this.state.searchQuery.length > 0;
+            // Language selector
+            document.getElementById('languageSelectorBtn')?.addEventListener('click', () => {
+                if (window.CountifyLanguage && window.CountifyLanguage.showLanguageSelector) {
+                    window.CountifyLanguage.showLanguageSelector();
+                }
+            });
 
-                    if (this.state.searchQuery.length > 0) {
-                        this.renderSearchResultsInDrawer();
-                    } else {
-                        document.getElementById('drawerSearchResults')?.classList.remove('show');
-                    }
-                });
+            // New activity
+            document.getElementById('newActivityBtn')?.addEventListener('click', () => this.openEditor());
+            document.getElementById('fab')?.addEventListener('click', () => this.openEditor());
 
-                // Close search results when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.drawer-search') && !e.target.closest('#drawerSearchResults')) {
-                        document.getElementById('drawerSearchResults')?.classList.remove('show');
-                    }
-                });
+            // Search input
+            const searchInput = document.getElementById('searchInput');
+            searchInput?.addEventListener('input', (e) => {
+                this.state.searchQuery = e.target.value.toLowerCase();
+                this.state.isSearching = this.state.searchQuery.length > 0;
 
-                // Editor events
-                document.getElementById('editorBack')?.addEventListener('click', () => {
-                    this.closeEditor();
-                });
+                if (this.state.searchQuery.length > 0) {
+                    this.renderSearchResultsInDrawer();
+                } else {
+                    document.getElementById('drawerSearchResults')?.classList.remove('show');
+                }
+            });
 
-                document.getElementById('editorSave')?.addEventListener('click', () => {
-                    this.saveActivity(false, true);
-                    this.closeEditor();
-                });
+            // Close search results when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.drawer-search') && !e.target.closest('#drawerSearchResults')) {
+                    document.getElementById('drawerSearchResults')?.classList.remove('show');
+                }
+            });
 
-                document.getElementById('editorDelete')?.addEventListener('click', () => {
-                    const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
-                    if (activity && activity.isTutorial) {
-                        this.showAlert(
-                            window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
-                            window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
-                        );
-                        return;
-                    }
+            // Editor events
+            document.getElementById('editorBack')?.addEventListener('click', () => {
+                this.closeEditor();
+            });
 
-                    this.showConfirmModal(
-                        window.CountifyLanguage?.getTranslation('delete_activity') || 'Delete Activity',
-                        window.CountifyLanguage?.getTranslation('delete_confirm') || 'Are you sure you want to delete this activity? This action cannot be undone.',
-                        () => {
-                            this.deleteActivity(this.state.currentActivityId);
-                            this.closeEditor();
-                        }
+            document.getElementById('editorSave')?.addEventListener('click', () => {
+                this.saveActivity(false, true);
+                this.closeEditor();
+            });
+
+            document.getElementById('editorDelete')?.addEventListener('click', () => {
+                const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
+                if (activity && activity.isTutorial) {
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
+                        window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
                     );
+                    return;
+                }
+
+                this.showConfirmModal(
+                    window.CountifyLanguage?.getTranslation('delete_activity') || 'Delete Activity',
+                    window.CountifyLanguage?.getTranslation('delete_confirm') || 'Are you sure you want to delete this activity? This action cannot be undone.',
+                    () => {
+                        this.deleteActivity(this.state.currentActivityId);
+                        this.closeEditor();
+                    }
+                );
+            });
+
+            // Real-time updates for editor content
+            const editorContent = document.getElementById('editorContent');
+            if (editorContent) {
+                editorContent.addEventListener('input', () => {
+                    this.updateTextAnalytics();
+                    this.pushToHistoryStack();
                 });
 
-                // Real-time updates for editor content
-                const editorContent = document.getElementById('editorContent');
-                if (editorContent) {
-                    editorContent.addEventListener('input', () => {
+                editorContent.addEventListener('paste', () => {
+                    setTimeout(() => {
                         this.updateTextAnalytics();
                         this.pushToHistoryStack();
-                    });
+                    }, 10);
+                });
+            }
 
-                    editorContent.addEventListener('paste', () => {
-                        setTimeout(() => {
-                            this.updateTextAnalytics();
-                            this.pushToHistoryStack();
-                        }, 10);
-                    });
+            document.getElementById('clearEditorBtn')?.addEventListener('click', () => {
+                this.showConfirmModal(
+                    window.CountifyLanguage?.getTranslation('clear_text') || 'Clear Text',
+                    window.CountifyLanguage?.getTranslation('clear_text_confirm') || 'Are you sure you want to clear all text? This action cannot be undone.',
+                    () => {
+                        document.getElementById('editorContent').value = '';
+                        this.updateTextAnalytics();
+                        this.pushToHistoryStack();
+                    }
+                );
+            });
+
+            // Undo/Redo buttons
+            document.getElementById('undoBtn')?.addEventListener('click', () => this.undo());
+            document.getElementById('redoBtn')?.addEventListener('click', () => this.redo());
+
+            // Voice input
+            document.getElementById('voiceInputBtn')?.addEventListener('click', () => {
+                if (!this.state.wattConsent) {
+                    this.showWATTBanner();
+                    return;
+                }
+                this.toggleVoiceMode();
+            });
+
+            // Voice mode controls
+            document.getElementById('voiceStart')?.addEventListener('click', () => this.startVoiceInput());
+            document.getElementById('voicePause')?.addEventListener('click', () => this.toggleVoicePause());
+            document.getElementById('voiceStop')?.addEventListener('click', () => this.stopVoiceInput());
+            document.getElementById('voiceSpace')?.addEventListener('click', () => this.insertSpace());
+            document.getElementById('closeVoiceMode')?.addEventListener('click', () => this.closeVoiceMode());
+
+            // Modal events
+            document.getElementById('confirmModalCancel')?.addEventListener('click', () => {
+                document.getElementById('confirmModal').classList.remove('modal-open');
+            });
+
+            document.getElementById('confirmModalConfirm')?.addEventListener('click', () => {
+                if (this.state.pendingAction) {
+                    this.state.pendingAction();
+                    this.state.pendingAction = null;
+                }
+                document.getElementById('confirmModal').classList.remove('modal-open');
+            });
+
+            document.getElementById('alertModalOk')?.addEventListener('click', () => {
+                document.getElementById('alertModal').classList.remove('modal-open');
+            });
+
+            // Settings changes
+            document.getElementById('themeSelect')?.addEventListener('change', (e) => {
+                this.state.theme = e.target.value;
+                this.applyTheme(this.state.theme);
+                this.saveSettings();
+            });
+
+            document.getElementById('fontSelect')?.addEventListener('change', (e) => {
+                this.state.font = e.target.value;
+                this.applyFont(this.state.font);
+                this.saveSettings();
+            });
+
+            document.getElementById('textSizeSelect')?.addEventListener('change', (e) => {
+                this.state.textSize = e.target.value;
+                this.applyTextSize(this.state.textSize);
+                this.saveSettings();
+            });
+
+            // Empty state buttons
+            document.addEventListener('click', (e) => {
+                if (e.target.id === 'createFirstActivity' || e.target.closest('#createFirstActivity')) {
+                    this.openEditor();
                 }
 
-                document.getElementById('clearEditorBtn')?.addEventListener('click', () => {
-                    this.showConfirmModal(
-                        window.CountifyLanguage?.getTranslation('clear_text') || 'Clear Text',
-                        window.CountifyLanguage?.getTranslation('clear_text_confirm') || 'Are you sure you want to clear all text? This action cannot be undone.',
-                        () => {
-                            document.getElementById('editorContent').value = '';
-                            this.updateTextAnalytics();
-                            this.pushToHistoryStack();
-                        }
-                    );
-                });
+                if (e.target.id === 'createTodayActivity' || e.target.closest('#createTodayActivity')) {
+                    this.openEditor();
+                }
+            });
 
-                // Undo/Redo buttons
-                document.getElementById('undoBtn')?.addEventListener('click', () => this.undo());
-                document.getElementById('redoBtn')?.addEventListener('click', () => this.redo());
-
-                // Voice input
-                document.getElementById('voiceInputBtn')?.addEventListener('click', () => {
-                    if (!this.state.wattConsent) {
-                        this.showWATTBanner();
-                        return;
-                    }
-                    this.toggleVoiceMode();
-                });
-
-                // Voice mode controls
-                document.getElementById('voiceStart')?.addEventListener('click', () => this.startVoiceInput());
-                document.getElementById('voicePause')?.addEventListener('click', () => this.toggleVoicePause());
-                document.getElementById('voiceStop')?.addEventListener('click', () => this.stopVoiceInput());
-                document.getElementById('voiceSpace')?.addEventListener('click', () => this.insertSpace());
-                document.getElementById('closeVoiceMode')?.addEventListener('click', () => this.closeVoiceMode());
-
-                // Modal events
-                document.getElementById('confirmModalCancel')?.addEventListener('click', () => {
-                    document.getElementById('confirmModal').classList.remove('modal-open');
-                });
-
-                document.getElementById('confirmModalConfirm')?.addEventListener('click', () => {
-                    if (this.state.pendingAction) {
-                        this.state.pendingAction();
-                        this.state.pendingAction = null;
-                    }
-                    document.getElementById('confirmModal').classList.remove('modal-open');
-                });
-
-                document.getElementById('alertModalOk')?.addEventListener('click', () => {
-                    document.getElementById('alertModal').classList.remove('modal-open');
-                });
-
-                // Settings changes
-                document.getElementById('themeSelect')?.addEventListener('change', (e) => {
-                    this.state.theme = e.target.value;
-                    this.applyTheme(this.state.theme);
-                    this.saveSettings();
-                });
-
-                document.getElementById('fontSelect')?.addEventListener('change', (e) => {
-                    this.state.font = e.target.value;
-                    this.applyFont(this.state.font);
-                    this.saveSettings();
-                });
-
-                document.getElementById('textSizeSelect')?.addEventListener('change', (e) => {
-                    this.state.textSize = e.target.value;
-                    this.applyTextSize(this.state.textSize);
-                    this.saveSettings();
-                });
-
-                // Empty state buttons
-                document.addEventListener('click', (e) => {
-                    if (e.target.id === 'createFirstActivity' || e.target.closest('#createFirstActivity')) {
-                        this.openEditor();
-                    }
-
-                    if (e.target.id === 'createTodayActivity' || e.target.closest('#createTodayActivity')) {
-                        this.openEditor();
-                    }
-                });
-
-                // Activity card clicks
-                document.addEventListener('click', (e) => {
-                    const activityCard = e.target.closest('.activity-card');
-                    if (activityCard) {
-                        const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
-                        if (activity) {
-                            if (activity.archived) {
-                                this.showConfirmModal(
-                                    window.CountifyLanguage?.getTranslation('unarchive_activity') || 'Unarchive Activity',
-                                    window.CountifyLanguage?.getTranslation('unarchive_confirm') || 'This activity is archived. Do you want to unarchive it to edit?',
-                                    () => {
-                                        activity.archived = false;
-                                        this.saveActivities();
-                                        this.openEditor(activity.id);
-                                    }
-                                );
-                            } else {
-                                this.openEditor(activityCard.dataset.id);
-                            }
+            // Activity card clicks
+            document.addEventListener('click', (e) => {
+                const activityCard = e.target.closest('.activity-card');
+                if (activityCard) {
+                    const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
+                    if (activity) {
+                        if (activity.archived) {
+                            this.showConfirmModal(
+                                window.CountifyLanguage?.getTranslation('unarchive_activity') || 'Unarchive Activity',
+                                window.CountifyLanguage?.getTranslation('unarchive_confirm') || 'This activity is archived. Do you want to unarchive it to edit?',
+                                () => {
+                                    activity.archived = false;
+                                    this.saveActivities();
+                                    this.openEditor(activity.id);
+                                }
+                            );
+                        } else {
+                            this.openEditor(activityCard.dataset.id);
                         }
                     }
-                });
+                }
+            });
 
-                // Activity card keyboard navigation
-                document.addEventListener('keydown', (e) => {
-                    const activityCard = document.activeElement.closest('.activity-card');
-                    if (activityCard && (e.key === 'Enter' || e.key === ' ')) {
+            // Activity card keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                const activityCard = document.activeElement.closest('.activity-card');
+                if (activityCard && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    this.openEditor(activityCard.dataset.id);
+                }
+            });
+
+            // Context menu for activity cards
+            document.addEventListener('contextmenu', (e) => {
+                const activityCard = e.target.closest('.activity-card');
+                if (activityCard) {
+                    e.preventDefault();
+                    const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
+                    if (activity) {
+                        this.showActivityOptions(activityCard.dataset.id, e.clientX, e.clientY);
+                    }
+                }
+            });
+
+            // Close context menu on click outside
+            document.addEventListener('click', () => {
+                this.hideContextMenu();
+            });
+
+            // WATT banner events
+            document.getElementById('wattAccept')?.addEventListener('click', () => {
+                this.state.wattConsent = true;
+                this.state.wattAsked = true;
+                localStorage.setItem('watt-consent', 'true');
+                localStorage.setItem('watt-asked', 'true');
+                document.getElementById('wattBanner').classList.remove('show');
+            });
+
+            document.getElementById('wattDecline')?.addEventListener('click', () => {
+                this.state.wattConsent = false;
+                this.state.wattAsked = true;
+                localStorage.setItem('watt-consent', 'false');
+                localStorage.setItem('watt-asked', 'true');
+                document.getElementById('wattBanner').classList.remove('show');
+            });
+
+            // Keyboard shortcuts for undo/redo
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 'z' && !e.shiftKey) {
                         e.preventDefault();
-                        this.openEditor(activityCard.dataset.id);
-                    }
-                });
-
-                // Context menu for activity cards
-                document.addEventListener('contextmenu', (e) => {
-                    const activityCard = e.target.closest('.activity-card');
-                    if (activityCard) {
+                        this.undo();
+                    } else if ((e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
                         e.preventDefault();
-                        const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
-                        if (activity) {
-                            this.showActivityOptions(activityCard.dataset.id, e.clientX, e.clientY);
-                        }
+                        this.redo();
+                    } else if (e.key === 's') {
+                        e.preventDefault();
+                        this.saveActivity(false, true);
+                        this.closeEditor();
                     }
-                });
-
-                // Close context menu on click outside
-                document.addEventListener('click', () => {
-                    this.hideContextMenu();
-                });
-
-                // WATT banner events
-                document.getElementById('wattAccept')?.addEventListener('click', () => {
-                    this.state.wattConsent = true;
-                    this.state.wattAsked = true;
-                    localStorage.setItem('watt-consent', 'true');
-                    localStorage.setItem('watt-asked', 'true');
-                    document.getElementById('wattBanner').classList.remove('show');
-                });
-
-                document.getElementById('wattDecline')?.addEventListener('click', () => {
-                    this.state.wattConsent = false;
-                    this.state.wattAsked = true;
-                    localStorage.setItem('watt-consent', 'false');
-                    localStorage.setItem('watt-asked', 'true');
-                    document.getElementById('wattBanner').classList.remove('show');
-                });
-
-                // Keyboard shortcuts for undo/redo
-                document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey || e.metaKey) {
-                        if (e.key === 'z' && !e.shiftKey) {
-                            e.preventDefault();
-                            this.undo();
-                        } else if ((e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-                            e.preventDefault();
-                            this.redo();
-                        } else if (e.key === 's') {
-                            e.preventDefault();
-                            this.saveActivity(false, true);
-                            this.closeEditor();
-                        }
-                    }
-                });
-
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth > 768) {
-                        document.getElementById('drawer').classList.remove('drawer-open');
-                        document.getElementById('drawerOverlay').classList.remove('drawer-overlay-visible');
-                    }
-                });
-
-                // Close voice mode when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (this.state.isVoiceModeActive &&
-                        !e.target.closest('#voiceModeSheet') &&
-                        !e.target.closest('#voiceInputBtn')) {
-                        this.closeVoiceMode();
-                    }
-                });
-            }
-
-            pushToHistoryStack() {
-                if (!this.state.currentActivityId) return;
-
-                const editorContent = document.getElementById('editorContent');
-                const editorTitle = document.getElementById('editorTitle');
-                if (!editorContent || !editorTitle) return;
-
-                const currentContent = editorContent.value;
-                const currentTitle = editorTitle.value;
-
-                if (!this.state.historyStack[this.state.currentActivityId]) {
-                    this.state.historyStack[this.state.currentActivityId] = [];
-                    this.state.futureStack[this.state.currentActivityId] = [];
                 }
+            });
 
-                const lastHistory = this.state.historyStack[this.state.currentActivityId][0];
-                if (lastHistory && lastHistory.content === currentContent && lastHistory.title === currentTitle) {
-                    return;
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    document.getElementById('drawer').classList.remove('drawer-open');
+                    document.getElementById('drawerOverlay').classList.remove('drawer-overlay-visible');
                 }
+            });
 
-                this.state.historyStack[this.state.currentActivityId].unshift({
-                    content: currentContent,
-                    title: currentTitle,
-                    timestamp: Date.now()
-                });
-
-                this.state.futureStack[this.state.currentActivityId] = [];
-
-                if (this.state.historyStack[this.state.currentActivityId].length > 50) {
-                    this.state.historyStack[this.state.currentActivityId].pop();
-                }
-
-                this.updateUndoRedoButtons();
-            }
-
-            undo() {
-                if (!this.state.currentActivityId ||
-                    !this.state.historyStack[this.state.currentActivityId] ||
-                    this.state.historyStack[this.state.currentActivityId].length < 2) {
-                    return;
-                }
-
-                const currentState = this.state.historyStack[this.state.currentActivityId].shift();
-                const previousState = this.state.historyStack[this.state.currentActivityId][0];
-
-                this.state.futureStack[this.state.currentActivityId].unshift(currentState);
-
-                document.getElementById('editorContent').value = previousState.content;
-                document.getElementById('editorTitle').value = previousState.title;
-                this.updateTextAnalytics();
-
-                this.updateUndoRedoButtons();
-            }
-
-            redo() {
-                if (!this.state.currentActivityId ||
-                    !this.state.futureStack[this.state.currentActivityId] ||
-                    this.state.futureStack[this.state.currentActivityId].length === 0) {
-                    return;
-                }
-
-                const nextState = this.state.futureStack[this.state.currentActivityId].shift();
-
-                const currentContent = document.getElementById('editorContent').value;
-                const currentTitle = document.getElementById('editorTitle').value;
-                this.state.historyStack[this.state.currentActivityId].unshift({
-                    content: currentContent,
-                    title: currentTitle,
-                    timestamp: Date.now()
-                });
-
-                document.getElementById('editorContent').value = nextState.content;
-                document.getElementById('editorTitle').value = nextState.title;
-                this.updateTextAnalytics();
-
-                this.updateUndoRedoButtons();
-            }
-
-            updateUndoRedoButtons() {
-                const undoBtn = document.getElementById('undoBtn');
-                const redoBtn = document.getElementById('redoBtn');
-
-                if (!this.state.currentActivityId || !undoBtn || !redoBtn) {
-                    return;
-                }
-
-                const hasUndo = this.state.historyStack[this.state.currentActivityId] &&
-                    this.state.historyStack[this.state.currentActivityId].length > 1;
-                const hasRedo = this.state.futureStack[this.state.currentActivityId] &&
-                    this.state.futureStack[this.state.currentActivityId].length > 0;
-
-                undoBtn.disabled = !hasUndo;
-                redoBtn.disabled = !hasRedo;
-            }
-
-            toggleVoiceMode() {
-                if (!this.state.isVoiceModeActive) {
-                    this.openVoiceMode();
-                } else {
+            // Close voice mode when clicking outside
+            document.addEventListener('click', (e) => {
+                if (this.state.isVoiceModeActive &&
+                    !e.target.closest('#voiceModeSheet') &&
+                    !e.target.closest('#voiceInputBtn')) {
                     this.closeVoiceMode();
                 }
+            });
+        }
+
+        pushToHistoryStack() {
+            if (!this.state.currentActivityId) return;
+
+            const editorContent = document.getElementById('editorContent');
+            const editorTitle = document.getElementById('editorTitle');
+            if (!editorContent || !editorTitle) return;
+
+            const currentContent = editorContent.value;
+            const currentTitle = editorTitle.value;
+
+            if (!this.state.historyStack[this.state.currentActivityId]) {
+                this.state.historyStack[this.state.currentActivityId] = [];
+                this.state.futureStack[this.state.currentActivityId] = [];
             }
 
-            openVoiceMode() {
-                this.state.isVoiceModeActive = true;
-                document.getElementById('voiceModeSheet').classList.add('open');
-                document.getElementById('voiceStart').focus();
+            const lastHistory = this.state.historyStack[this.state.currentActivityId][0];
+            if (lastHistory && lastHistory.content === currentContent && lastHistory.title === currentTitle) {
+                return;
             }
 
-            closeVoiceMode() {
-                this.state.isVoiceModeActive = false;
-                document.getElementById('voiceModeSheet').classList.remove('open');
+            this.state.historyStack[this.state.currentActivityId].unshift({
+                content: currentContent,
+                title: currentTitle,
+                timestamp: Date.now()
+            });
+
+            this.state.futureStack[this.state.currentActivityId] = [];
+
+            if (this.state.historyStack[this.state.currentActivityId].length > 50) {
+                this.state.historyStack[this.state.currentActivityId].pop();
+            }
+
+            this.updateUndoRedoButtons();
+        }
+
+        undo() {
+            if (!this.state.currentActivityId ||
+                !this.state.historyStack[this.state.currentActivityId] ||
+                this.state.historyStack[this.state.currentActivityId].length < 2) {
+                return;
+            }
+
+            const currentState = this.state.historyStack[this.state.currentActivityId].shift();
+            const previousState = this.state.historyStack[this.state.currentActivityId][0];
+
+            this.state.futureStack[this.state.currentActivityId].unshift(currentState);
+
+            document.getElementById('editorContent').value = previousState.content;
+            document.getElementById('editorTitle').value = previousState.title;
+            this.updateTextAnalytics();
+
+            this.updateUndoRedoButtons();
+        }
+
+        redo() {
+            if (!this.state.currentActivityId ||
+                !this.state.futureStack[this.state.currentActivityId] ||
+                this.state.futureStack[this.state.currentActivityId].length === 0) {
+                return;
+            }
+
+            const nextState = this.state.futureStack[this.state.currentActivityId].shift();
+
+            const currentContent = document.getElementById('editorContent').value;
+            const currentTitle = document.getElementById('editorTitle').value;
+            this.state.historyStack[this.state.currentActivityId].unshift({
+                content: currentContent,
+                title: currentTitle,
+                timestamp: Date.now()
+            });
+
+            document.getElementById('editorContent').value = nextState.content;
+            document.getElementById('editorTitle').value = nextState.title;
+            this.updateTextAnalytics();
+
+            this.updateUndoRedoButtons();
+        }
+
+        updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn');
+
+            if (!this.state.currentActivityId || !undoBtn || !redoBtn) {
+                return;
+            }
+
+            const hasUndo = this.state.historyStack[this.state.currentActivityId] &&
+                this.state.historyStack[this.state.currentActivityId].length > 1;
+            const hasRedo = this.state.futureStack[this.state.currentActivityId] &&
+                this.state.futureStack[this.state.currentActivityId].length > 0;
+
+            undoBtn.disabled = !hasUndo;
+            redoBtn.disabled = !hasRedo;
+        }
+
+        toggleVoiceMode() {
+            if (!this.state.isVoiceModeActive) {
+                this.openVoiceMode();
+            } else {
+                this.closeVoiceMode();
+            }
+        }
+
+        openVoiceMode() {
+            this.state.isVoiceModeActive = true;
+            document.getElementById('voiceModeSheet').classList.add('open');
+            document.getElementById('voiceStart').focus();
+        }
+
+        closeVoiceMode() {
+            this.state.isVoiceModeActive = false;
+            document.getElementById('voiceModeSheet').classList.remove('open');
+            this.stopVoiceInput();
+        }
+
+        startVoiceInput() {
+            if (!('webkitSpeechRecognition' in window)) {
+                this.showAlert(
+                    window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
+                    'Voice input is not supported in your browser.'
+                );
+                return;
+            }
+
+            if (this.state.voiceRecognition) {
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            this.state.voiceRecognition = recognition;
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = window.CountifyLanguage?.getLanguageCode(this.state.currentLanguage) || 'en-US';
+
+            // Disable automatic stopping
+            recognition.onend = null;
+            recognition.onaudioend = null;
+            recognition.onsoundend = null;
+            recognition.onspeechend = null;
+
+            recognition.onstart = () => {
+                this.state.isVoiceListening = true;
+                document.getElementById('voiceStart').disabled = true;
+                document.getElementById('voicePause').disabled = false;
+                document.getElementById('voiceStop').disabled = false;
+                document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic_off</span>';
+                document.getElementById('voiceInputBtn').style.color = 'var(--error)';
+                this.startVoiceVisualizer();
+                this.triggerHapticFeedback('success');
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                document.getElementById('voiceCaption').textContent = interimTranscript || finalTranscript;
+
+                if (finalTranscript) {
+                    const editor = document.getElementById('editorContent');
+                    editor.value += (editor.value ? ' ' : '') + finalTranscript;
+                    this.updateTextAnalytics();
+                    this.pushToHistoryStack();
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error', event.error);
                 this.stopVoiceInput();
-            }
+                this.triggerHapticFeedback('error');
+                this.showAlert(
+                    window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
+                    `An error occurred: ${event.error}`
+                );
+            };
 
-            startVoiceInput() {
-                if (!('webkitSpeechRecognition' in window)) {
-                    this.showAlert(
-                        window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
-                        'Voice input is not supported in your browser.'
-                    );
-                    return;
-                }
-
-                if (this.state.voiceRecognition) {
-                    return;
-                }
-
-                const recognition = new webkitSpeechRecognition();
-                this.state.voiceRecognition = recognition;
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = window.CountifyLanguage?.getLanguageCode(this.state.currentLanguage) || 'en-US';
-
-                recognition.onstart = () => {
-                    document.getElementById('voiceStart').disabled = true;
-                    document.getElementById('voicePause').disabled = false;
-                    document.getElementById('voiceStop').disabled = false;
-                    document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic_off</span>';
-                    document.getElementById('voiceInputBtn').style.color = 'var(--error)';
-                    this.startVoiceVisualizer();
-                };
-
-                recognition.onresult = (event) => {
-                    let interimTranscript = '';
-                    let finalTranscript = '';
-
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
-                        } else {
-                            interimTranscript += transcript;
-                        }
-                    }
-
-                    document.getElementById('voiceCaption').textContent = interimTranscript || finalTranscript;
-
-                    if (finalTranscript) {
-                        const editor = document.getElementById('editorContent');
-                        editor.value += (editor.value ? ' ' : '') + finalTranscript;
-                        this.updateTextAnalytics();
-                        this.pushToHistoryStack();
-                    }
-                };
-
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error', event.error);
-                    this.stopVoiceInput();
-                    this.showAlert(
-                        window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
-                        `An error occurred: ${event.error}`
-                    );
-                };
-
-                recognition.onend = () => {
-                    if (this.state.voiceRecognition) {
-                        // Only restart if we didn't explicitly stop it
-                        this.state.voiceRecognition.start();
-                    }
-                };
-
+            try {
                 recognition.start();
+            } catch (error) {
+                this.showAlert(
+                    window.CountifyLanguage?.getTranslation('microphone_error') || 'Microphone Error',
+                    window.CountifyLanguage?.getTranslation('microphone_permission_denied') || 'Microphone permission was denied. Please enable microphone access in your browser settings.'
+                );
+                this.triggerHapticFeedback('error');
             }
+        }
 
-            toggleVoicePause() {
-                if (!this.state.voiceRecognition) return;
+        toggleVoicePause() {
+            if (!this.state.voiceRecognition) return;
 
-                const pauseBtn = document.getElementById('voicePause');
-                if (pauseBtn.textContent.includes(window.CountifyLanguage?.getTranslation('pause') || 'Pause')) {
-                    this.state.voiceRecognition.stop();
-                    pauseBtn.innerHTML = `<span class="material-icons">play_arrow</span> <span data-translate="continue">Continue</span>`;
-                    this.stopVoiceVisualizer();
-                } else {
-                    this.state.voiceRecognition.start();
-                    pauseBtn.innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
-                    this.startVoiceVisualizer();
-                }
-            }
-
-            stopVoiceInput() {
-                if (!this.state.voiceRecognition) return;
-
+            const pauseBtn = document.getElementById('voicePause');
+            if (this.state.isVoiceListening) {
                 this.state.voiceRecognition.stop();
-                this.state.voiceRecognition = null;
-
-                document.getElementById('voiceStart').disabled = false;
-                document.getElementById('voicePause').disabled = true;
-                document.getElementById('voiceStop').disabled = true;
-                document.getElementById('voicePause').innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
-                document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic</span>';
-                document.getElementById('voiceInputBtn').style.color = '';
-                document.getElementById('voiceCaption').textContent = '';
-
+                this.state.isVoiceListening = false;
+                pauseBtn.innerHTML = `<span class="material-icons">play_arrow</span> <span data-translate="continue">Continue</span>`;
                 this.stopVoiceVisualizer();
+                this.triggerHapticFeedback('light');
+            } else {
+                this.state.voiceRecognition.start();
+                this.state.isVoiceListening = true;
+                pauseBtn.innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
+                this.startVoiceVisualizer();
+                this.triggerHapticFeedback('light');
+            }
+        }
+
+        stopVoiceInput() {
+            if (!this.state.voiceRecognition) return;
+
+            try {
+                this.state.voiceRecognition.stop();
+            } catch (e) {
+                console.log('Voice recognition already stopped');
             }
 
-            insertSpace() {
-                const editor = document.getElementById('editorContent');
-                editor.value += ' ';
-                editor.focus();
-                this.updateTextAnalytics();
-                this.pushToHistoryStack();
-            }
+            this.state.voiceRecognition = null;
+            this.state.isVoiceListening = false;
 
-            startVoiceVisualizer() {
-                this.stopVoiceVisualizer();
+            document.getElementById('voiceStart').disabled = false;
+            document.getElementById('voicePause').disabled = true;
+            document.getElementById('voiceStop').disabled = true;
+            document.getElementById('voicePause').innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
+            document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic</span>';
+            document.getElementById('voiceInputBtn').style.color = '';
+            document.getElementById('voiceCaption').textContent = '';
+
+            this.stopVoiceVisualizer();
+            this.triggerHapticFeedback('success', 2);
+        }
+
+        insertSpace() {
+            const editor = document.getElementById('editorContent');
+            editor.value += ' ';
+            editor.focus();
+            this.updateTextAnalytics();
+            this.pushToHistoryStack();
+            this.triggerHapticFeedback('light');
+        }
+
+        triggerHapticFeedback(type = 'light', count = 1) {
+            if (!('vibrate' in navigator)) return;
+
+            try {
+                switch (type) {
+                    case 'success':
+                        navigator.vibrate(50);
+                        break;
+                    case 'error':
+                        navigator.vibrate([100, 50, 100]);
+                        break;
+                    case 'light':
+                        navigator.vibrate(30);
+                        break;
+                    default:
+                        navigator.vibrate(50 * count);
+                }
+            } catch (e) {
+                console.log('Haptic feedback not supported');
+            }
+        }
+
+        startVoiceVisualizer() {
+            this.stopVoiceVisualizer();
+
+            const visualizerBars = [
+                document.getElementById('voiceBar1'),
+                document.getElementById('voiceBar2'),
+                document.getElementById('voiceBar3'),
+                document.getElementById('voiceBar4'),
+                document.getElementById('voiceBar5')
+            ];
+
+            this.state.visualizerInterval = setInterval(() => {
+                visualizerBars.forEach(bar => {
+                    const height = Math.floor(Math.random() * 30) + 5;
+                    bar.style.height = `${height}px`;
+                    bar.style.backgroundColor = `hsl(${Math.random() * 60 + 180}, 80%, 60%)`;
+                });
+            }, 100);
+        }
+
+        stopVoiceVisualizer() {
+            if (this.state.visualizerInterval) {
+                clearInterval(this.state.visualizerInterval);
+                this.state.visualizerInterval = null;
 
                 const visualizerBars = [
                     document.getElementById('voiceBar1'),
@@ -1833,436 +1868,416 @@ rel="noopener noreferrer"
                     document.getElementById('voiceBar5')
                 ];
 
-                this.state.visualizerInterval = setInterval(() => {
-                    visualizerBars.forEach(bar => {
-                        const height = Math.floor(Math.random() * 30) + 5;
-                        bar.style.height = `${height}px`;
-                    });
-                }, 100);
-            }
-
-            stopVoiceVisualizer() {
-                if (this.state.visualizerInterval) {
-                    clearInterval(this.state.visualizerInterval);
-                    this.state.visualizerInterval = null;
-
-                    const visualizerBars = [
-                        document.getElementById('voiceBar1'),
-                        document.getElementById('voiceBar2'),
-                        document.getElementById('voiceBar3'),
-                        document.getElementById('voiceBar4'),
-                        document.getElementById('voiceBar5')
-                    ];
-
-                    visualizerBars.forEach(bar => {
-                        bar.style.height = '5px';
-                    });
-                }
-            }
-
-            showWATTBanner() {
-                if (!this.state.wattAsked) {
-                    document.getElementById('wattBanner')?.classList.add('show');
-                }
-            }
-
-            setupRippleEffects() {
-                document.addEventListener('click', function(e) {
-                    const target = e.target.closest('.btn, .btn-icon, .activity-card, .fab');
-                    if (target) {
-                        const rect = target.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-
-                        const ripple = document.createElement('span');
-                        ripple.classList.add('ripple');
-                        ripple.style.left = `${x}px`;
-                        ripple.style.top = `${y}px`;
-
-                        target.appendChild(ripple);
-
-                        ripple.addEventListener('animationend', () => {
-                            ripple.remove();
-                        });
-                    }
+                visualizerBars.forEach(bar => {
+                    bar.style.height = '5px';
+                    bar.style.backgroundColor = 'var(--primary)';
                 });
             }
+        }
 
-            toggleDrawer() {
-                document.getElementById('drawer')?.classList.toggle('drawer-open');
-                document.getElementById('drawerOverlay')?.classList.toggle('drawer-overlay-visible');
-                document.getElementById('drawerSearchResults')?.classList.remove('show');
+        showWATTBanner() {
+            if (!this.state.wattAsked) {
+                document.getElementById('wattBanner')?.classList.add('show');
             }
+        }
 
-            async loadSettings() {
-                try {
-                    const settings = JSON.parse(localStorage.getItem('countify-settings')) || {};
+        setupRippleEffects() {
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('.btn, .btn-icon, .activity-card, .fab');
+                if (target) {
+                    const rect = target.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
 
-                    if (settings.theme) {
-                        this.state.theme = settings.theme;
-                        this.applyTheme(settings.theme);
-                    }
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
 
-                    if (settings.font) {
-                        this.state.font = settings.font;
-                        this.applyFont(settings.font);
-                    }
+                    target.appendChild(ripple);
 
-                    if (settings.textSize) {
-                        this.state.textSize = settings.textSize;
-                        this.applyTextSize(settings.textSize);
-                    }
-
-                    if (settings.language) {
-                        this.state.currentLanguage = settings.language;
-                        if (window.CountifyLanguage) {
-                            window.CountifyLanguage.setCurrentLanguage(settings.language);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error loading settings:', error);
-                }
-            }
-
-            async saveSettings() {
-                try {
-                    const settings = {
-                        theme: this.state.theme,
-                        font: this.state.font,
-                        textSize: this.state.textSize,
-                        language: this.state.currentLanguage
-                    };
-
-                    localStorage.setItem('countify-settings', JSON.stringify(settings));
-                } catch (error) {
-                    console.error('Error saving settings:', error);
-                }
-            }
-
-            async loadActivities() {
-                try {
-                    const activities = localStorage.getItem('countify-activities');
-                    this.state.activities = activities ? JSON.parse(activities) || [] : [];
-                } catch (error) {
-                    console.error('Error loading activities:', error);
-                    this.state.activities = [];
-                }
-            }
-
-            async saveActivities() {
-                try {
-                    localStorage.setItem('countify-activities', JSON.stringify(this.state.activities.filter(a => !a.isTutorial)));
-                } catch (error) {
-                    console.error('Error saving activities:', error);
-                }
-            }
-
-            applyTheme(theme) {
-                if (theme === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    theme = prefersDark ? 'dark' : 'light';
-                }
-
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-
-            applyFont(font) {
-                if (font !== 'Poppins') {
-                    document.body.style.fontFamily = `${font}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif`;
-                } else {
-                    document.body.style.fontFamily = '';
-                }
-            }
-
-            applyTextSize(size) {
-                document.body.classList.remove('text-small', 'text-normal', 'text-large');
-                if (size !== 'normal') {
-                    document.body.classList.add(`text-${size}`);
-                }
-
-                const editor = document.getElementById('editorContent');
-                if (editor) {
-                    editor.style.fontSize = size === 'small' ? '0.875rem' :
-                        size === 'large' ? '1.125rem' : '1rem';
-                }
-            }
-
-            watchSystemTheme() {
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                mediaQuery.addEventListener('change', (e) => {
-                    if (this.state.theme === 'system') {
-                        this.applyTheme('system');
-                    }
-                });
-            }
-
-            filterActivities() {
-                let filtered = [...this.state.activities].filter(a => !a.deleted && !a.archived);
-
-                if (this.state.searchQuery) {
-                    filtered = filtered.filter(activity =>
-                        activity.title.toLowerCase().includes(this.state.searchQuery) ||
-                        activity.content.toLowerCase().includes(this.state.searchQuery)
-                    );
-                }
-
-                if (this.state.selectedFolder !== 'all') {
-                    filtered = filtered.filter(activity =>
-                        activity.folder === this.state.selectedFolder
-                    );
-                }
-
-                return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-            }
-
-            getTodaysActivities() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                return this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= today && !activity.deleted && !activity.archived;
-                });
-            }
-
-            getYesterdaysActivities() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                return this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
-                });
-            }
-
-            formatDate(timestamp) {
-                const date = new Date(timestamp);
-                const now = new Date();
-                const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-
-                if (diffInDays === 0) {
-                    return window.CountifyLanguage?.getTranslation('today') || 'Today';
-                } else if (diffInDays === 1) {
-                    return window.CountifyLanguage?.getTranslation('yesterday') || 'Yesterday';
-                } else if (diffInDays < 7) {
-                    return date.toLocaleDateString(this.state.currentLanguage, {
-                        weekday: 'short'
-                    });
-                } else {
-                    return date.toLocaleDateString(this.state.currentLanguage, {
-                        month: 'short',
-                        day: 'numeric'
+                    ripple.addEventListener('animationend', () => {
+                        ripple.remove();
                     });
                 }
-            }
+            });
+        }
 
-            countWords(text) {
-                if (!text || !text.trim()) return 0;
-                return text.trim().split(/\s+/).length;
-            }
+        toggleDrawer() {
+            document.getElementById('drawer')?.classList.toggle('drawer-open');
+            document.getElementById('drawerOverlay')?.classList.toggle('drawer-overlay-visible');
+            document.getElementById('drawerSearchResults')?.classList.remove('show');
+        }
 
-            countCharacters(text, includeSpaces = true) {
-                if (!text) return 0;
-                return includeSpaces ? text.length : text.replace(/\s+/g, '').length;
-            }
+        async loadSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('countify-settings')) || {};
 
-            countSentences(text) {
-                if (!text || !text.trim()) return 0;
-                const sentences = text.split(/[.!?]+(?=\s|$)/);
-                return sentences.filter(s => s.trim().length > 0).length;
-            }
+                if (settings.theme) {
+                    this.state.theme = settings.theme;
+                    this.applyTheme(settings.theme);
+                }
 
-            countParagraphs(text) {
-                if (!text || !text.trim()) return 0;
-                const paragraphs = text.split(/\n\s*\n+/);
-                return paragraphs.filter(p => p.trim().length > 0).length;
-            }
+                if (settings.font) {
+                    this.state.font = settings.font;
+                    this.applyFont(settings.font);
+                }
 
-            calculateReadingTime(wordCount) {
-                const wordsPerMinute = 200;
-                const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
-            }
+                if (settings.textSize) {
+                    this.state.textSize = settings.textSize;
+                    this.applyTextSize(settings.textSize);
+                }
 
-            calculateSpeakingTime(wordCount) {
-                const wordsPerMinute = 150;
-                const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
-            }
-
-            updateTextAnalytics() {
-                const text = document.getElementById('editorContent')?.value || '';
-                const wordCount = this.countWords(text);
-
-                document.getElementById('wordCount').textContent = wordCount;
-                document.getElementById('charCount').textContent = this.countCharacters(text, true);
-                document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
-                document.getElementById('sentenceCount').textContent = this.countSentences(text);
-                document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
-
-                document.getElementById('readingTime').textContent =
-                    this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
-                        ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
-                        ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
-
-                document.getElementById('speakingTime').textContent =
-                    this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
-                        ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
-                        ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
-            }
-
-            async openEditor(activityId = null) {
-                if (activityId) {
-                    const activity = this.state.activities.find(a => a.id === activityId);
-                    if (activity) {
-                        this.state.currentActivityId = activity.id;
-                        document.getElementById('editorTitle').value = activity.title;
-
-                        if (activity.isTutorial) {
-                            document.getElementById('editorTitle').readOnly = true;
-                            document.getElementById('editorContent').readOnly = true;
-                        } else {
-                            document.getElementById('editorTitle').readOnly = false;
-                            document.getElementById('editorContent').readOnly = false;
-                        }
-
-                        document.getElementById('editorContent').value = activity.content;
-                        this.updateTextAnalytics();
-                        this.state.isEditing = true;
-
-                        if (!this.state.historyStack[activityId]) {
-                            this.state.historyStack[activityId] = [{
-                                content: activity.content,
-                                title: activity.title,
-                                timestamp: Date.now()
-                            }];
-                            this.state.futureStack[activityId] = [];
-                        }
+                if (settings.language) {
+                    this.state.currentLanguage = settings.language;
+                    if (window.CountifyLanguage) {
+                        window.CountifyLanguage.setCurrentLanguage(settings.language);
                     }
-                } else {
-                    this.state.currentActivityId = this.generateId();
-                    document.getElementById('editorTitle').value = this.generateDefaultTitle();
-                    document.getElementById('editorTitle').readOnly = false;
-                    document.getElementById('editorContent').value = '';
-                    document.getElementById('editorContent').readOnly = false;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        async saveSettings() {
+            try {
+                const settings = {
+                    theme: this.state.theme,
+                    font: this.state.font,
+                    textSize: this.state.textSize,
+                    language: this.state.currentLanguage
+                };
+
+                localStorage.setItem('countify-settings', JSON.stringify(settings));
+            } catch (error) {
+                console.error('Error saving settings:', error);
+            }
+        }
+
+        async loadActivities() {
+            try {
+                const activities = localStorage.getItem('countify-activities');
+                this.state.activities = activities ? JSON.parse(activities) || [] : [];
+            } catch (error) {
+                console.error('Error loading activities:', error);
+                this.state.activities = [];
+            }
+        }
+
+        async saveActivities() {
+            try {
+                localStorage.setItem('countify-activities', JSON.stringify(this.state.activities.filter(a => !a.isTutorial)));
+            } catch (error) {
+                console.error('Error saving activities:', error);
+            }
+        }
+
+        applyTheme(theme) {
+            if (theme === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                theme = prefersDark ? 'dark' : 'light';
+            }
+
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        applyFont(font) {
+            if (font !== 'Poppins') {
+                document.body.style.fontFamily = `${font}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif`;
+            } else {
+                document.body.style.fontFamily = '';
+            }
+        }
+
+        applyTextSize(size) {
+            document.body.classList.remove('text-small', 'text-normal', 'text-large');
+            if (size !== 'normal') {
+                document.body.classList.add(`text-${size}`);
+            }
+
+            const editor = document.getElementById('editorContent');
+            if (editor) {
+                editor.style.fontSize = size === 'small' ? '0.875rem' :
+                    size === 'large' ? '1.125rem' : '1rem';
+            }
+        }
+
+        watchSystemTheme() {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addEventListener('change', (e) => {
+                if (this.state.theme === 'system') {
+                    this.applyTheme('system');
+                }
+            });
+        }
+
+        filterActivities() {
+            let filtered = [...this.state.activities].filter(a => !a.deleted && !a.archived);
+
+            if (this.state.searchQuery) {
+                filtered = filtered.filter(activity =>
+                    activity.title.toLowerCase().includes(this.state.searchQuery) ||
+                    activity.content.toLowerCase().includes(this.state.searchQuery)
+                );
+            }
+
+            if (this.state.selectedFolder !== 'all') {
+                filtered = filtered.filter(activity =>
+                    activity.folder === this.state.selectedFolder
+                );
+            }
+
+            return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        }
+
+        getTodaysActivities() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            return this.state.activities.filter(activity => {
+                const activityDate = new Date(activity.updatedAt);
+                return activityDate >= today && !activity.deleted && !activity.archived;
+            });
+        }
+
+        getYesterdaysActivities() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            return this.state.activities.filter(activity => {
+                const activityDate = new Date(activity.updatedAt);
+                return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
+            });
+        }
+
+        formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+            if (diffInDays === 0) {
+                return window.CountifyLanguage?.getTranslation('today') || 'Today';
+            } else if (diffInDays === 1) {
+                return window.CountifyLanguage?.getTranslation('yesterday') || 'Yesterday';
+            } else if (diffInDays < 7) {
+                return date.toLocaleDateString(this.state.currentLanguage, {
+                    weekday: 'short'
+                });
+            } else {
+                return date.toLocaleDateString(this.state.currentLanguage, {
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        }
+
+        countWords(text) {
+            if (!text || !text.trim()) return 0;
+            return text.trim().split(/\s+/).length;
+        }
+
+        countCharacters(text, includeSpaces = true) {
+            if (!text) return 0;
+            return includeSpaces ? text.length : text.replace(/\s+/g, '').length;
+        }
+
+        countSentences(text) {
+            if (!text || !text.trim()) return 0;
+            const sentences = text.split(/[.!?]+(?=\s|$)/);
+            return sentences.filter(s => s.trim().length > 0).length;
+        }
+
+        countParagraphs(text) {
+            if (!text || !text.trim()) return 0;
+            const paragraphs = text.split(/\n\s*\n+/);
+            return paragraphs.filter(p => p.trim().length > 0).length;
+        }
+
+        calculateReadingTime(wordCount) {
+            const wordsPerMinute = 200;
+            const minutes = wordCount / wordsPerMinute;
+            return Math.ceil(minutes) || 0;
+        }
+
+        calculateSpeakingTime(wordCount) {
+            const wordsPerMinute = 150;
+            const minutes = wordCount / wordsPerMinute;
+            return Math.ceil(minutes) || 0;
+        }
+
+        updateTextAnalytics() {
+            const text = document.getElementById('editorContent')?.value || '';
+            const wordCount = this.countWords(text);
+
+            document.getElementById('wordCount').textContent = wordCount;
+            document.getElementById('charCount').textContent = this.countCharacters(text, true);
+            document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
+            document.getElementById('sentenceCount').textContent = this.countSentences(text);
+            document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
+
+            document.getElementById('readingTime').textContent =
+                this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
+                    ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
+                    ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+
+            document.getElementById('speakingTime').textContent =
+                this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
+                    ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
+                    ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+        }
+
+        async openEditor(activityId = null) {
+            if (activityId) {
+                const activity = this.state.activities.find(a => a.id === activityId);
+                if (activity) {
+                    this.state.currentActivityId = activity.id;
+                    document.getElementById('editorTitle').value = activity.title;
+
+                    if (activity.isTutorial) {
+                        document.getElementById('editorTitle').readOnly = true;
+                        document.getElementById('editorContent').readOnly = true;
+                    } else {
+                        document.getElementById('editorTitle').readOnly = false;
+                        document.getElementById('editorContent').readOnly = false;
+                    }
+
+                    document.getElementById('editorContent').value = activity.content;
                     this.updateTextAnalytics();
-                    this.state.isEditing = false;
-
-                    this.state.historyStack[this.state.currentActivityId] = [{
-                        content: '',
-                        title: this.generateDefaultTitle(),
-                        timestamp: Date.now()
-                    }];
-                    this.state.futureStack[this.state.currentActivityId] = [];
-                }
-
-                document.getElementById('editorContainer').classList.add('editor-container-open');
-                document.getElementById('editorContent').focus();
-                this.updateUndoRedoButtons();
-
-                if (document.getElementById('drawer').classList.contains('drawer-open')) {
-                    this.toggleDrawer();
-                }
-
-                document.getElementById('fab').style.display = 'none';
-                this.closeVoiceMode();
-            }
-
-            generateDefaultTitle() {
-                const now = new Date();
-                const hours = now.getHours();
-
-                if (window.CountifyLanguage) {
-                    if (hours < 12) return window.CountifyLanguage.getTranslation('morning_activity') || 'Morning Activity';
-                    if (hours < 17) return window.CountifyLanguage.getTranslation('afternoon_activity') || 'Afternoon Activity';
-                    return window.CountifyLanguage.getTranslation('evening_activity') || 'Evening Activity';
-                } else {
-                    if (hours < 12) return 'Morning Activity';
-                    if (hours < 17) return 'Afternoon Activity';
-                    return 'Evening Activity';
-                }
-            }
-
-            closeEditor() {
-                document.getElementById('editorContainer').classList.remove('editor-container-open');
-                this.state.currentActivityId = null;
-                this.renderView();
-                document.getElementById('fab').style.display = 'flex';
-                this.closeVoiceMode();
-            }
-
-            async saveActivity(isAutoSave = false, showIndicator = false) {
-                const title = document.getElementById('editorTitle')?.value.trim() || this.generateDefaultTitle();
-                const content = document.getElementById('editorContent')?.value.trim() || '';
-                const wordCount = this.countWords(content);
-                const now = new Date().toISOString();
-
-                const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
-                if (activity && activity.isTutorial) {
-                    this.showAlert(
-                        window.CountifyLanguage?.getTranslation('cannot_save') || 'Cannot Save',
-                        window.CountifyLanguage?.getTranslation('cannot_save_message') || 'This is a tutorial activity and cannot be modified.'
-                    );
-                    return;
-                }
-
-                if (this.state.isEditing) {
-                    this.state.activities = this.state.activities.map(activity => {
-                        if (activity.id === this.state.currentActivityId) {
-                            return {
-                                ...activity,
-                                title,
-                                content,
-                                wordCount,
-                                updatedAt: now
-                            };
-                        }
-                        return activity;
-                    });
-                } else {
-                    this.state.activities.unshift({
-                        id: this.state.currentActivityId,
-                        title,
-                        content,
-                        wordCount,
-                        createdAt: now,
-                        updatedAt: now,
-                        deleted: false,
-                        archived: false
-                    });
                     this.state.isEditing = true;
-                }
 
-                await this.saveActivities();
-
-                if (showIndicator) {
-                    this.showAutoSaveIndicator();
+                    if (!this.state.historyStack[activityId]) {
+                        this.state.historyStack[activityId] = [{
+                            content: activity.content,
+                            title: activity.title,
+                            timestamp: Date.now()
+                        }];
+                        this.state.futureStack[activityId] = [];
+                    }
                 }
+            } else {
+                this.state.currentActivityId = this.generateId();
+                document.getElementById('editorTitle').value = this.generateDefaultTitle();
+                document.getElementById('editorTitle').readOnly = false;
+                document.getElementById('editorContent').value = '';
+                document.getElementById('editorContent').readOnly = false;
+                this.updateTextAnalytics();
+                this.state.isEditing = false;
+
+                this.state.historyStack[this.state.currentActivityId] = [{
+                    content: '',
+                    title: this.generateDefaultTitle(),
+                    timestamp: Date.now()
+                }];
+                this.state.futureStack[this.state.currentActivityId] = [];
             }
 
-            async deleteActivity(activityId) {
-                const activity = this.state.activities.find(a => a.id === activityId);
-                if (activity && activity.isTutorial) {
-                    this.showAlert(
-                        window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
-                        window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
-                    );
-                    return;
-                }
+            document.getElementById('editorContainer').classList.add('editor-container-open');
+            document.getElementById('editorContent').focus();
+            this.updateUndoRedoButtons();
 
-                this.state.activities = this.state.activities.filter(activity => activity.id !== activityId);
-                await this.saveActivities();
-                this.renderView();
+            if (document.getElementById('drawer').classList.contains('drawer-open')) {
+                this.toggleDrawer();
             }
 
-            showActivityOptions(activityId, x, y) {
-                const activity = this.state.activities.find(a => a.id === activityId);
-                if (!activity) return;
+            document.getElementById('fab').style.display = 'none';
+            this.closeVoiceMode();
+        }
 
-                const contextMenu = document.getElementById('contextMenu');
-                contextMenu.innerHTML = `
+        generateDefaultTitle() {
+            const now = new Date();
+            const hours = now.getHours();
+
+            if (window.CountifyLanguage) {
+                if (hours < 12) return window.CountifyLanguage.getTranslation('morning_activity') || 'Morning Activity';
+                if (hours < 17) return window.CountifyLanguage.getTranslation('afternoon_activity') || 'Afternoon Activity';
+                return window.CountifyLanguage.getTranslation('evening_activity') || 'Evening Activity';
+            } else {
+                if (hours < 12) return 'Morning Activity';
+                if (hours < 17) return 'Afternoon Activity';
+                return 'Evening Activity';
+            }
+        }
+
+        closeEditor() {
+            document.getElementById('editorContainer').classList.remove('editor-container-open');
+            this.state.currentActivityId = null;
+            this.renderView();
+            document.getElementById('fab').style.display = 'flex';
+            this.closeVoiceMode();
+        }
+
+        async saveActivity(isAutoSave = false, showIndicator = false) {
+            const title = document.getElementById('editorTitle')?.value.trim() || this.generateDefaultTitle();
+            const content = document.getElementById('editorContent')?.value.trim() || '';
+            const wordCount = this.countWords(content);
+            const now = new Date().toISOString();
+
+            const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
+            if (activity && activity.isTutorial) {
+                this.showAlert(
+                    window.CountifyLanguage?.getTranslation('cannot_save') || 'Cannot Save',
+                    window.CountifyLanguage?.getTranslation('cannot_save_message') || 'This is a tutorial activity and cannot be modified.'
+                );
+                return;
+            }
+
+            if (this.state.isEditing) {
+                this.state.activities = this.state.activities.map(activity => {
+                    if (activity.id === this.state.currentActivityId) {
+                        return {
+                            ...activity,
+                            title,
+                            content,
+                            wordCount,
+                            updatedAt: now
+                        };
+                    }
+                    return activity;
+                });
+            } else {
+                this.state.activities.unshift({
+                    id: this.state.currentActivityId,
+                    title,
+                    content,
+                    wordCount,
+                    createdAt: now,
+                    updatedAt: now,
+                    deleted: false,
+                    archived: false
+                });
+                this.state.isEditing = true;
+            }
+
+            await this.saveActivities();
+
+            if (showIndicator) {
+                this.showAutoSaveIndicator();
+            }
+        }
+
+        async deleteActivity(activityId) {
+            const activity = this.state.activities.find(a => a.id === activityId);
+            if (activity && activity.isTutorial) {
+                this.showAlert(
+                    window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
+                    window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
+                );
+                return;
+            }
+
+            this.state.activities = this.state.activities.filter(activity => activity.id !== activityId);
+            await this.saveActivities();
+            this.renderView();
+        }
+
+        showActivityOptions(activityId, x, y) {
+            const activity = this.state.activities.find(a => a.id === activityId);
+            if (!activity) return;
+
+            const contextMenu = document.getElementById('contextMenu');
+            contextMenu.innerHTML = `
             <div class="context-menu-item" data-action="edit" tabindex="0">
                 <span class="material-icons">edit</span>
                 <span data-translate="edit">Edit</span>
@@ -2293,111 +2308,112 @@ rel="noopener noreferrer"
             `}
         `;
 
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const menuWidth = 200;
-                const menuHeight = activity.deleted ? 96 : activity.archived ? 144 : 192;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const menuWidth = 200;
+            const menuHeight = activity.deleted ? 96 : activity.archived ? 144 : 192;
 
-                const adjustedX = x + menuWidth > viewportWidth ? viewportWidth - menuWidth - 10 : x;
-                const adjustedY = y + menuHeight > viewportHeight ? viewportHeight - menuHeight - 10 : y;
+            const adjustedX = x + menuWidth > viewportWidth ? viewportWidth - menuWidth - 10 : x;
+            const adjustedY = y + menuHeight > viewportHeight ? viewportHeight - menuHeight - 10 : y;
 
-                contextMenu.style.left = `${adjustedX}px`;
-                contextMenu.style.top = `${adjustedY}px`;
-                contextMenu.classList.add('context-menu-open');
+            contextMenu.style.left = `${adjustedX}px`;
+            contextMenu.style.top = `${adjustedY}px`;
+            contextMenu.classList.add('context-menu-open');
 
-                setTimeout(() => {
-                    contextMenu.querySelector('.context-menu-item').focus();
-                }, 10);
+            setTimeout(() => {
+                contextMenu.querySelector('.context-menu-item').focus();
+            }, 10);
 
-                contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
-                    item.addEventListener('click', async (e) => {
+            contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
+                item.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const action = item.dataset.action;
+                    this.handleContextMenuAction(action, activity);
+                });
+
+                item.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
                         e.stopPropagation();
                         const action = item.dataset.action;
                         this.handleContextMenuAction(action, activity);
-                    });
-
-                    item.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const action = item.dataset.action;
-                            this.handleContextMenuAction(action, activity);
-                        }
-                    });
+                    }
                 });
-            }
-
-            handleContextMenuAction(action, activity) {
-                switch (action) {
-                    case 'edit':
-                        this.openEditor(activity.id);
-                        break;
-                    case 'archive':
-                        activity.archived = true;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'unarchive':
-                        activity.archived = false;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'delete':
-                        activity.deleted = true;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'deletePermanently':
-                        this.showConfirmModal(
-                            window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Delete Permanently',
-                            window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Are you sure you want to permanently delete this activity? This cannot be undone.',
-                            async () => {
-                                this.state.activities = this.state.activities.filter(a => a.id !== activity.id);
-                                await this.saveActivities();
-                                this.renderView();
-                            }
-                        );
-                        break;
-                }
-
-                this.hideContextMenu();
-            }
-
-            hideContextMenu() {
-                document.getElementById('contextMenu').classList.remove('context-menu-open');
-            }
-
-            showConfirmModal(title, message, confirmAction) {
-                document.getElementById('confirmModalTitle').textContent = title;
-                document.getElementById('confirmModalMessage').textContent = message;
-                this.state.pendingAction = confirmAction;
-                document.getElementById('confirmModal').classList.add('modal-open');
-
-                setTimeout(() => {
-                    document.getElementById('confirmModalCancel').focus();
-                }, 100);
-            }
-
-            showAlert(title, message) {
-                document.getElementById('alertModalTitle').textContent = title;
-                document.getElementById('alertModalMessage').textContent = message;
-                document.getElementById('alertModal').classList.add('modal-open');
-
-                setTimeout(() => {
-                    document.getElementById('alertModalOk').focus();
-                }, 100);
-            }
-
-            generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-            }
+            });
         }
 
-        // Initialize the app when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            const app = new CountifyApp();
-        });
-    </script>
+        handleContextMenuAction(action, activity) {
+            switch (action) {
+                case 'edit':
+                    this.openEditor(activity.id);
+                    break;
+                case 'archive':
+                    activity.archived = true;
+                    this.saveActivities();
+                    this.renderView();
+                    break;
+                case 'unarchive':
+                    activity.archived = false;
+                    this.saveActivities();
+                    this.renderView();
+                    break;
+                case 'delete':
+                    activity.deleted = true;
+                    this.saveActivities();
+                    this.renderView();
+                    break;
+                case 'deletePermanently':
+                    this.showConfirmModal(
+                        window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Delete Permanently',
+                        window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Are you sure you want to permanently delete this activity? This cannot be undone.',
+                        async () => {
+                            this.state.activities = this.state.activities.filter(a => a.id !== activity.id);
+                            await this.saveActivities();
+                            this.renderView();
+                        }
+                    );
+                    break;
+            }
+
+            this.hideContextMenu();
+        }
+
+        hideContextMenu() {
+            document.getElementById('contextMenu').classList.remove('context-menu-open');
+        }
+
+        showConfirmModal(title, message, confirmAction) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMessage').textContent = message;
+            this.state.pendingAction = confirmAction;
+            document.getElementById('confirmModal').classList.add('modal-open');
+
+            setTimeout(() => {
+                document.getElementById('confirmModalCancel').focus();
+            }, 100);
+        }
+
+        showAlert(title, message) {
+            document.getElementById('alertModalTitle').textContent = title;
+            document.getElementById('alertModalMessage').textContent = message;
+            document.getElementById('alertModal').classList.add('modal-open');
+
+            setTimeout(() => {
+                document.getElementById('alertModalOk').focus();
+            }, 100);
+        }
+
+        generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+    }
+
+    // Initialize the app when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        const app = new CountifyApp();
+    });
+</script>
+
 </body>
 
 </html>
