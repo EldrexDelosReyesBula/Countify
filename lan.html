@@ -7,15 +7,15 @@
     <meta name="theme-color" content="#7c3aed" />
     <meta name="description" content="Countify Lite - Advanced writing analytics tool with word count, character count, reading time and more" />
     <title>Countify+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="/logo/countify.svg" type="image/svg+xml">
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.css">
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://countify-black.vercel.app/css/main.css" />
-    <script src="https://www.paypal.com/sdk/js?client-id=BAALvw_Ri8vqAGObpMeZGYY0eLZZ3trTxQ_MdB5qdHJZrbWJAVRlgoykIK3X4P0iovnRJYksnD1WwUI6HA&components=hosted-buttons&disable-funding=venmo&currency=PHP">
-    </script>
-    <script src="https://countify-black.vercel.app/fonts/language.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/compromise@14.8.0/builds/compromise.min.js"></script>
+    <script src="fonts/language.js"></script>
     <link rel="manifest" href="/manifest.json" />
 </head>
 <style>
@@ -23,8 +23,8 @@
         font-family: 'Material Icons';
         font-style: normal;
         font-weight: 400;
-        src: url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff2'),
-            url('https://countify-black.vercel.app/fonts/MaterialIcons-Regular.woff') format('woff');
+        src: url('/fonts/MaterialIcons-Regular.woff') format('woff2'),
+            url('fonts/MaterialIcons-Regular.woff') format('woff');
     }
 
     .material-icons {
@@ -41,7 +41,361 @@
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
     }
+
+    .keyword-highlight {
+        background-color: rgba(255, 235, 59, 0.3);
+        border-bottom: 2px solid #FFC107;
+        padding: 0 2px;
+        border-radius: 2px;
+    }
+
+    .repetitive-word {
+        background-color: rgba(255, 138, 101, 0.3);
+        border-bottom: 2px solid #FF5722;
+    }
+
+    .typing-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+
+    .typing-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .analytics-expand-btn {
+        background: none;
+        border: none;
+        color: var(--primary);
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .analytics-expand-btn .material-icons {
+        font-size: 1rem;
+    }
+
+    .keyword-density-container {
+        margin-top: 20px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .keyword-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        padding: 5px;
+        border-radius: 4px;
+        background-color: var(--background-secondary);
+    }
+
+    .keyword-word {
+        font-weight: 500;
+    }
+
+    .keyword-count {
+        color: var(--primary);
+    }
+
+    .export-options {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: var(--background-primary);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 100;
+        min-width: 150px;
+        padding: 8px 0;
+    }
+
+    .export-options.show {
+        display: block;
+    }
+
+    .export-option {
+        padding: 8px 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .export-option:hover {
+        background-color: var(--background-secondary);
+    }
+
+    .more-options-btn {
+        position: relative;
+    }
+/* More Options Button & Dropdown */
+.more-options-btn {
+  position: relative;
+  display: inline-block;
+}
+
+.more-options-btn .btn-icon {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.more-options-btn .btn-icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.export-options {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 5px);
+  background: var(--background-primary);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 180px;
+  padding: 8px 0;
+  border: 1px solid var(--border-color);
+}
+
+.export-options.show {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.export-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.export-option:hover {
+  background-color: var(--background-secondary);
+}
+
+.export-option .material-icons {
+  font-size: 1.1rem;
+}
+
+.export-option.danger {
+  color: var(--error);
+}
+
+.export-option.danger:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Show More/Less Analytics Button */
+.analytics-expand-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.analytics-expand-btn:hover {
+  background-color: rgba(124, 58, 237, 0.1);
+}
+
+.analytics-expand-btn .material-icons {
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.analytics-expand-btn[data-expanded="true"] .material-icons {
+  transform: rotate(180deg);
+}
+
+/* Keyword Density Analysis */
+.keyword-density-container {
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.keyword-density-container h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.keyword-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background-color: var(--background-tertiary);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.keyword-item:hover {
+  background-color: var(--background-quaternary);
+}
+
+.keyword-word {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.keyword-count {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Word Highlighting */
+.keyword-highlight {
+  background-color: rgba(255, 235, 59, 0.3);
+  border-bottom: 2px solid #FFC107;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.repetitive-word {
+  background-color: rgba(255, 138, 101, 0.3);
+  border-bottom: 2px solid #FF5722;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* Typing Stats */
+.typing-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background-color: var(--background-secondary);
+  border-radius: 6px;
+}
+
+.typing-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.typing-stat-item .material-icons {
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+#liveWpm {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+#typingAccuracy {
+  font-weight: 500;
+  color: var(--success);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .export-options {
+    right: -10px;
+    min-width: 160px;
+  }
+  
+  .keyword-density-container {
+    max-height: 150px;
+  }
+}
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!('vibrate' in navigator)) return;
+
+        const hapticLinks = document.querySelectorAll('.haptic-link');
+        if (!hapticLinks.length) return;
+
+        const vibrate = () => {
+            try {
+                navigator.vibrate([15, 3, 15]);
+            } catch (e) {
+                console.warn('Haptic feedback unavailable');
+            }
+        };
+
+        hapticLinks.forEach(link => {
+            link.addEventListener('touchstart', vibrate, {
+                passive: true
+            });
+
+            // Mouse clicks
+            link.addEventListener('mousedown', vibrate);
+
+            // For click events (delayed slightly to not block navigation)
+            link.addEventListener('click', (e) => {
+                if (e.screenX !== 0) { // Filter out synthetic clicks
+                    setTimeout(vibrate, 10);
+                }
+            });
+
+            // For long press (contextmenu)
+            link.addEventListener('contextmenu', vibrate);
+        });
+
+        // Optional: Prevent vibration on scroll
+        let lastTouchTime = 0;
+        document.addEventListener('touchmove', () => {
+            lastTouchTime = Date.now();
+        }, {
+            passive: true
+        });
+    });
+</script>
 
 <body>
     <div class="app">
@@ -50,11 +404,6 @@
         <span class="material-icons">check_circle</span>
         <span>Changes saved</span>
     </div>
-    <script>
-        paypal.HostedButtons({
-            hostedButtonId: "CDAMVH4KJQPGE",
-        }).render("#paypal-container-CDAMVH4KJQPGE");
-    </script>
     <script>
         // PWA Installation Manager
         class PWAInstaller {
@@ -237,25 +586,7 @@
             });
         });
     </script>
-    <style>
-        window.CountifyLanguage.onLanguageChange=(newLang)=> {
-            // Update the app's current language state
-            this.state.currentLanguage=newLang;
 
-            // Save the new language preference
-            this.saveSettings();
-
-            // Update all UI texts
-            this.updateUITexts();
-
-            // If in voice mode, update the recognition language
-            if (this.state.voiceRecognition) {
-                this.state.voiceRecognition.lang=this.getVoiceRecognitionLanguage();
-            }
-        }
-
-        ;
-    </style>
     <script>
         // Main App Class
         class CountifyApp {
@@ -277,45 +608,63 @@
                     wattAsked: localStorage.getItem('watt-asked') === 'true',
                     voiceRecognition: null,
                     isVoiceModeActive: false,
+                    isVoiceListening: false,
                     historyStack: {},
                     futureStack: {},
                     lastSaveTime: null,
                     autoSaveInterval: null,
-                    currentLanguage: 'en' // Default to English
+                    currentLanguage: 'en',
+                    visualizerInterval: null,
+                    typingStartTime: null,
+                    typingStats: {
+                        wpm: 0,
+                        accuracy: 100,
+                        lastKeystroke: null
+                    },
+                    showAdvancedAnalytics: false,
+                    stopWords: ['a', 'an', 'the', 'and', 'or', 'but', 'if', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
                 };
 
                 this.views = ['dashboard', 'yesterday', 'deleted', 'archived', 'history'];
-                this.tutorialActivities = [{
+                this.tutorialActivities = this.getTutorialActivities();
+
+                this.init();
+            }
+
+            getTutorialActivities() {
+                if (window.CountifyLanguage) {
+                    const tutorial1 = window.CountifyLanguage.getTutorialContent(1);
+                    const tutorial2 = window.CountifyLanguage.getTutorialContent(2);
+
+                    return [{
+                            id: 'tutorial-2',
+                            title: tutorial2.title,
+                            content: tutorial2.content,
+                            wordCount: this.countWords(tutorial2.content),
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                            deleted: false,
+                            archived: false,
+                            isTutorial: true
+                        },
+                        {
+                            id: 'tutorial-1',
+                            title: tutorial1.title,
+                            content: tutorial1.content,
+                            wordCount: this.countWords(tutorial1.content),
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                            deleted: false,
+                            archived: false,
+                            isTutorial: true
+                        }
+                    ];
+                }
+
+                return [{
                         id: 'tutorial-2',
                         title: 'Mastering the Countify+ Editor',
-                        content: `The Countify+ editor provides a powerful yet distraction-free environment for all your writing needs. Here's how to make the most of it:
-
-EDITOR FEATURES:
-1. Real-time Analytics Panel:
-   - Word count updates as you type
-   - Character counts (with/without spaces)
-   - Paragraph and sentence analysis
-   - Estimated reading/speaking times
-
-2. Productivity Tools:
-   - Voice Input: Dictate instead of type (supports multiple languages)
-   - Quick Save: Ctrl+S or tap the save button
-   - Format Preservation: Maintains paragraphs and spacing
-   - Dark/Light Mode: Adjusts to your preference
-
-3. Content Management:
-   - Archive instead of delete for better organization
-   - Search across all your documents
-
-SAFETY FEATURES:
-- Red buttons indicate destructive actions (delete, clear texts)
-- Green buttons indicate input actions (voice)
-- Purple buttons indicate navigation/saving
-
-VOICE MODE:
-- Tap the microphone to start voice input
-- Use the bottom sheet controls to manage dictation
-- Your voice input is processed locally`,
+                        content: `The Countify+ editor provides a powerful yet distraction-free environment...`,
                         wordCount: 145,
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
@@ -326,29 +675,7 @@ VOICE MODE:
                     {
                         id: 'tutorial-1',
                         title: 'Welcome to Countify+ - Your Writing Analytics Hub',
-                        content: `Countify+ is your comprehensive writing analytics tool designed to track, analyze, and optimize your writing productivity with precision.
-
-KEY FEATURES:
-
-1. Advanced Analytics:
-   - Real-time word, character, and paragraph counting
-   - Reading and speaking time estimates
-   - Sentence structure analysis
-   - Historical progress tracking
-
-2. Enhanced Productivity:
-   - Voice-to-text dictation (supports multiple languages)
-   - Dark/light mode for comfortable writing
-   
-3. Data Security:
-   - Local-first data storage
-   - No cloud storage
-
-GETTING STARTED:
-- Tap the "+" button to create your first writing activity
-- Use descriptive titles for better organization
-- The dashboard shows your recent activities and writing stats
-- Check the analytics panel for detailed writing metrics`,
+                        content: `Countify+ is your comprehensive writing analytics tool...`,
                         wordCount: 178,
                         createdAt: new Date().toISOString(),
                         updatedAt: new Date().toISOString(),
@@ -357,8 +684,6 @@ GETTING STARTED:
                         isTutorial: true
                     }
                 ];
-
-                this.init();
             }
 
             async init() {
@@ -379,66 +704,65 @@ GETTING STARTED:
                 this.initializeHistoryStack();
                 this.startAutoSave();
 
-                // Load language support from external file
-                await this.loadLanguageSupport();
-            }
-
-            async loadLanguageSupport() {
-                try {
-                    const script = document.createElement('script');
-                    script.src = '/fonts/language.js';
-                    document.body.appendChild(script);
-
-                    script.onload = () => {
-                        if (window.CountifyLanguage) {
-                            this.languageSupport = window.CountifyLanguage;
-                            // Set up language change callback if available
-                            if (this.languageSupport.onLanguageChange) {
-                                this.languageSupport.onLanguageChange = (newLang) => {
-                                    this.state.currentLanguage = newLang;
-                                    this.updateUITexts();
-                                };
-                            }
-                            this.applyLanguageSettings();
-                        }
+                // Initialize language support
+                if (window.CountifyLanguage) {
+                    window.CountifyLanguage.onLanguageChange = (newLang) => {
+                        this.state.currentLanguage = newLang;
+                        this.updateUITexts();
+                        this.saveSettings();
                     };
-                } catch (error) {
-                    console.error('Error loading language support:', error);
-                }
-            }
-
-            applyLanguageSettings() {
-                if (this.languageSupport && this.languageSupport.getTranslation) {
                     this.updateUITexts();
                 }
             }
 
             updateUITexts() {
-                if (this.languageSupport && this.languageSupport.getTranslation) {
-                    // Update all translatable elements
-                    const elements = document.querySelectorAll('[data-translate]');
-                    elements.forEach(el => {
-                        const key = el.getAttribute('data-translate');
-                        const translation = this.languageSupport.getTranslation(key);
-                        if (translation) {
+                if (!window.CountifyLanguage) return;
+
+                // Update all translatable elements
+                const elements = document.querySelectorAll('[data-translate]');
+                elements.forEach(el => {
+                    const key = el.getAttribute('data-translate');
+                    const translation = window.CountifyLanguage.getTranslation(key);
+                    if (translation) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            el.placeholder = translation;
+                        } else {
                             el.textContent = translation;
                         }
-                    });
+                    }
+                });
 
-                    // Update select options
-                    const selectElements = document.querySelectorAll('select[data-translate-options]');
-                    selectElements.forEach(select => {
-                        const options = select.querySelectorAll('option');
-                        options.forEach(option => {
-                            const key = option.getAttribute('data-translate-key');
-                            if (key) {
-                                const translation = this.languageSupport.getTranslation(key);
-                                if (translation) {
-                                    option.textContent = translation;
-                                }
+                // Update select options
+                const selectElements = document.querySelectorAll('select[data-translate-options]');
+                selectElements.forEach(select => {
+                    const options = select.querySelectorAll('option');
+                    options.forEach(option => {
+                        const key = option.getAttribute('data-translate-key');
+                        if (key) {
+                            const translation = window.CountifyLanguage.getTranslation(key);
+                            if (translation) {
+                                option.textContent = translation;
                             }
-                        });
+                        }
                     });
+                });
+
+                // Update tutorial activities if they exist
+                const tutorial1 = this.state.activities.find(a => a.id === 'tutorial-1');
+                const tutorial2 = this.state.activities.find(a => a.id === 'tutorial-2');
+
+                if (tutorial1) {
+                    const tutorialContent = window.CountifyLanguage.getTutorialContent(1);
+                    tutorial1.title = tutorialContent.title;
+                    tutorial1.content = tutorialContent.content;
+                    tutorial1.wordCount = this.countWords(tutorialContent.content);
+                }
+
+                if (tutorial2) {
+                    const tutorialContent = window.CountifyLanguage.getTutorialContent(2);
+                    tutorial2.title = tutorialContent.title;
+                    tutorial2.content = tutorialContent.content;
+                    tutorial2.wordCount = this.countWords(tutorialContent.content);
                 }
             }
 
@@ -486,11 +810,11 @@ GETTING STARTED:
                 const hasTutorial2 = this.state.activities.some(a => a.id === 'tutorial-2');
 
                 if (!hasTutorial1) {
-                    this.state.activities.unshift(this.tutorialActivities[0]);
+                    this.state.activities.unshift(this.tutorialActivities[1]);
                 }
 
                 if (!hasTutorial2) {
-                    this.state.activities.unshift(this.tutorialActivities[1]);
+                    this.state.activities.unshift(this.tutorialActivities[0]);
                 }
             }
 
@@ -498,14 +822,14 @@ GETTING STARTED:
                 document.querySelector('.app').innerHTML = `
                 <!-- Header -->
                 <header class="header">
-                    <button id="drawerToggle" class="btn-icon" aria-label="Open menu" style="border: none;">
+                    <button id="drawerToggle" class="btn-icon haptic-link" aria-label="Open menu" style="border: none;">
                         <span class="material-icons">menu</span>
                     </button>
-                    <h1 class="header-title" data-translate="app_title">
+                    <h1 class="header-title" data-translate="app_title" onclick="window.location.href='functions/treasure/owl.html'" style="cursor: pointer;">
                         Countify+
                     </h1>
                     <div class="header-actions">
-                        <button id="newActivityBtn" class="btn btn-primary">
+                        <button id="newActivityBtn" class="btn btn-primary haptic-link">
                             <span class="material-icons">add</span>
                             <span class="desktop-only" data-translate="new">New</span>
                         </button>
@@ -536,7 +860,7 @@ GETTING STARTED:
                 <div id="voiceModeSheet" class="voice-mode-sheet">
                     ${this.renderVoiceModeSheet()}
                 </div>
-                <button id="fab" class="fab" aria-label="Create new activity" style="border: none;">
+                <button id="fab" class="fab haptic-link" aria-label="Create new activity" style="border: none;">
                     <span class="material-icons">add</span>
                 </button>
 
@@ -544,13 +868,12 @@ GETTING STARTED:
                     <div class="watt-content">
                         <div class="watt-title" data-translate="privacy_tracking">Privacy & Tracking</div>  
                         <div class="watt-description" data-translate="privacy_description">
-                            Countify+ processes your writing and voice locally on your device to provide real-time calculations and analysis.  
-                            No data is ever sent to external servers — we do not collect or store any personal information.  
+                            Countify+ processes your writing and voice locally on your device...
                         </div>
                     </div>
                     <div class="watt-actions">
-                        <button id="wattDecline" class="btn btn-outline" data-translate="decline">Decline</button>
-                        <button id="wattAccept" class="btn btn-primary" data-translate="i_understand">I understand</button>
+                        <button id="wattDecline" class="btn btn-outline haptic-link" data-translate="decline">Decline</button>
+                        <button id="wattAccept" class="btn btn-primary haptic-link" data-translate="i_understand">I understand</button>
                     </div>
                 </div>
                 <div id="autoSaveIndicator" class="auto-save-indicator" data-translate="saved">Saved</div>
@@ -580,11 +903,11 @@ GETTING STARTED:
                 <div class="drawer-section">
                     <div class="drawer-section-title" data-translate="views">VIEWS</div>
                     <div class="drawer-item ${this.state.activeView === 'dashboard' ? 'active' : ''}" id="dashboardView">
-                        <span class="material-icons drawer-item-icon">dashboard</span>
+                        <span class="material-icons drawer-item-icon haptic-link">dashboard</span>
                         <span data-translate="dashboard">Dashboard</span>
                     </div>
                     <div class="drawer-item ${this.state.activeView === 'today' ? 'active' : ''}" id="todaysActivities">
-                        <span class="material-icons drawer-item-icon">today</span>
+                        <span class="material-icons drawer-item-icon haptic-link">today</span>
                         <span data-translate="today_activities">Today's Activities</span>
                     </div>
                     <div class="drawer-item ${this.state.activeView === 'yesterday' ? 'active' : ''}" id="yesterdaysActivities">
@@ -592,7 +915,7 @@ GETTING STARTED:
                         <span data-translate="yesterday_activities">Yesterday's Activities</span>
                     </div>
                     <div class="drawer-item ${this.state.activeView === 'history' ? 'active' : ''}" id="writingHistory">
-                        <span class="material-icons drawer-item-icon">show_chart</span>
+                        <span class="material-icons drawer-item-icon haptic-link">show_chart</span>
                         <span data-translate="writing_history">Writing History</span>
                     </div>
                 </div>
@@ -600,10 +923,10 @@ GETTING STARTED:
                 <div class="drawer-section">
                     <div class="drawer-section-title" data-translate="manage">MANAGE</div>
                     <div class="drawer-item ${this.state.activeView === 'deleted' ? 'active' : ''}" id="deletedActivities">
-                        <span class="material-icons drawer-item-icon">delete</span>
+                        <span class="material-icons drawer-item-icon haptic-link">delete</span>
                         <span data-translate="deleted_activities">Deleted Activities</span>
                     </div>
-                    <div class="drawer-item ${this.state.activeView === 'archived' ? 'active' : ''}" id="archivedActivities">
+                    <div class="drawer-item haptic-link ${this.state.activeView === 'archived' ? 'active' : ''}" id="archivedActivities">
                         <span class="material-icons drawer-item-icon">archive</span>
                         <span data-translate="archived_activities">Archived Activities</span>
                     </div>
@@ -617,6 +940,15 @@ GETTING STARTED:
                         <span class="drawer-item-arrow">
                             <span class="material-icons">chevron_right</span>
                         </span>
+<style>
+
+
+.drawer-item-arrow {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+</style>
                     </div>
                     <div class="drawer-item" id="fontSelector">
                         <span class="material-icons drawer-item-icon">font_download</span>
@@ -630,15 +962,20 @@ GETTING STARTED:
                             <option value="Courier New" ${this.state.font === 'Courier New' ? 'selected' : ''} data-translate-key="font_courier">Courier New</option>
                         </select>
                     </div>
-                    <div class="drawer-item" id="textSizeSelector">
-                        <span class="material-icons drawer-item-icon">format_size</span>
-                        <span data-translate="text_size">Text Size</span>
-                        <select id="textSizeSelect" style="margin-left: auto; border: none; background: none; color: var(--text-primary);" aria-label="Select text size">
-                            <option value="small" ${this.state.textSize === 'small' ? 'selected' : ''} data-translate-key="size_small">Small</option>
-                            <option value="normal" ${this.state.textSize === 'normal' ? 'selected' : ''} data-translate-key="size_normal">Normal</option>
-                            <option value="large" ${this.state.textSize === 'large' ? 'selected' : ''} data-translate-key="size_large">Large</option>
-                        </select>
-                    </div>
+<style>
+#fontSelect {
+    margin-left: auto;
+    border: none;
+    background: none;
+    color: var(--text-primary);
+    min-width: 70px; /* Ensure enough space for longest text */
+    max-width: 70px; /* Optional: to prevent it from being too wide */
+    width: auto;
+    font: inherit;
+    padding: 4px;
+}
+</style>
+
                     <div class="drawer-item" id="themeToggle">
                         <span class="material-icons drawer-item-icon">palette</span>
                         <span data-translate="app_theme">App Theme</span>
@@ -649,33 +986,68 @@ GETTING STARTED:
                         </select>
                     </div>
                 </div>
-
-                <div class="drawer-section">
-                    <div class="drawer-item" style="flex-direction: column; align-items: flex-start;">
-                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                        </div>
-                        <div id="paypal-container-CDAMVH4KJQPGE" style="width: 100%;"></div>
-                    </div>
-                </div>
-
                 <div class="drawer-section" style="text-decoration: none;">
                     <div class="drawer-section-title" data-translate="about">ABOUT</div>
-                    <a style="text-decoration: none; color: var(--text-secondary); " class="drawer-item" href="/docs/privacy.html" target="_blank" rel="noopener noreferrer">
-                        <span class="material-icons drawer-item-icon">lock</span>
-                        <span data-translate="privacy_policy">Privacy Policy</span>
-                    </a>
-                    <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/terms.html" target="_blank" rel="noopener noreferrer">
-                        <span class="material-icons drawer-item-icon">description</span>
-                        <span data-translate="terms_service">Terms of Service</span>
-                    </a>
-                    <div class="drawer-item">
-                        <span class="material-icons drawer-item-icon"><img style="width: 100%; height: 100%;"src="/logo/countify.svg"></span>
-                        <span data-translate="version">Version</span> 2.0.1.27 beta
-                    </div>
-                    <div class="drawer-item">
-                        <span class="material-icons drawer-item-icon">info</span>
-                        © landecs 2025
-                    </div>
+<a style="
+    text-decoration: none;
+    color: var(--text-secondary);
+    background: linear-gradient(145deg, rgba(255, 185, 185, 0.9), rgba(255, 130, 130, 0.8));
+    box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 0.5), 
+        inset -4px -4px 6px rgba(255, 110, 110, 0.3),
+        6px 6px 14px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    padding: 12px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    transform: perspective(1000px);
+" 
+class="drawer-item" 
+href="/functions/donation.html" 
+target="_blank" 
+rel="noopener noreferrer"
+>
+    <span class="material-icons drawer-item-icon" style="
+        color: #FF4668;
+        font-size: 24px;
+        /* Removed translateY */
+        display: flex;
+        align-items: center;
+    ">favorite</span>
+    
+    <span style="
+        font-weight: bold;
+        font-size: 16px;
+        color: #6c1b1b;
+        text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.6);
+    ">Support app</span>
+</a>
+<a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/privacy.html" target="_blank" rel="noopener noreferrer">
+    <span class="material-icons drawer-item-icon">lock</span>
+    <span data-translate="privacy_policy">Privacy Policy</span>
+</a>
+
+<a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/terms.html" target="_blank" rel="noopener noreferrer">
+    <span class="material-icons drawer-item-icon">description</span>
+    <span data-translate="terms_service">Terms of Service</span>
+</a>
+
+<a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="https://countify-black.vercel.app/docs/license.html" target="_blank" rel="noopener noreferrer">
+    <span class="material-icons drawer-item-icon">gavel</span>
+    <span data-translate="license">License (LPSL v1.0)</span>
+</a>
+
+<div class="drawer-item">
+    <span class="material-icons drawer-item-icon">
+        <img style="width: 100%; height: 100%;" src="/logo/countify.svg">
+    </span>
+    <span data-translate="version">Version</span> 2.1.0
+</div>
+
                 </div>
             `;
             }
@@ -703,12 +1075,28 @@ GETTING STARTED:
                             <button id="editorSave" class="btn btn-primary" aria-label="Save activity" style="border-radius: 20px;">
                                 <span class="desktop-only" data-translate="save">Save</span>
                             </button>
-                            <button id="editorDelete" class="btn btn-icon" aria-label="Delete activity" 
-                                    style="background-color: rgba(255, 46, 69, 0.1); 
-                                           border: 1px solid #FF8B8B; 
-                                           color: #FF2E45;">
-                                <span class="material-icons">delete</span>
-                            </button>
+                            <div class="more-options-btn" style="position: relative;">
+                                <button id="editorMoreOptions" class="btn btn-icon" aria-label="More options" 
+                                        style="background-color: rgba(255, 46, 69, 0.1); 
+                                               border: 1px solid #FF8B8B; 
+                                               color: #FF2E45;">
+                                    <span class="material-icons">more_vert</span>
+                                </button>
+                                <div class="export-options" id="exportOptions">
+                                    <div class="export-option" id="exportTxt">
+                                        <span class="material-icons">description</span>
+                                        <span data-translate="export_txt">Export as TXT</span>
+                                    </div>
+                                    <div class="export-option" id="exportPdf">
+                                        <span class="material-icons">picture_as_pdf</span>
+                                        <span data-translate="export_pdf">Export as PDF</span>
+                                    </div>
+                                    <div class="export-option danger" id="editorDelete">
+                                        <span class="material-icons">delete</span>
+                                        <span data-translate="delete">Delete</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -733,20 +1121,44 @@ GETTING STARTED:
                             <div class="analytics-value" id="sentenceCount">0</div>
                             <div class="analytics-label" data-translate="sentences">Sentences</div>
                         </div>
-                        <div class="analytics-item">
-                            <div class="analytics-value" id="paragraphCount">0</div>
-                            <div class="analytics-label" data-translate="paragraphs">Paragraphs</div>
-                        </div>
-                        <div class="analytics-item">
-                            <div class="analytics-value" id="readingTime">0</div>
-                            <div class="analytics-label" data-translate="reading_time">Reading Time</div>
-                        </div>
-                        <div class="analytics-item">
-                            <div class="analytics-value" id="speakingTime">0</div>
-                            <div class="analytics-label" data-translate="speaking_time">Speaking Time</div>
-                        </div>
+                        ${this.state.showAdvancedAnalytics ? `
+                            <div class="analytics-item">
+                                <div class="analytics-value" id="paragraphCount">0</div>
+                                <div class="analytics-label" data-translate="paragraphs">Paragraphs</div>
+                            </div>
+                            <div class="analytics-item">
+                                <div class="analytics-value" id="readingTime">0</div>
+                                <div class="analytics-label" data-translate="reading_time">Reading Time</div>
+                            </div>
+                            <div class="analytics-item">
+                                <div class="analytics-value" id="speakingTime">0</div>
+                                <div class="analytics-label" data-translate="speaking_time">Speaking Time</div>
+                            </div>
+                            <div class="analytics-item">
+                                <div class="analytics-value" id="typingSpeed">0</div>
+                                <div class="analytics-label" data-translate="typing_speed">Typing Speed (WPM)</div>
+                            </div>
+                        ` : ''}
+                        <button class="analytics-expand-btn" id="toggleAnalytics">
+                            <span data-translate="${this.state.showAdvancedAnalytics ? 'show_less' : 'show_more'}">${this.state.showAdvancedAnalytics ? 'Show Less' : 'Show More'}</span>
+                            <span class="material-icons">${this.state.showAdvancedAnalytics ? 'expand_less' : 'expand_more'}</span>
+                        </button>
                     </div>
                     <textarea id="editorContent" class="editor-content glass" placeholder="Start typing here..." aria-label="Activity content" data-translate-placeholder="start_typing"></textarea>
+                    <div class="typing-stats">
+                        <div class="typing-stat-item">
+                            <span class="material-icons" style="font-size: 1rem;">speed</span>
+                            <span id="liveWpm">0</span> <span data-translate="wpm">WPM</span>
+                        </div>
+                        <div class="typing-stat-item">
+                            <span class="material-icons" style="font-size: 1rem;">check_circle</span>
+                            <span id="typingAccuracy">100%</span> <span data-translate="accuracy">accuracy</span>
+                        </div>
+                    </div>
+                    <div class="keyword-density-container glass" id="keywordDensityContainer" style="display: none;">
+                        <h4 data-translate="keyword_density">Keyword Density</h4>
+                        <div id="keywordDensityList"></div>
+                    </div>
                 </div>
 
                 <div class="editor-footer">
@@ -798,7 +1210,6 @@ GETTING STARTED:
                             <span data-translate="space">Space</span>
                         </button>
                     </div>
-<p style="font-size: 10px; text-align: center;">This feature may not work as expected. It is currently in beta and still undergoing improvements to enhance its functionality.</p>
                 </div>
             `;
             }
@@ -948,7 +1359,7 @@ GETTING STARTED:
                     const height = (wordCounts[index] / maxWords) * 100;
                     barsHTML += `
                 <div class="history-bar" style="height: ${height}%" data-count="${wordCounts[index]} words">
-                    <div class="history-date">${new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                    <div class="history-date">${new Date(date).toLocaleDateString(this.state.currentLanguage, { month: 'short', day: 'numeric' })}</div>
                 </div>
             `;
                 });
@@ -1002,7 +1413,7 @@ GETTING STARTED:
                 this.state.activities.forEach(activity => {
                     const activityDate = new Date(activity.updatedAt);
                     if (activityDate >= oneWeekAgo && !activity.deleted && !activity.archived) {
-                        const day = activityDate.toLocaleDateString('en-US', {
+                        const day = activityDate.toLocaleDateString(this.state.currentLanguage, {
                             weekday: 'long'
                         });
                         wordsByDay[day] = (wordsByDay[day] || 0) + this.countWords(activity.content);
@@ -1067,17 +1478,17 @@ GETTING STARTED:
                     }
 
                     return `
-                <h2 class="page-title" data-translate="${title}">${this.languageSupport?.getTranslation(title) || title}</h2>
+                <h2 class="page-title" data-translate="${title}">${window.CountifyLanguage?.getTranslation(title) || title}</h2>
                 <div class="empty-state">
                     <div class="empty-state-icon">
                         <span class="material-icons" style="font-size: 4rem;">${icon}</span>
                     </div>
                     <h3 class="empty-state-title" data-translate="no_activities_found">No Activities Found</h3>
-                    <p class="empty-state-description" data-translate="${messageKey}">${this.languageSupport?.getTranslation(messageKey) || messageKey}</p>
+                    <p class="empty-state-description" data-translate="${messageKey}">${window.CountifyLanguage?.getTranslation(messageKey) || messageKey}</p>
                     ${viewType === 'today' ? `
                         <button id="createTodayActivity" class="btn btn-primary">
                             <span class="material-icons">add</span>
-                            <span data-translate="${buttonKey}">${this.languageSupport?.getTranslation(buttonKey) || buttonKey}</span>
+                            <span data-translate="${buttonKey}">${window.CountifyLanguage?.getTranslation(buttonKey) || buttonKey}</span>
                         </button>
                     ` : ''}
                 </div>
@@ -1108,7 +1519,7 @@ GETTING STARTED:
                 });
 
                 return `
-            <h2 class="page-title" data-translate="${title}">${this.languageSupport?.getTranslation(title) || title}</h2>
+            <h2 class="page-title" data-translate="${title}">${window.CountifyLanguage?.getTranslation(title) || title}</h2>
             <div class="dashboard-grid">
                 ${cardsHTML}
             </div>
@@ -1263,8 +1674,6 @@ GETTING STARTED:
                 document.getElementById('languageSelectorBtn')?.addEventListener('click', () => {
                     if (window.CountifyLanguage && window.CountifyLanguage.showLanguageSelector) {
                         window.CountifyLanguage.showLanguageSelector();
-                    } else {
-                        console.log('Language support not loaded yet');
                     }
                 });
 
@@ -1302,29 +1711,73 @@ GETTING STARTED:
                     this.closeEditor();
                 });
 
+                // More options button
+                document.getElementById('editorMoreOptions')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('exportOptions').classList.toggle('show');
+                });
+
+                // Close export options when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.more-options-btn')) {
+                        document.getElementById('exportOptions').classList.remove('show');
+                    }
+                });
+
+                // Export options
+                document.getElementById('exportTxt')?.addEventListener('click', () => {
+                    this.exportActivity('txt');
+                    document.getElementById('exportOptions').classList.remove('show');
+                });
+
+                document.getElementById('exportPdf')?.addEventListener('click', () => {
+                    this.exportActivity('pdf');
+                    document.getElementById('exportOptions').classList.remove('show');
+                });
+
                 document.getElementById('editorDelete')?.addEventListener('click', () => {
                     const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
                     if (activity && activity.isTutorial) {
-                        this.showAlert('Cannot Delete', 'This is a tutorial activity and cannot be deleted.');
+                        this.showAlert(
+                            window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
+                            window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
+                        );
                         return;
                     }
 
                     this.showConfirmModal(
-                        'Delete Activity',
-                        'Are you sure you want to delete this activity? This action cannot be undone.',
+                        window.CountifyLanguage?.getTranslation('delete_activity') || 'Delete Activity',
+                        window.CountifyLanguage?.getTranslation('delete_confirm') || 'Are you sure you want to delete this activity? This action cannot be undone.',
                         () => {
                             this.deleteActivity(this.state.currentActivityId);
                             this.closeEditor();
                         }
                     );
+                    document.getElementById('exportOptions').classList.remove('show');
+                });
+
+                // Toggle analytics
+                document.getElementById('toggleAnalytics')?.addEventListener('click', () => {
+                    this.state.showAdvancedAnalytics = !this.state.showAdvancedAnalytics;
+                    this.updateTextAnalytics();
+                    this.renderEditorContent();
+                    this.setupEventListeners();
                 });
 
                 // Real-time updates for editor content
                 const editorContent = document.getElementById('editorContent');
                 if (editorContent) {
-                    editorContent.addEventListener('input', () => {
+                    editorContent.addEventListener('input', (e) => {
                         this.updateTextAnalytics();
                         this.pushToHistoryStack();
+                        this.updateTypingStats();
+                    });
+
+                    editorContent.addEventListener('keydown', (e) => {
+                        if (!this.state.typingStartTime) {
+                            this.state.typingStartTime = Date.now();
+                        }
+                        this.state.typingStats.lastKeystroke = Date.now();
                     });
 
                     editorContent.addEventListener('paste', () => {
@@ -1337,8 +1790,8 @@ GETTING STARTED:
 
                 document.getElementById('clearEditorBtn')?.addEventListener('click', () => {
                     this.showConfirmModal(
-                        'Clear Text',
-                        'Are you sure you want to clear all text? This action cannot be undone.',
+                        window.CountifyLanguage?.getTranslation('clear_text') || 'Clear Text',
+                        window.CountifyLanguage?.getTranslation('clear_text_confirm') || 'Are you sure you want to clear all text? This action cannot be undone.',
                         () => {
                             document.getElementById('editorContent').value = '';
                             this.updateTextAnalytics();
@@ -1422,8 +1875,8 @@ GETTING STARTED:
                         if (activity) {
                             if (activity.archived) {
                                 this.showConfirmModal(
-                                    'Unarchive Activity',
-                                    'This activity is archived. Do you want to unarchive it to edit?',
+                                    window.CountifyLanguage?.getTranslation('unarchive_activity') || 'Unarchive Activity',
+                                    window.CountifyLanguage?.getTranslation('unarchive_confirm') || 'This activity is archived. Do you want to unarchive it to edit?',
                                     () => {
                                         activity.archived = false;
                                         this.saveActivities();
@@ -1632,7 +2085,10 @@ GETTING STARTED:
 
             startVoiceInput() {
                 if (!('webkitSpeechRecognition' in window)) {
-                    this.showAlert('Not Supported', 'Voice input is not supported in your browser.');
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
+                        'Voice input is not supported in your browser.'
+                    );
                     return;
                 }
 
@@ -1644,15 +2100,23 @@ GETTING STARTED:
                 this.state.voiceRecognition = recognition;
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = this.getVoiceRecognitionLanguage();
+                recognition.lang = window.CountifyLanguage?.getLanguageCode(this.state.currentLanguage) || 'en-US';
+
+                // Disable automatic stopping
+                recognition.onend = null;
+                recognition.onaudioend = null;
+                recognition.onsoundend = null;
+                recognition.onspeechend = null;
 
                 recognition.onstart = () => {
+                    this.state.isVoiceListening = true;
                     document.getElementById('voiceStart').disabled = true;
                     document.getElementById('voicePause').disabled = false;
                     document.getElementById('voiceStop').disabled = false;
                     document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic_off</span>';
                     document.getElementById('voiceInputBtn').style.color = 'var(--error)';
                     this.startVoiceVisualizer();
+                    this.triggerHapticFeedback('success');
                 };
 
                 recognition.onresult = (event) => {
@@ -1681,49 +2145,65 @@ GETTING STARTED:
                 recognition.onerror = (event) => {
                     console.error('Speech recognition error', event.error);
                     this.stopVoiceInput();
-                    this.showAlert('Voice Input Error', `An error occurred: ${event.error}`);
+                    this.triggerHapticFeedback('error');
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('voice_input_error') || 'Voice Input Error',
+                        `An error occurred: ${event.error}`
+                    );
                 };
 
-                recognition.onend = () => {
-                    if (this.state.voiceRecognition) {
-                        // Only restart if we didn't explicitly stop it
-                        this.state.voiceRecognition.start();
-                    }
-                };
-
-                recognition.start();
+                try {
+                    recognition.start();
+                } catch (error) {
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('microphone_error') || 'Microphone Error',
+                        window.CountifyLanguage?.getTranslation('microphone_permission_denied') || 'Microphone permission was denied. Please enable microphone access in your browser settings.'
+                    );
+                    this.triggerHapticFeedback('error');
+                }
             }
 
             toggleVoicePause() {
                 if (!this.state.voiceRecognition) return;
 
                 const pauseBtn = document.getElementById('voicePause');
-                if (pauseBtn.textContent.includes('Pause')) {
+                if (this.state.isVoiceListening) {
                     this.state.voiceRecognition.stop();
-                    pauseBtn.innerHTML = '<span class="material-icons">play_arrow</span> <span data-translate="continue">Continue</span>';
+                    this.state.isVoiceListening = false;
+                    pauseBtn.innerHTML = `<span class="material-icons">play_arrow</span> <span data-translate="continue">Continue</span>`;
                     this.stopVoiceVisualizer();
+                    this.triggerHapticFeedback('light');
                 } else {
                     this.state.voiceRecognition.start();
-                    pauseBtn.innerHTML = '<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>';
+                    this.state.isVoiceListening = true;
+                    pauseBtn.innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
                     this.startVoiceVisualizer();
+                    this.triggerHapticFeedback('light');
                 }
             }
 
             stopVoiceInput() {
                 if (!this.state.voiceRecognition) return;
 
-                this.state.voiceRecognition.stop();
+                try {
+                    this.state.voiceRecognition.stop();
+                } catch (e) {
+                    console.log('Voice recognition already stopped');
+                }
+
                 this.state.voiceRecognition = null;
+                this.state.isVoiceListening = false;
 
                 document.getElementById('voiceStart').disabled = false;
                 document.getElementById('voicePause').disabled = true;
                 document.getElementById('voiceStop').disabled = true;
-                document.getElementById('voicePause').innerHTML = '<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>';
+                document.getElementById('voicePause').innerHTML = `<span class="material-icons">pause</span> <span data-translate="pause">Pause</span>`;
                 document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic</span>';
                 document.getElementById('voiceInputBtn').style.color = '';
                 document.getElementById('voiceCaption').textContent = '';
 
                 this.stopVoiceVisualizer();
+                this.triggerHapticFeedback('success', 2);
             }
 
             insertSpace() {
@@ -1732,6 +2212,29 @@ GETTING STARTED:
                 editor.focus();
                 this.updateTextAnalytics();
                 this.pushToHistoryStack();
+                this.triggerHapticFeedback('light');
+            }
+
+            triggerHapticFeedback(type = 'light', count = 1) {
+                if (!('vibrate' in navigator)) return;
+
+                try {
+                    switch (type) {
+                        case 'success':
+                            navigator.vibrate(50);
+                            break;
+                        case 'error':
+                            navigator.vibrate([100, 50, 100]);
+                            break;
+                        case 'light':
+                            navigator.vibrate(30);
+                            break;
+                        default:
+                            navigator.vibrate(50 * count);
+                    }
+                } catch (e) {
+                    console.log('Haptic feedback not supported');
+                }
             }
 
             startVoiceVisualizer() {
@@ -1749,6 +2252,7 @@ GETTING STARTED:
                     visualizerBars.forEach(bar => {
                         const height = Math.floor(Math.random() * 30) + 5;
                         bar.style.height = `${height}px`;
+                        bar.style.backgroundColor = `hsl(${Math.random() * 60 + 180}, 80%, 60%)`;
                     });
                 }, 100);
             }
@@ -1768,16 +2272,9 @@ GETTING STARTED:
 
                     visualizerBars.forEach(bar => {
                         bar.style.height = '5px';
+                        bar.style.backgroundColor = 'var(--primary)';
                     });
                 }
-            }
-
-            getVoiceRecognitionLanguage() {
-                // Default to English if language support isn't loaded
-                if (!this.languageSupport) return 'en-US';
-
-                // Get the language code for the current language
-                return this.languageSupport.getLanguageCode(this.state.currentLanguage) || 'en-US';
             }
 
             showWATTBanner() {
@@ -1835,6 +2332,9 @@ GETTING STARTED:
 
                     if (settings.language) {
                         this.state.currentLanguage = settings.language;
+                        if (window.CountifyLanguage) {
+                            window.CountifyLanguage.setCurrentLanguage(settings.language);
+                        }
                     }
                 } catch (error) {
                     console.error('Error loading settings:', error);
@@ -1960,9 +2460,9 @@ GETTING STARTED:
                 const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
                 if (diffInDays === 0) {
-                    return this.languageSupport?.getTranslation('today') || 'Today';
+                    return window.CountifyLanguage?.getTranslation('today') || 'Today';
                 } else if (diffInDays === 1) {
-                    return this.languageSupport?.getTranslation('yesterday') || 'Yesterday';
+                    return window.CountifyLanguage?.getTranslation('yesterday') || 'Yesterday';
                 } else if (diffInDays < 7) {
                     return date.toLocaleDateString(this.state.currentLanguage, {
                         weekday: 'short'
@@ -2000,13 +2500,150 @@ GETTING STARTED:
             calculateReadingTime(wordCount) {
                 const wordsPerMinute = 200;
                 const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
+                return Math.max(Math.ceil(minutes * 60), 5); // Return in seconds, minimum 5 seconds
             }
 
             calculateSpeakingTime(wordCount) {
                 const wordsPerMinute = 150;
                 const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
+                return Math.max(Math.ceil(minutes * 60), 5); // Return in seconds, minimum 5 seconds
+            }
+
+            formatTime(seconds) {
+                if (seconds < 60) {
+                    return `${seconds} ${seconds === 1 ? 
+                        (window.CountifyLanguage?.getTranslation('second') || 'sec') : 
+                        (window.CountifyLanguage?.getTranslation('seconds') || 'secs')}`;
+                } else {
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    if (remainingSeconds === 0) {
+                        return `${minutes} ${minutes === 1 ? 
+                            (window.CountifyLanguage?.getTranslation('minute') || 'min') : 
+                            (window.CountifyLanguage?.getTranslation('minutes') || 'mins')}`;
+                    } else {
+                        return `${minutes} ${minutes === 1 ? 
+                            (window.CountifyLanguage?.getTranslation('minute') || 'min') : 
+                            (window.CountifyLanguage?.getTranslation('minutes') || 'mins')} ${remainingSeconds} ${remainingSeconds === 1 ? 
+                            (window.CountifyLanguage?.getTranslation('second') || 'sec') : 
+                            (window.CountifyLanguage?.getTranslation('seconds') || 'secs')}`;
+                    }
+                }
+            }
+
+            updateTypingStats() {
+                if (!this.state.typingStartTime) {
+                    this.state.typingStartTime = Date.now();
+                    return;
+                }
+
+                const now = Date.now();
+                const elapsedMinutes = (now - this.state.typingStartTime) / (1000 * 60);
+                const wordCount = this.countWords(document.getElementById('editorContent')?.value || '');
+                
+                // Calculate WPM (words per minute)
+                const wpm = elapsedMinutes > 0 ? Math.round(wordCount / elapsedMinutes) : 0;
+                this.state.typingStats.wpm = wpm;
+                
+                // Update UI
+                document.getElementById('liveWpm').textContent = wpm;
+                document.getElementById('typingAccuracy').textContent = '100%'; // Basic implementation
+                
+                // Update typing speed in analytics if shown
+                if (this.state.showAdvancedAnalytics) {
+                    document.getElementById('typingSpeed').textContent = wpm;
+                }
+            }
+
+            analyzeKeywordDensity(text) {
+                if (!text || !text.trim()) {
+                    document.getElementById('keywordDensityContainer').style.display = 'none';
+                    return;
+                }
+
+                // Use compromise.js for NLP analysis
+                const doc = window.nlp(text);
+                const terms = doc.terms().out('freq');
+                
+                // Filter out stop words and very short words
+                const keywords = {};
+                let totalKeywords = 0;
+                
+                terms.forEach(term => {
+                    const word = term.normal.toLowerCase();
+                    if (word.length > 2 && !this.state.stopWords.includes(word)) {
+                        keywords[word] = (keywords[word] || 0) + term.count;
+                        totalKeywords += term.count;
+                    }
+                });
+                
+                // Convert to array and sort by frequency
+                const keywordArray = Object.keys(keywords).map(key => ({
+                    word: key,
+                    count: keywords[key],
+                    percentage: (keywords[key] / totalKeywords) * 100
+                })).sort((a, b) => b.count - a.count).slice(0, 10); // Top 10 keywords
+                
+                // Render keyword density list
+                const container = document.getElementById('keywordDensityContainer');
+                const list = document.getElementById('keywordDensityList');
+                
+                if (keywordArray.length > 0) {
+                    list.innerHTML = keywordArray.map(keyword => `
+                        <div class="keyword-item">
+                            <span class="keyword-word">${keyword.word}</span>
+                            <span class="keyword-count">${keyword.count} (${keyword.percentage.toFixed(1)}%)</span>
+                        </div>
+                    `).join('');
+                    
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            }
+
+            highlightRepetitiveWords(text) {
+                if (!text || !text.trim()) return;
+
+                // First remove any existing highlights
+                const editor = document.getElementById('editorContent');
+                const plainText = editor.value;
+                
+                // Use compromise.js for NLP analysis
+                const doc = window.nlp(plainText);
+                const terms = doc.terms().out('freq');
+                
+                // Find words that appear more than 5 times
+                const repetitiveWords = terms
+                    .filter(term => term.count > 5 && term.normal.length > 3 && !this.state.stopWords.includes(term.normal.toLowerCase()))
+                    .map(term => term.normal.toLowerCase());
+                
+                // Create a highlighted version of the text
+                let highlightedText = plainText;
+                repetitiveWords.forEach(word => {
+                    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                    highlightedText = highlightedText.replace(regex, `<span class="repetitive-word">${word}</span>`);
+                });
+                
+                // Temporarily disable the input event listener
+                editor.removeEventListener('input', this.updateTextAnalytics);
+                
+                // Create a temporary div to hold our HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = highlightedText;
+                
+                // Get the cursor position
+                const startPos = editor.selectionStart;
+                const endPos = editor.selectionEnd;
+                
+                // Update the editor content
+                editor.value = tempDiv.textContent;
+                
+                // Restore the cursor position
+                editor.setSelectionRange(startPos, endPos);
+                
+                // Re-enable the input event listener
+                editor.addEventListener('input', () => this.updateTextAnalytics());
             }
 
             updateTextAnalytics() {
@@ -2017,17 +2654,19 @@ GETTING STARTED:
                 document.getElementById('charCount').textContent = this.countCharacters(text, true);
                 document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
                 document.getElementById('sentenceCount').textContent = this.countSentences(text);
-                document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
 
-                document.getElementById('readingTime').textContent =
-                    this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
-                        ' ' + (this.languageSupport?.getTranslation('min') || 'min') :
-                        ' ' + (this.languageSupport?.getTranslation('mins') || 'mins'));
+                if (this.state.showAdvancedAnalytics) {
+                    document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
+                    document.getElementById('readingTime').textContent = this.formatTime(this.calculateReadingTime(wordCount));
+                    document.getElementById('speakingTime').textContent = this.formatTime(this.calculateSpeakingTime(wordCount));
+                    document.getElementById('typingSpeed').textContent = this.state.typingStats.wpm;
+                }
 
-                document.getElementById('speakingTime').textContent =
-                    this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
-                        ' ' + (this.languageSupport?.getTranslation('min') || 'min') :
-                        ' ' + (this.languageSupport?.getTranslation('mins') || 'mins'));
+                // Update keyword density analysis
+                this.analyzeKeywordDensity(text);
+                
+                // Highlight repetitive words
+                this.highlightRepetitiveWords(text);
             }
 
             async openEditor(activityId = null) {
@@ -2091,10 +2730,10 @@ GETTING STARTED:
                 const now = new Date();
                 const hours = now.getHours();
 
-                if (this.languageSupport) {
-                    if (hours < 12) return this.languageSupport.getTranslation('morning_activity') || 'Morning Activity';
-                    if (hours < 17) return this.languageSupport.getTranslation('afternoon_activity') || 'Afternoon Activity';
-                    return this.languageSupport.getTranslation('evening_activity') || 'Evening Activity';
+                if (window.CountifyLanguage) {
+                    if (hours < 12) return window.CountifyLanguage.getTranslation('morning_activity') || 'Morning Activity';
+                    if (hours < 17) return window.CountifyLanguage.getTranslation('afternoon_activity') || 'Afternoon Activity';
+                    return window.CountifyLanguage.getTranslation('evening_activity') || 'Evening Activity';
                 } else {
                     if (hours < 12) return 'Morning Activity';
                     if (hours < 17) return 'Afternoon Activity';
@@ -2118,7 +2757,10 @@ GETTING STARTED:
 
                 const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
                 if (activity && activity.isTutorial) {
-                    this.showAlert('Cannot Save', 'This is a tutorial activity and cannot be modified.');
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('cannot_save') || 'Cannot Save',
+                        window.CountifyLanguage?.getTranslation('cannot_save_message') || 'This is a tutorial activity and cannot be modified.'
+                    );
                     return;
                 }
 
@@ -2159,13 +2801,45 @@ GETTING STARTED:
             async deleteActivity(activityId) {
                 const activity = this.state.activities.find(a => a.id === activityId);
                 if (activity && activity.isTutorial) {
-                    this.showAlert('Cannot Delete', 'This is a tutorial activity and cannot be deleted.');
+                    this.showAlert(
+                        window.CountifyLanguage?.getTranslation('cannot_delete') || 'Cannot Delete',
+                        window.CountifyLanguage?.getTranslation('cannot_delete_message') || 'This is a tutorial activity and cannot be deleted.'
+                    );
                     return;
                 }
 
                 this.state.activities = this.state.activities.filter(activity => activity.id !== activityId);
                 await this.saveActivities();
                 this.renderView();
+            }
+
+            exportActivity(format) {
+                const title = document.getElementById('editorTitle')?.value.trim() || 'Untitled';
+                const content = document.getElementById('editorContent')?.value || '';
+                
+                if (format === 'txt') {
+                    const blob = new Blob([`${title}\n\n${content}`], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } else if (format === 'pdf') {
+                    // Check if jsPDF is available
+                    if (typeof jsPDF !== 'undefined') {
+                        const doc = new jsPDF();
+                        doc.text(`${title}\n\n${content}`, 10, 10);
+                        doc.save(`${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+                    } else {
+                        this.showAlert(
+                            window.CountifyLanguage?.getTranslation('pdf_export_error') || 'PDF Export Error',
+                            window.CountifyLanguage?.getTranslation('pdf_export_error_message') || 'PDF export requires jsPDF library. Please load it first.'
+                        );
+                    }
+                }
             }
 
             showActivityOptions(activityId, x, y) {
@@ -2202,12 +2876,20 @@ GETTING STARTED:
                     <span data-translate="delete">Delete</span>
                 </div>
             `}
+            <div class="context-menu-item" data-action="exportTxt" tabindex="0">
+                <span class="material-icons">description</span>
+                <span data-translate="export_txt">Export as TXT</span>
+            </div>
+            <div class="context-menu-item" data-action="exportPdf" tabindex="0">
+                <span class="material-icons">picture_as_pdf</span>
+                <span data-translate="export_pdf">Export as PDF</span>
+            </div>
         `;
 
                 const viewportWidth = window.innerWidth;
                 const viewportHeight = window.innerHeight;
                 const menuWidth = 200;
-                const menuHeight = activity.deleted ? 96 : activity.archived ? 144 : 192;
+                const menuHeight = activity.deleted ? 192 : activity.archived ? 240 : 288;
 
                 const adjustedX = x + menuWidth > viewportWidth ? viewportWidth - menuWidth - 10 : x;
                 const adjustedY = y + menuHeight > viewportHeight ? viewportHeight - menuHeight - 10 : y;
@@ -2260,14 +2942,28 @@ GETTING STARTED:
                         break;
                     case 'deletePermanently':
                         this.showConfirmModal(
-                            'Delete Permanently',
-                            'Are you sure you want to permanently delete this activity? This cannot be undone.',
+                            window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Delete Permanently',
+                            window.CountifyLanguage?.getTranslation('delete_permanent_confirm') || 'Are you sure you want to permanently delete this activity? This cannot be undone.',
                             async () => {
                                 this.state.activities = this.state.activities.filter(a => a.id !== activity.id);
                                 await this.saveActivities();
                                 this.renderView();
                             }
                         );
+                        break;
+                    case 'exportTxt':
+                        this.state.currentActivityId = activity.id;
+                        this.openEditor(activity.id);
+                        setTimeout(() => {
+                            this.exportActivity('txt');
+                        }, 100);
+                        break;
+                    case 'exportPdf':
+                        this.state.currentActivityId = activity.id;
+                        this.openEditor(activity.id);
+                        setTimeout(() => {
+                            this.exportActivity('pdf');
+                        }, 100);
                         break;
                 }
 
