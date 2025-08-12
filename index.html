@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="/logo/countify.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.css">
-    <link rel="stylesheet" href="https://countify-black.vercel.app/css/mdui.min.css">
+    <link rel="stylesheet" href="https://countify.landecs.org/css/mdui.css">
+    <link rel="stylesheet" href="https://countify.landecs.org/css/mdui.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://countify-black.vercel.app/css/main.css" />
+    <link rel="stylesheet" href="https://countify.landecs.org/css/main.css" />
     </script>
     <script src="fonts/language.js"></script>
     <link rel="manifest" href="/manifest.json" />
@@ -46,7 +46,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
   if (!('vibrate' in navigator)) return;
-  
+
   const hapticLinks = document.querySelectorAll('.haptic-link');
   if (!hapticLinks.length) return;
 
@@ -61,21 +61,21 @@ document.addEventListener('DOMContentLoaded', function() {
   hapticLinks.forEach(link => {
 
     link.addEventListener('touchstart', vibrate, { passive: true });
-    
+
     // Mouse clicks
     link.addEventListener('mousedown', vibrate);
-    
+
     // For click events (delayed slightly to not block navigation)
     link.addEventListener('click', (e) => {
       if (e.screenX !== 0) { // Filter out synthetic clicks
         setTimeout(vibrate, 10);
       }
     });
-    
+
     // For long press (contextmenu)
     link.addEventListener('contextmenu', vibrate);
   });
-  
+
   // Optional: Prevent vibration on scroll
   let lastTouchTime = 0;
   document.addEventListener('touchmove', () => {
