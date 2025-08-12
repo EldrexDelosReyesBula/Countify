@@ -19,11 +19,6 @@
       "New algorithms",
       "Fixed Waray-Waray translations",
       "Improved accessibility"
-    ],
-    "2.0.0": [
-      "Initial stable release",
-      "Core counting features",
-      "Basic offline support"
     ]
   },
   "minimumBrowserRequirements": {
@@ -44,15 +39,15 @@
   "apiCompatibility": {
     "current": "v2.1",
     "supported": ["v1.5", "v2.0", "v2.1"],
-    "deprecationNotice": "v1.5 will be discontinued on 2026-03-01"
+    "deprecationNotice": "v3 will be discontinued on 2026-03-01"
   },
   "links": {
     "privacyPolicy": "/docs/privacy.html",
     "termsOfService": "/docs/terms.html",
     "license": "/docs/license.html",
     "documentation": "/docs/",
-    "feedback": "https://feedback.countify.plus",
-    "support": "mailto:support@countify.plus"
+    "feedback": "landecs.org@gmail.com",
+    "support": "mailto:landecs.org@gmail.com"
   },
   "localization": {
     "supportedLanguages": ["en", "es", "tl", "war"],
