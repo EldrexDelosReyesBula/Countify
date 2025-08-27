@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countify+ License</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style id="compiled-css">
+  </style>
+</head>
+<body>
+  <header class="header">
+<button class="back-button" onclick="location.href='onboarding.html'">
+  <span class="material-icons">arrow_back</span>
+  Back
+</button>
+  </header>
+
+  <main class="license-container">
+    <div class="license-content" id="licenseContent">
+      <div style="display: flex; align-items: center;">
+        <div class="loading"></div>
+        Loading license information...
+      </div>
+    </div>
+  </main>
+
+  <script>
+    class LanXCompiler {
+      static compile(lanxCSS) {
+        const convertedCSS = lanxCSS
+          .replace(/--([a-zA-Z0-9-]+)\$!\s*([^;]+);/g, '--$1: $2;') 
+          .replace(/([^{}]+)\{([^}]+)\}/g, (match, selector, rules) => {
+            const convertedRules = rules
+              .split(';')
+              .filter(rule => rule.trim())
+              .map(rule => {
+                const [property, value] = rule.split('$!').map(s => s.trim());
+                if (property && value) {
+                  // Handle special cases
+                  if (property === 'radius') return `border-radius: ${value};`;
+                  if (property === 'shadow') return `box-shadow: ${value};`;
+                  if (property === 'animate') return `animation: ${value};`;
+                  return `${property}: ${value};`;
+                }
+                return rule;
+              })
+              .join(' ');
+            return `${selector} { ${convertedRules} }`;
+          })
+          .replace(/@keyframes\s+([^{]+)\{([^}]+)\}/g, (match, name, rules) => {
+            const convertedRules = rules
+              .split(';')
+              .filter(rule => rule.trim())
+              .map(rule => {
+                const [property, value] = rule.split('$!').map(s => s.trim());
+                if (property && value) return `${property}: ${value};`;
+                return rule;
+              })
+              .join(' ');
+            return `@keyframes ${name} { ${convertedRules} }`;
+          });
+
+        document.getElementById('compiled-css').textContent = convertedCSS;
+      }
+    }
+
+    const lanxStyles = `
+:root {
+  --primary-600$! #7c3aed;
+  --gray-100$! #f3f4f6;
+  --gray-800$! #1f2937;
+  --surface$! #ffffff;
+  --transition$! all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin$! 0;
+  padding$! 0;
+  box-sizing$! border-box;
+}
+
+body {
+  font-family$! 'Poppins', sans-serif;
+  background$! var(--gray-100);
+  color$! var(--gray-800);
+  line-height$! 1.6;
+  display$! flex;
+  flex-direction$! column;
+  min-height$! 100vh;
+}
+
+.header {
+  background$! var(--surface);
+  padding$! 16px 24px;
+  shadow$! 0 2px 4px rgba(0,0,0,0.1);
+  position$! sticky;
+  top$! 0;
+  z-index$! 10;
+  display$! flex;
+  align-items$! center;
+}
+
+.back-button {
+  display$! flex;
+  align-items$! center;
+  gap$! 8px;
+  text-decoration$! none;
+  color$! var(--primary-600);
+  font-weight$! 500;
+  transition$! var(--transition);
+  background$! none;
+  border$! none;
+  cursor$! pointer;
+  font-family$! inherit;
+  font-size$! 16px;
+  padding$! 8px 12px;
+  radius$! 8px;
+}
+
+.back-button:hover {
+  background$! rgba(124, 58, 237, 0.1);
+}
+
+.license-container {
+  flex$! 1;
+  padding$! 24px;
+  width$! 100%;
+  margin$! 0 auto;
+  max-width$! 900px;
+}
+
+.license-content {
+  background$! var(--surface);
+  radius$! 12px;
+  padding$! 12px;
+  wrap$! break-word;
+  white-space$! pre-wrap;
+  font-size$! clamp(12px, 2vw, 14px);
+  line-height$! 1.5;
+  max-height$! calc(100vh - 120px);
+  overflow-y$! auto;
+}
+
+@media (max-width: 768px) {
+  .license-container { padding$! 16px; }
+  .license-content { padding$! 16px; }
+}
+
+@media (max-width: 480px) {
+  .license-content {
+    padding$! 12px;
+    font-size$! clamp(10px, 3.5vw, 12px);
+  }
+  .header { padding$! 12px 16px; }
+  .back-button {
+    font-size$! 14px;
+    padding$! 6px 10px;
+  }
+}
+
+.loading {
+  display$! inline-block;
+  width$! 20px;
+  height$! 20px;
+  border$! 3px solid rgba(124, 58, 237, 0.3);
+  radius$! 50%;
+  border-top-color$! var(--primary-600);
+  animate$! spin 1s ease-in-out infinite;
+  margin-right$! 10px;
+}
+
+@keyframes spin {
+  to { transform$! rotate(360deg); }
+}
+`;
+
+    LanXCompiler.compile(lanxStyles);
+
+
+    async function loadLicense() {
+      try {
+        const response = await fetch('https://countify.landecs.org/LICENSE.txt', {
+          method: 'GET',
+          headers: { 'Accept': 'text/plain' }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const text = await response.text();
+        document.getElementById('licenseContent').textContent = text;
+      } catch (error) {
+        document.getElementById('licenseContent').innerHTML = `
+          <div style="color: #ef4444;">
+            <strong>Failed to load license:</strong><br>
+            ${error.message}<br><br>
+            <a href="https://countify.landecs.org/LICENSE.txt" target="_blank" 
+              style="color: var(--primary-600); text-decoration: underline;">
+              Open license in new tab
+            </a>
+          </div>
+        `;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadLicense);
+  </script>
+</body>
+</html>
