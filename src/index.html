@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <title>Welcome to Countify+</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/public/css/mdui.css">
+    <link rel="stylesheet" href="/public/css/mdui.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./css/onboarding.css">
+</head>
+
+<body>
+    <div class="onboarding-container">
+        <!-- Slide 1: Welcome -->
+        <div class="onboarding-slide active" id="slide1">
+            <div class="slide-header">
+                <h1 class="slide-title">Welcome to Countify+</h1>
+                <p class="slide-subtitle">Your advanced writing analytics companion for tracking words, characters, and more</p>
+            </div>
+
+            <div class="slide-content">
+                <div class="illustration-container">
+                    <img class="illustration writing-illustration" style="width: 130%; height: 130%;" src="/public/2_20250816_223837_0001.svg">
+                </div>
+
+                <div class="slide-features">
+                    <div class="feature-item fade-in" style="animation-delay: 0.2s">
+                        <div class="feature-icon">
+                            <span class="material-icons">calculate</span>
+                        </div>
+                        <div class="feature-text">Real-time writing analytics</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.4s">
+                        <div class="feature-icon">
+                            <span class="material-icons">insights</span>
+                        </div>
+                        <div class="feature-text">Track your writing progress</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.6s">
+                        <div class="feature-icon">
+                            <span class="material-icons">mic</span>
+                        </div>
+                        <div class="feature-text">Voice dictation support</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <div class="progress-indicator">
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
+                <button class="btn btn-primary" onclick="nextSlide()">Get Started</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: Analytics -->
+        <div class="onboarding-slide" id="slide2">
+            <div class="slide-header">
+                <h1 class="slide-title">Comprehensive Analytics</h1>
+                <p class="slide-subtitle">Track every aspect of your writing with precision</p>
+            </div>
+
+            <div class="slide-content">
+                <div class="illustration-container">
+                    <img class="illustration analytics-illustration" style="width: 130%; height: 130%;" src="/public/3_20250816_223837_0002.svg">
+                </div>
+
+                <div class="slide-features">
+                    <div class="feature-item fade-in" style="animation-delay: 0.2s">
+                        <div class="feature-icon">
+                            <span class="material-icons">format_size</span>
+                        </div>
+                        <div class="feature-text">Word, character, and sentence counts</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.4s">
+                        <div class="feature-icon">
+                            <span class="material-icons">schedule</span>
+                        </div>
+                        <div class="feature-text">Reading and speaking time estimates</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.6s">
+                        <div class="feature-icon">
+                            <span class="material-icons">trending_up</span>
+                        </div>
+                        <div class="feature-text">Historical progress tracking</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <div class="progress-indicator">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                </div>
+                <button class="btn btn-primary" onclick="nextSlide()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Voice Input -->
+        <div class="onboarding-slide" id="slide3">
+            <div class="slide-header">
+                <h1 class="slide-title">Voice Dictation</h1>
+                <p class="slide-subtitle">Speak your words and let Countify+ do the counting</p>
+            </div>
+
+            <div class="slide-content">
+                <div class="illustration-container">
+                    <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                        <img class="ready-illustration" style="width: 130%; height: 130%;" src="/public/4_20250816_223837_0003.svg">
+                    </div>
+                </div>
+
+                <div class="slide-features">
+                    <div class="feature-item fade-in" style="animation-delay: 0.2s">
+                        <div class="feature-icon">
+                            <span class="material-icons">mic_none</span>
+                        </div>
+                        <div class="feature-text">Real-time speech recognition</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.4s">
+                        <div class="feature-icon">
+                            <span class="material-icons">pause</span>
+                        </div>
+                        <div class="feature-text">Pause and resume dictation</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.6s">
+                        <div class="feature-icon">
+                            <span class="material-icons">space_bar</span>
+                        </div>
+                        <div class="feature-text">Insert spaces with a tap</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <div class="progress-indicator">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                    <div class="progress-dot"></div>
+                </div>
+                <button class="btn btn-primary" onclick="nextSlide()">Continue</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Ready -->
+        <div class="onboarding-slide" id="slide4">
+            <div class="slide-header">
+                <h1 class="slide-title">You're All Set!</h1>
+                <p class="slide-subtitle">
+                    Start tracking your writing progress with Countify+ <br>
+                    <span style="font-weight: 600;">Join over 4,000 users today</span>
+                </p>
+            </div>
+
+            <div class="slide-content">
+                <div class="illustration-container" style="position: relative; width: 200px; height: 200px;">
+                    <img class="ready-illustration" style="width: 130%; height: 130%;" src="/public/1_20250816_223836_0000.svg">
+                </div>
+
+                <div class="slide-features">
+                    <div class="feature-item fade-in" style="animation-delay: 0.2s">
+                        <div class="feature-icon">
+                            <span class="material-icons">edit</span>
+                        </div>
+                        <div class="feature-text">Create unlimited writing activities</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.4s">
+                        <div class="feature-icon">
+                            <span class="material-icons">history</span>
+                        </div>
+                        <div class="feature-text">View your writing history</div>
+                    </div>
+
+                    <div class="feature-item fade-in" style="animation-delay: 0.6s">
+                        <div class="feature-icon">
+                            <span class="material-icons">settings</span>
+                        </div>
+                        <div class="feature-text">Customize your experience</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide-footer">
+                <div class="progress-indicator">
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot"></div>
+                    <div class="progress-dot active"></div>
+                </div>
+                <button class="btn btn-primary" onclick="completeOnboarding()">Start Writing</button>
+                <br>
+                <p style="font-size: 14px; color: #666; line-height: 1.6; text-align: center;">
+                    By continuing, you agree to Countify+’s
+                    <a href="/public/docs/terms.html" target="_blank" style="color:#7c3aed; text-decoration:none; font-weight:500;">Terms of Use</a>,
+                    <a href="/public/license.html" target="_blank" style="color:#7c3aed; text-decoration:none; font-weight:500;">License (LPSL)</a>, and
+                    <a href="/public/docs/privacy.html" target="_blank" style="color:#7c3aed; text-decoration:none; font-weight:500;">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./js/onboarding.js"></script>
+</body>
+
+</html>
