@@ -5,19 +5,24 @@ const RUNTIME_CACHE = 'runtime-cache';
 // Core assets that should be cached during installation
 const CORE_ASSETS = [
   '/',
-  '/index.html',
-  '/lans.html',
-  '/fonts/language.js',
+  '/main.html',
+  '/lite.html',
+  '/lan.html',
+  '/config.js',
+  '/offline.html',
   '/css/main.css',
   '/css/mdui.css',
   '/css/mdui.min.css',
+  '/css/waves.min.css',
+  '/fonts/MaterialIcons-Regular.woff',
+  '/fonts/MaterialIcons-Regular.woff2',
+  '/fonts/language.js',
   '/logo/countify.svg',
   '/manifest.json',
   '/docs/privacy.html',
   '/functions/donation.html',
   '/docs/license.html',
   '/docs/terms.html',
-  '/offline.html',
   '/js/app.js'
 ];
 
@@ -105,18 +110,42 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event handler with sophisticated strategies
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-  
-  // Skip non-GET requests and browser-specific URLs
-  if (request.method !== 'GET' || 
-      request.url.startsWith('chrome-extension://') || 
-      request.url.includes('browser-sync')) {
-    return;
-  }
+    const { request } = event;
+    const url = new URL(request.url);
 
-  // Handle different types of requests with appropriate strategies
-  if (url.origin === location.origin) {
+    if (request.method === 'POST' && url.pathname === '/') {
+        event.respondWith((async () => {
+            try {
+                const formData = await request.formData();
+                const title = formData.get('title') || '';
+                const sharedContent = formData.get('text');
+                let text = '';
+
+                if (sharedContent) {
+                    if (typeof sharedContent === 'string') {
+                        text = sharedContent;
+                    } else if (sharedContent instanceof File) {
+                        text = await sharedContent.text();
+                    }
+                }
+
+                const redirectUrl = `/main.html?title=${encodeURIComponent(title)}&text=${encodeURIComponent(text)}`;
+                return Response.redirect(redirectUrl, 303);
+            } catch (error) {
+                console.error('Error handling share target:', error);
+                return Response.redirect('/main.html', 303);
+            }
+        })());
+        return;
+    }
+
+    if (request.method !== 'GET' ||
+        request.url.startsWith('chrome-extension://') ||
+        request.url.includes('browser-sync')) {
+        return;
+    }
+
+    if (url.origin === location.origin) {
     // Local assets - Cache First with Network Update
     if (CORE_ASSETS.some(asset => url.pathname === asset)) {
       event.respondWith(cacheFirstWithUpdate(request));

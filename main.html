@@ -374,6 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.renderView();
             this.watchSystemTheme();
             this.setupRippleEffects();
+            this.handleSharedData();
 
             if (!this.state.wattAsked) {
                 setTimeout(() => this.showWATTBanner(), 2000);
@@ -392,6 +393,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 this.updateUITexts();
             }
+        }
+
+        handleSharedData() {
+            window.addEventListener('load', () => {
+                const params = new URLSearchParams(window.location.search);
+                const title = params.get('title');
+                const text = params.get('text');
+
+                if (title || text) {
+                    this.openEditor();
+                    const editorTitle = document.getElementById('editorTitle');
+                    const editorContent = document.getElementById('editorContent');
+
+                    if (editorTitle) {
+                        editorTitle.value = title || this.generateDefaultTitle();
+                    }
+                    if (editorContent) {
+                        editorContent.value = text || '';
+                    }
+                    this.updateTextAnalytics();
+
+                    // Clean up the URL
+                    const newUrl = window.location.pathname;
+                    history.replaceState({}, document.title, newUrl);
+                }
+            });
         }
 
         updateUITexts() {
