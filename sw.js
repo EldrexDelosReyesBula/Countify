@@ -6,6 +6,7 @@ const RUNTIME_CACHE = 'runtime-cache';
 const CORE_ASSETS = [
   '/',
   '/main.html',
+  '/lite.html',
   '/lan.html',
   '/config.js',
   '/offline.html',
@@ -112,7 +113,7 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    if (request.method === 'POST' && url.pathname === '/') {
+    if (request.method === 'POST' && url.pathname === '/share/') {
         event.respondWith((async () => {
             try {
                 const formData = await request.formData();
