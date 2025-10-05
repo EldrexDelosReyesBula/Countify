@@ -6,7 +6,6 @@ const RUNTIME_CACHE = 'runtime-cache';
 const CORE_ASSETS = [
   '/',
   '/main.html',
-  '/lite.html',
   '/lan.html',
   '/config.js',
   '/offline.html',
