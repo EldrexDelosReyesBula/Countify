@@ -41,6 +41,58 @@
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
     }
+
+    /* Enhanced Animations */
+    @keyframes fade-slide-up {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .activity-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Smoother Editor and Modal Transitions */
+    .editor-container {
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal {
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-content {
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    .modal-open .modal-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .activity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .activity-card.animate-slide {
+        opacity: 0; /* Start hidden to prevent flash of unstyled content */
+        animation: fade-slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-0 { animation-delay: 0s; }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
 </style>
 <script>
 
@@ -306,6 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             this.views = ['dashboard', 'yesterday', 'deleted', 'archived', 'history'];
             this.tutorialActivities = this.getTutorialActivities();
+            this.animationTimers = {};
 
             this.init();
         }
@@ -2107,25 +2160,68 @@ rel="noopener noreferrer"
             return Math.ceil(minutes) || 0;
         }
 
+        animateCount(element, start, end, duration) {
+            // Clear any existing timer for this element
+            if (this.animationTimers[element.id]) {
+                clearInterval(this.animationTimers[element.id]);
+            }
+
+            const range = end - start;
+            let current = start;
+            const increment = end > start ? 1 : -1;
+
+            if (range === 0) return;
+
+            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
+
+            const timer = setInterval(() => {
+                current += increment;
+                element.textContent = current;
+                if (current == end) {
+                    clearInterval(timer);
+                    delete this.animationTimers[element.id];
+                }
+            }, stepTime);
+
+            this.animationTimers[element.id] = timer;
+        }
+
         updateTextAnalytics() {
             const text = document.getElementById('editorContent')?.value || '';
             const wordCount = this.countWords(text);
 
-            document.getElementById('wordCount').textContent = wordCount;
-            document.getElementById('charCount').textContent = this.countCharacters(text, true);
-            document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
-            document.getElementById('sentenceCount').textContent = this.countSentences(text);
-            document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
+            const analytics = [
+                { id: 'wordCount', value: wordCount },
+                { id: 'charCount', value: this.countCharacters(text, true) },
+                { id: 'charNoSpacesCount', value: this.countCharacters(text, false) },
+                { id: 'sentenceCount', value: this.countSentences(text) },
+                { id: 'paragraphCount', value: this.countParagraphs(text) },
+            ];
 
-            document.getElementById('readingTime').textContent =
-                this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
-                    ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
-                    ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+            analytics.forEach(analytic => {
+                const el = document.getElementById(analytic.id);
+                if (el) {
+                    const start = parseInt(el.textContent, 10) || 0;
+                    this.animateCount(el, start, analytic.value, 200);
+                }
+            });
 
-            document.getElementById('speakingTime').textContent =
-                this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
-                    ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
-                    ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+            const readingTime = this.calculateReadingTime(wordCount);
+            const readingTimeEl = document.getElementById('readingTime');
+            if(readingTimeEl) {
+                readingTimeEl.textContent = readingTime + (readingTime === 1 ?
+                        ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
+                        ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+            }
+
+
+            const speakingTime = this.calculateSpeakingTime(wordCount);
+            const speakingTimeEl = document.getElementById('speakingTime');
+            if(speakingTimeEl) {
+                speakingTimeEl.textContent = speakingTime + (speakingTime === 1 ?
+                        ' ' + (window.CountifyLanguage?.getTranslation('min') || 'min') :
+                        ' ' + (window.CountifyLanguage?.getTranslation('mins') || 'mins'));
+            }
         }
 
         async openEditor(activityId = null) {
