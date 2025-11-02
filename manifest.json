@@ -27,7 +27,7 @@
       "url": "/#new",
       "icons": [
         {
-          "src": "/icons/new.svg",
+          "src": "/logo/new_activity.svg",
           "sizes": "any",
           "type": "image/svg+xml",
           "purpose": "any"
@@ -35,6 +35,50 @@
       ]
     },
     {
+      "name": "Dashboard",
+      "short_name": "Stats",
+      "description": "View your writing statistics",
+      "url": "/#dashboard",
+      "icons": [
+        {
+          "src": "/logo/countify_dashboard.svg",
+          "sizes": "any",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+      ]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/",
+      "accept": {
+        "text/plain": [".txt"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "files": [
+        {
+          "name": "text",
+          "accept": ["text/plain"]
+        }
+      ]
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+countify",
+      "url": "/?url=%s"
+    }
+  ]
+}    {
       "name": "Dashboard",
       "short_name": "Stats",
       "description": "View your writing statistics",
