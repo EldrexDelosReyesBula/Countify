@@ -5,7 +5,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "theme_color": "#7c3aed",
   "background_color": "#ffffff",
   "categories": ["productivity", "writing", "tools"],
@@ -13,10 +13,38 @@
   "dir": "ltr",
   "icons": [
     {
-      "src": "/countify.svg",
+      "src": "/logo/countify-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/countify-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/countify.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Countify+ Desktop Interface"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "375x667",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Countify+ Mobile Interface"
     }
   ],
   "shortcuts": [
@@ -24,13 +52,12 @@
       "name": "New Activity",
       "short_name": "New",
       "description": "Create a new writing activity",
-      "url": "/#new",
+      "url": "/?new=true",
       "icons": [
         {
-          "src": "/logo/new_activity.svg",
-          "sizes": "any",
-          "type": "image/svg+xml",
-          "purpose": "any"
+          "src": "/logo/new-activity-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     },
@@ -38,13 +65,12 @@
       "name": "Dashboard",
       "short_name": "Stats",
       "description": "View your writing statistics",
-      "url": "/#dashboard",
+      "url": "/?dashboard=true",
       "icons": [
         {
-          "src": "/logo/countify_dashboard.svg",
-          "sizes": "any",
-          "type": "image/svg+xml",
-          "purpose": "any"
+          "src": "/logo/dashboard-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     }
@@ -53,73 +79,30 @@
     {
       "action": "/",
       "accept": {
-        "text/plain": [".txt"]
+        "text/plain": [".txt", ".text"],
+        "text/markdown": [".md", ".markdown"]
       }
     }
   ],
   "share_target": {
-    "action": "/",
-    "method": "POST",
-    "enctype": "multipart/form-data",
+    "action": "/share",
+    "method": "GET",
     "params": {
       "title": "title",
       "text": "text",
-      "files": [
-        {
-          "name": "text",
-          "accept": ["text/plain"]
-        }
-      ]
+      "url": "url"
     }
   },
   "protocol_handlers": [
     {
       "protocol": "web+countify",
-      "url": "/?url=%s"
-    }
-  ]
-}    {
-      "name": "Dashboard",
-      "short_name": "Stats",
-      "description": "View your writing statistics",
-      "url": "/#dashboard",
-      "icons": [
-        {
-          "src": "/icons/dashboard.svg",
-          "sizes": "any",
-          "type": "image/svg+xml",
-          "purpose": "any"
-        }
-      ]
+      "url": "/?source=%s"
     }
   ],
-  "file_handlers": [
-    {
-      "action": "/",
-      "accept": {
-        "text/plain": [".txt"]
-      }
-    }
-  ],
-  "share_target": {
-    "action": "/",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "files": [
-        {
-          "name": "text",
-          "accept": ["text/plain"]
-        }
-      ]
-    }
+  "edge_side_panel": {
+    "preferred_width": 400
   },
-  "protocol_handlers": [
-    {
-      "protocol": "web+countify",
-      "url": "/?url=%s"
-    }
-  ]
+  "launch_handler": {
+    "client_mode": "auto"
+  }
 }
