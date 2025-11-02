@@ -7,11 +7,12 @@ const CORE_ASSETS = [
   '/',
   '/index.html',
   '/main.html',
-  '/fonts/language.js',
   '/css/main.css',
   '/css/mdui.css',
   '/css/mdui.min.css',
   '/logo/countify.svg',
+  '/logo/new_activity.svg',
+  '/logo/countify_dashboard.svg'
   '/manifest.json',
   '/docs/privacy.html',
   '/docs/license.html',
@@ -154,13 +155,29 @@ async function cacheFirstWithUpdate(request) {
         }
         return networkResponse;
       })
-      .catch(() => {}); // Silent fail is okay here
+      .catch(() => {
+        // Return undefined if network fails
+        return undefined;
+      });
     
     // Return cached response if available, otherwise wait for network
-    return cachedResponse || (await networkPromise);
+    if (cachedResponse) {
+      // Start network request but don't wait for it
+      networkPromise.catch(() => {}); // Handle any uncaught errors
+      return cachedResponse;
+    }
+    
+    // If no cache, wait for network
+    const networkResponse = await networkPromise;
+    if (networkResponse) {
+      return networkResponse;
+    }
+    
+    throw new Error('Both cache and network failed');
   } catch (error) {
     console.error('CacheFirstWithUpdate failed:', error);
-    return fetch(request); // Fallback to network
+    // Final fallback - try direct fetch
+    return fetch(request);
   }
 }
 
@@ -181,17 +198,20 @@ async function networkFirst(request) {
     console.warn(`Network failed for ${request.url}, falling back to cache`);
     
     // Try to get from cache
-    const cache = await caches.open(RUNTIME_CACHE);
-    const cachedResponse = await cache.match(request);
+    const runtimeCache = await caches.open(RUNTIME_CACHE);
+    const cachedResponse = await runtimeCache.match(request);
     
     if (cachedResponse) {
       return cachedResponse;
     }
     
     // For HTML requests, return offline page
-    if (request.headers.get('accept').includes('text/html')) {
+    if (request.headers.get('accept')?.includes('text/html')) {
       const coreCache = await caches.open(CACHE_NAME);
-      return coreCache.match('/offline.html');
+      const offlinePage = await coreCache.match('/offline.html');
+      if (offlinePage) {
+        return offlinePage;
+      }
     }
     
     // Generic offline response
@@ -217,10 +237,25 @@ async function staleWhileRevalidate(request) {
         }
         return networkResponse;
       })
-      .catch(() => {}); // Silent fail is okay here
+      .catch(() => {
+        // Return undefined if network fails
+        return undefined;
+      });
     
     // Return cached response if available, otherwise wait for network
-    return cachedResponse || (await networkPromise);
+    if (cachedResponse) {
+      // Start network request but don't wait for it
+      networkPromise.catch(() => {}); // Handle any uncaught errors
+      return cachedResponse;
+    }
+    
+    // If no cache, wait for network
+    const networkResponse = await networkPromise;
+    if (networkResponse) {
+      return networkResponse;
+    }
+    
+    throw new Error('Both cache and network failed');
   } catch (error) {
     console.error('StaleWhileRevalidate failed:', error);
     return fetch(request); // Fallback to network
@@ -232,20 +267,25 @@ self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-data') {
     console.log('Background sync triggered');
     // Implement your background sync logic here
-  }
-});
-
-// Periodic sync registration (for periodic background updates)
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'update-content') {
-    console.log('Periodic sync triggered');
-    // Implement your periodic update logic here
+    event.waitUntil(
+      // Add your sync logic
+      Promise.resolve()
+    );
   }
 });
 
 // Push notification handling
 self.addEventListener('push', (event) => {
-  const data = event.data?.json();
+  let data = {};
+  try {
+    data = event.data?.json() || {};
+  } catch (e) {
+    data = {
+      title: 'Countify Plus',
+      body: 'You have a new notification'
+    };
+  }
+  
   const title = data?.title || 'Countify Plus';
   const options = {
     body: data?.body || 'You have a new notification',
@@ -355,6 +395,7 @@ async function trimCache() {
         }
       }
     }
+    console.log('Cache trimmed successfully');
   } catch (error) {
     console.error('Cache trimming failed:', error);
   }
@@ -366,7 +407,7 @@ async function checkForUpdates() {
     const response = await fetch('/version.json', { cache: 'no-store' });
     if (response.ok) {
       const data = await response.json();
-      if (data.version !== APP_VERSION) {
+      if (data.version && data.version !== APP_VERSION) {
         // Notify clients about available update
         const clients = await self.clients.matchAll();
         clients.forEach(client => {
@@ -376,9 +417,21 @@ async function checkForUpdates() {
             newVersion: data.version
           });
         });
+        return true;
       }
     }
+    return false;
   } catch (error) {
     console.error('Update check failed:', error);
+    return false;
   }
 }
+
+// Handle service worker errors
+self.addEventListener('error', (event) => {
+  console.error('Service Worker error:', event.error);
+});
+
+self.addEventListener('unhandledrejection', (event) => {
+  console.error('Service Worker unhandled rejection:', event.reason);
+});
