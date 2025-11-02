@@ -1,6 +1,6 @@
 {
   "name": "Countify+",
-  "short_name": "Countify",
+  "short_name": "Countify+",
   "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more",
   "start_url": "/",
   "scope": "/",
@@ -24,13 +24,29 @@
       "name": "New Activity",
       "short_name": "New",
       "description": "Create a new writing activity",
-      "url": "/#new"
+      "url": "/#new",
+      "icons": [
+        {
+          "src": "/icons/new.svg",
+          "sizes": "any",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+      ]
     },
     {
       "name": "Dashboard",
       "short_name": "Stats",
       "description": "View your writing statistics",
-      "url": "/#dashboard"
+      "url": "/#dashboard",
+      "icons": [
+        {
+          "src": "/icons/dashboard.svg",
+          "sizes": "any",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+      ]
     }
   ],
   "file_handlers": [
