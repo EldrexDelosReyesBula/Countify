@@ -6,7 +6,7 @@ const RUNTIME_CACHE = 'runtime-cache';
 const CORE_ASSETS = [
   '/',
   '/index.html',
-  '/lans.html',
+  '/main.html',
   '/fonts/language.js',
   '/css/main.css',
   '/css/mdui.css',
@@ -14,7 +14,6 @@ const CORE_ASSETS = [
   '/logo/countify.svg',
   '/manifest.json',
   '/docs/privacy.html',
-  '/functions/donation.html',
   '/docs/license.html',
   '/docs/terms.html',
   '/offline.html',
