@@ -55,9 +55,9 @@
       "url": "/?new=true",
       "icons": [
         {
-          "src": "/logo/new-activity-96.png",
+          "src": "/logo/countify_activity.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg"
         }
       ]
     },
@@ -68,9 +68,9 @@
       "url": "/?dashboard=true",
       "icons": [
         {
-          "src": "/logo/dashboard-96.png",
+          "src": "/logo/countify_dashboard.svg",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg"
         }
       ]
     }
