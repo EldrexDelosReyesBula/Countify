@@ -1,13 +1,13 @@
 {
   "name": "Countify+",
   "short_name": "Countify+",
-  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more",
+  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more. Built with ❤️ by landecs.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "theme_color": "#7c3aed",
-  "background_color": "#ffffff",
+  "background_color": "#7c3aed",
   "categories": ["productivity", "writing", "tools"],
   "lang": "en-US",
   "dir": "ltr",
@@ -15,13 +15,13 @@
     {
       "src": "/logo/countify.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
       "src": "/logo/countify.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
@@ -35,12 +35,12 @@
     {
       "src": "/assets/illustrations/DESKTOP_INSTALL.svg",
       "sizes": "1280x720",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "form_factor": "wide",
       "label": "Countify+ Desktop Interface"
     },
     {
-      "src": "/logo/MOBILE INSTALL_20251103_115307_0000.png",
+      "src": "/logo/MOBILE%20INSTALL_20251103_115307_0000.png",
       "sizes": "375x667",
       "type": "image/png",
       "form_factor": "narrow",
@@ -57,7 +57,7 @@
         {
           "src": "/logo/countify_activity.svg",
           "sizes": "96x96",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     },
@@ -70,7 +70,7 @@
         {
           "src": "/logo/countify_dashboard.svg",
           "sizes": "96x96",
-          "type": "image/svg"
+          "type": "image/svg+xml"
         }
       ]
     }
@@ -104,5 +104,8 @@
   },
   "launch_handler": {
     "client_mode": "auto"
-  }
+  },
+  "display_override": ["window-controls-overlay"],
+  "handle_links": "preferred",
+  "prefer_related_applications": false
 }
