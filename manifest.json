@@ -1,7 +1,7 @@
 {
   "name": "Countify+",
   "short_name": "Countify+",
-  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more. Built with ❤️ by landecs.",
+  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more. Powered by Landecs.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
