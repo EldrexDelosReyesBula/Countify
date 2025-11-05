@@ -91,6 +91,215 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="material-icons">check_circle</span>
         <span>Changes saved</span>
     </div>
+
+
+<!-- Add this HTML right before the closing body tag -->
+<div id="updateBanner" class="update-banner">
+    <div class="update-banner-content">
+        <div class="update-banner-header">
+            <div class="update-banner-icon">
+                <img src="https://countify.landecs.org/logo/countify.svg" alt="Countify+ Logo">
+            </div>
+            <h3 class="update-banner-title">Exciting Updates Coming Soon! 🚀</h3>
+            <button id="closeUpdateBanner" class="update-banner-close haptic-link">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="update-banner-body">
+            <p class="update-banner-message">
+                Countify+ new updates are coming bringing the most incredible features, 
+                improvements, error fixes and more! Stay tuned for an enhanced writing experience.
+            </p>
+        </div>
+        <div class="update-banner-actions">
+            <button id="dismissUpdateBanner" class="btn btn-outline haptic-link">Dismiss</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.update-banner {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    z-index: 1000;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.update-banner.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.update-banner-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.update-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.update-banner-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.update-banner-icon img {
+    width: 100%;
+    height: 100%;
+    filter: brightness(0) invert(1);
+}
+
+.update-banner-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+}
+
+.update-banner-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.update-banner-close:hover {
+    background: var(--hover);
+    color: var(--text-primary);
+}
+
+.update-banner-body {
+    margin-bottom: 16px;
+}
+
+.update-banner-message {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.update-banner-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+    .update-banner {
+        left: 15px;
+        right: 15px;
+        bottom: 15px;
+    }
+    
+    .update-banner-content {
+        padding: 16px;
+    }
+    
+    .update-banner-actions {
+        flex-direction: column;
+    }
+    
+    .update-banner-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+// Update Banner Manager
+class UpdateBanner {
+    constructor() {
+        this.banner = document.getElementById('updateBanner');
+        this.hasSeenBanner = localStorage.getItem('countify-update-banner-seen') === 'true';
+        this.init();
+    }
+
+    init() {
+        if (!this.hasSeenBanner) {
+            setTimeout(() => this.show(), 1500);
+        }
+        this.setupEventListeners();
+    }
+
+    setupEventListeners() {
+        document.getElementById('closeUpdateBanner')?.addEventListener('click', () => {
+            this.hide(true);
+        });
+
+        document.getElementById('dismissUpdateBanner')?.addEventListener('click', () => {
+            this.hide(true);
+        });
+
+        document.getElementById('learnMoreUpdate')?.addEventListener('click', () => {
+            this.hide(true);
+            console.log('Learn more about updates clicked');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.banner.classList.contains('show')) {
+                this.hide(true);
+            }
+        });
+    }
+
+    show() {
+        if (this.hasSeenBanner) return;
+        
+        this.banner.classList.add('show');
+        
+        if ('vibrate' in navigator) {
+            navigator.vibrate(50);
+        }
+    }
+
+    hide(permanent = false) {
+        this.banner.classList.remove('show');
+        
+        if (permanent) {
+            this.hasSeenBanner = true;
+            localStorage.setItem('countify-update-banner-seen', 'true');
+        }
+        
+        if ('vibrate' in navigator) {
+            navigator.vibrate(30);
+        }
+    }
+
+    reset() {
+        localStorage.removeItem('countify-update-banner-seen');
+        this.hasSeenBanner = false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new UpdateBanner();
+});
+</script>
     <script>
         // PWA Installation Manager
         class PWAInstaller {
