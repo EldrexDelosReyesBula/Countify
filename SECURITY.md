@@ -1,4 +1,4 @@
-# ![Countify+ Logo](https://countify.landecs.org/assets/illustrations/logo/countify.svg) Countify+ Security Policy
+# <img src="https://countify.landecs.org/assets/illustrations/logo/countify.svg" alt="Countify+ Logo" width="80" style="vertical-align: middle;"> Countify+ Security Policy
 
 At **Countify+**, security is a top priority. This document outlines which versions are supported, how to report vulnerabilities, and recommended practices to keep your experience safe and secure.  
 
