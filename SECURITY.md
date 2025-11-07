@@ -1,39 +1,35 @@
-# Countify+ Security Policy
+# ![Countify+ Logo](https://via.placeholder.com/150) Countify+ Security Policy
 
-At **Countify+**, security is a top priority. This document outlines which versions of Countify+ are actively supported, how to report vulnerabilities, and what to expect when a security issue is reported.
-
----
-
-## Supported Versions
-
-We provide security updates only for the following versions. Using unsupported versions may expose you to security risks.  
-
-| Version      | Supported | Notes |
-| ------------ | --------- | ----- |
-| 5.1.x        | ✅ Yes    | Actively maintained with latest security patches |
-| 5.0.x        | ❌ No     | No longer supported; upgrade recommended |
-| 4.0.x        | ✅ Yes    | Supported with critical security fixes only |
-| < 4.0        | ❌ No     | **Upgrade is strongly recommended.** |
-
-> **Recommendation:** Always use the latest supported version to ensure you have the latest security fixes.
+At **Countify+**, security is a top priority. This document outlines which versions are supported, how to report vulnerabilities, and recommended practices to keep your experience safe and secure.  
 
 ---
 
-## Reporting a Vulnerability
+## 🔒 Supported Versions
 
-If you discover a potential security vulnerability in Countify+, we encourage you to report it responsibly.  
+| Version      | Status | Notes |
+| ------------ | ------ | ----- |
+| 5.1.x        | ![badge](https://img.shields.io/badge/Supported-Yes-brightgreen) | Actively maintained with the latest security patches |
+| 5.0.x        | ![badge](https://img.shields.io/badge/Supported-No-red) | No longer supported; upgrade recommended |
+| 4.0.x        | ![badge](https://img.shields.io/badge/Supported-Yes-brightgreen) | Supported with critical security fixes only |
+| < 4.0        | ![badge](https://img.shields.io/badge/Supported-No-red) | **Your current release (2.0.29) falls here. Upgrade strongly recommended** |
 
-**Steps to report:**
+> ⚠️ **Recommendation:** Always use a supported version to ensure you receive the latest security fixes.
 
-1. **Contact:** Send an email to our security team at **security@countifyplus.com**  
+---
+
+## 🛡️ Reporting a Vulnerability
+
+We welcome responsible reporting of security vulnerabilities. To report an issue:
+
+1. **Email:** `security@countifyplus.com`  
 2. **Include:**  
-   - Description of the issue  
+   - Description of the vulnerability  
    - Steps to reproduce  
    - Affected versions  
-   - Any suggested fixes or patches (optional)  
-3. **Confidentiality:** Please do **not** disclose the vulnerability publicly until it has been resolved.
+   - Any suggested fixes (optional)  
+3. **Confidentiality:** Do **not** disclose publicly until the issue is resolved.
 
-**Response timeline:**
+**Response Timeline:**
 
 | Stage                        | Expected Timeframe |
 | ---------------------------- | ---------------- |
@@ -42,27 +38,31 @@ If you discover a potential security vulnerability in Countify+, we encourage yo
 | Resolution plan communicated  | Within 14 days   |
 | Patch/release availability    | Based on severity |
 
-> **Outcome:**  
-> - **Accepted vulnerability:** We will prioritize and provide a patch. You will be credited in the release notes if you wish.  
-> - **Declined vulnerability:** We will explain why the report does not qualify as a security issue.  
+**Outcome:**  
+- **Accepted:** Patch prioritized; reporter credited if desired.  
+- **Declined:** Explanation provided.
 
 ---
 
-## Security Best Practices
+## ⚙️ Security Best Practices
 
-To help maintain security while using Countify+, we recommend:  
+To maximize security while using Countify+:  
 
 - Always update to the latest supported version.  
-- Do not use third-party plugins or modifications that are not officially supported.  
+- Avoid unsupported plugins or modifications.  
 - Keep your environment (OS, browser, dependencies) up-to-date.  
 - Report suspicious activity immediately.  
 
 ---
 
-## Acknowledgements
+## 📌 Notes About Current Release (2.0.29)
 
-We thank our community and security researchers for helping keep Countify+ secure. Responsible disclosure is critical to ensuring a safe and reliable experience for all users.
+Your current release, **2.0.29**, is **not supported**. While it is the latest web app release, it does **not receive security updates**. For maximum security, upgrade to a version ≥4.0.x.  
 
 ---
 
-> **Note:** This security policy may be updated periodically. Please refer to this page for the latest version.
+## 🙏 Acknowledgements
+
+We thank our community and security researchers for helping keep Countify+ safe. Your responsible disclosures help us maintain a secure experience for all users.
+
+> ⚠️ This security policy may be updated periodically. Please check this page for the latest version.
