@@ -11,7 +11,7 @@ At **Countify+**, security is a top priority. This document outlines which versi
 | 5.1.x        | ![badge](https://img.shields.io/badge/Supported-Yes-brightgreen) | Actively maintained with the latest security patches |
 | 5.0.x        | ![badge](https://img.shields.io/badge/Supported-No-red) | No longer supported; upgrade recommended |
 | 4.0.x        | ![badge](https://img.shields.io/badge/Supported-Yes-brightgreen) | Supported with critical security fixes only |
-| < 4.0        | ![badge](https://img.shields.io/badge/Supported-No-red) | **Your current release (2.0.29) falls here. Upgrade strongly recommended** |
+| < 4.0        | ![badge](https://img.shields.io/badge/Supported-No-red) | **Your current release (v2.0.29) falls here. Upgrade strongly recommended** |
 
 > ⚠️ **Recommendation:** Always use a supported version to ensure you receive the latest security fixes.
 
@@ -55,9 +55,9 @@ To maximize security while using Countify+:
 
 ---
 
-## 📌 Notes About Current Release (2.0.29)
+## 📌 Notes About Current Release (v2.0.29)
 
-Your current release, **2.0.29**, is not actively supported with security updates.  
+Your current release, **v2.0.29**, is not actively supported with security updates.  
 
 ⚠️ **Important:** This version is fully offline and does not collect or transmit user data. Because of this, the security risk for users is minimal.  
 
