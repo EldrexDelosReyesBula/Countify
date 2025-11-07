@@ -57,7 +57,11 @@ To maximize security while using Countify+:
 
 ## 📌 Notes About Current Release (2.0.29)
 
-Your current release, **2.0.29**, is **not supported**. While it is the latest web app release, it does **not receive security updates**. For maximum security, upgrade to a version ≥4.0.x.  
+Your current release, **2.0.29**, is not actively supported with security updates.  
+
+⚠️ **Important:** This version is fully offline and does not collect or transmit user data. Because of this, the security risk for users is minimal.  
+
+For maximum security and new features, we still recommend upgrading to a supported version (≥4.0.x) when available.
 
 ---
 
