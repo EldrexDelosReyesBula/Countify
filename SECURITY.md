@@ -8,12 +8,12 @@ At **Countify+**, security is a top priority. This document outlines which versi
 
 We provide security updates only for the following versions. Using unsupported versions may expose you to security risks.  
 
-| Version | Supported | Notes |
-| ------- | --------- | ----- |
-| 5.1.x   | ✅ Yes    | Actively maintained with latest security patches |
-| 5.0.x   | ❌ No     | No longer supported; upgrade recommended |
-| 4.0.x   | ✅ Yes    | Supported with critical security fixes only |
-| < 4.0   | ❌ No     | Unsupported; upgrade required |
+| Version      | Supported | Notes |
+| ------------ | --------- | ----- |
+| 5.1.x        | ✅ Yes    | Actively maintained with latest security patches |
+| 5.0.x        | ❌ No     | No longer supported; upgrade recommended |
+| 4.0.x        | ✅ Yes    | Supported with critical security fixes only |
+| < 4.0        | ❌ No     | **Upgrade is strongly recommended.** |
 
 > **Recommendation:** Always use the latest supported version to ensure you have the latest security fixes.
 
