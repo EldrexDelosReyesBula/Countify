@@ -32,6 +32,265 @@
         <span class="material-icons">check_circle</span>
         <span>Changes saved</span>
     </div>
+<div id="banner-overlay" class="banner-overlay"></div>
+<div id="release-banner" class="banner-container">
+  <div class="banner-content">
+    <div class="banner-icon">
+      <!-- MDUI icon style: update to your MDUI setup if needed -->
+<i class="mdui-icon material-icons" style="font-size: 15vw;">new_releases</i>
+    </div>
+    <div class="banner-text">
+      <h3>NEW RELEASE: v2.0.29</h3>
+      <p>
+        We’re excited to introduce <strong>v2.0.29</strong>, released on <strong>November 8, 2025, 2:20 PM Philippines</strong>. This update includes a refreshed UI/UX and new features. Some features are still in beta, so you might encounter minor issues or unexpected behavior. Your feedback is welcome as we continue refining the platform.
+      </p>
+    </div>
+    <div class="banner-actions">
+      <button id="understand-btn" class="btn-primary">I Understand</button>
+      <a href="learn.html" class="btn-secondary">Learn More</a>
+    </div>
+    <button id="close-banner" class="close-btn" aria-label="Close banner">
+      <i class="mdui-icon material-icons">close</i>
+    </button>
+  </div>
+</div>
+
+<style>
+/* ===== Banner Container ===== */
+.banner-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 900px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  box-shadow: var(--elevation-3);
+  z-index: 1000;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  opacity: 0.95;
+  transition: var(--transition);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.banner-container:hover {
+  opacity: 1;
+  box-shadow: var(--elevation-3), 0 0 0 2px var(--primary-200);
+}
+
+/* ===== Banner Content ===== */
+.banner-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 16px;
+  position: relative;
+}
+
+/* ===== Banner Icon ===== */
+.banner-icon {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-600);
+  font-size: 8rem;
+  animation: iconPulse 2s infinite alternate;
+}
+
+/* Icon animation: pulse + rotate slightly */
+@keyframes iconPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(-5deg);
+  }
+}
+
+/* ===== Banner Text ===== */
+.banner-text {
+  flex: 1;
+}
+
+.banner-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.banner-text p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.banner-text strong {
+  color: var(--primary-600);
+}
+
+/* ===== Banner Actions ===== */
+.banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--primary-600);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--primary-700);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-600);
+  border: 1px solid var(--primary-300);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-50);
+  transform: translateY(-1px);
+}
+
+/* ===== Close Button ===== */
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.close-btn:hover {
+  background: var(--gray-100);
+  color: var(--text-primary);
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+  .banner-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .banner-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .banner-container {
+    width: 95%;
+    bottom: 10px;
+  }
+
+  .banner-icon {
+    font-size: 6rem;
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ===== Entrance Animation ===== */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 0.95;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ===== Overlay Behind Banner ===== */
+.banner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 999;
+  display: none;
+  transition: opacity 0.3s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const banner = document.getElementById('release-banner');
+  const overlay = document.getElementById('banner-overlay');
+  const understandBtn = document.getElementById('understand-btn');
+  const closeBtn = document.getElementById('close-banner');
+
+  const dismissed = localStorage.getItem('banner-v2.0.29-dismissed');
+  if (dismissed) {
+    banner.style.display = 'none';
+    overlay.style.display = 'none';
+    return;
+  }
+
+  // Show overlay
+  overlay.style.display = 'block';
+
+  function dismissBanner() {
+    localStorage.setItem('banner-v2.0.29-dismissed', 'true');
+    banner.style.opacity = '0';
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      banner.style.display = 'none';
+      overlay.style.display = 'none';
+    }, 300);
+  }
+
+  understandBtn.addEventListener('click', dismissBanner);
+  closeBtn.addEventListener('click', dismissBanner);
+});
+</script>
     <script src="js/app.js"></script>
 </body>
 
