@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#7c3aed",
-  "background_color": "#7c3aed",
+  "background_color": "#FFFFFF",
   "categories": ["productivity", "writing", "tools"],
   "lang": "en-US",
   "dir": "ltr",
