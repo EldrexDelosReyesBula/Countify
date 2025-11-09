@@ -1,7 +1,7 @@
 {
   "name": "Countify+",
   "short_name": "Countify+",
-  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more. Powered by Landecs.",
+  "description": "Advanced writing analytics tool with real-time word count, character count, reading time, and more. Powered by LanDecs.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -40,7 +40,7 @@
       "label": "Countify+ Desktop Interface"
     },
     {
-      "src": "/logo/MOBILE%20INSTALL_20251103_115307_0000.png",
+      "src": "/assets/illustrations/MOBILE%20INSTALL.png",
       "sizes": "375x667",
       "type": "image/png",
       "form_factor": "narrow",
