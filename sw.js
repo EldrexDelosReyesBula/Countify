@@ -15,7 +15,10 @@ const CORE_ASSETS = [
   '/docs/license.html',
   '/docs/terms.html',
   '/offline.html',
-  '/js/app.js'
+  '/js/app.js',
+  '/js/lanlink.js',
+  '/js/vibration.js',
+  '/js/installer.js'
 ];
 
 // Logo and icon assets
