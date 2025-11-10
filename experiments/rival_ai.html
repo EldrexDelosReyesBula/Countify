@@ -3,56 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Rival beta 2 • Intellectual Debate Platform</title>
+    <title>AI Rival • Intellectual Debate Platform</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <!-- TensorFlow.js -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@1.3.3"></script>
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            /* Light Theme */
-            --color-primary: #4361ee;
-            --color-primary-dark: #3a56d4;
-            --color-secondary: #7209b7;
-            --color-accent: #f72585;
+            /* Color System */
+            --primary-50: #eef2ff;
+            --primary-100: #e0e7ff;
+            --primary-500: #6366f1;
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            
+            /* Semantic Colors - Light Theme */
+            --color-bg: var(--gray-50);
             --color-surface: #ffffff;
-            --color-background: #f8f9fa;
-            --color-on-surface: #212529;
-            --color-on-primary: #ffffff;
-            --color-border: #e9ecef;
-            --color-success: #4cc9f0;
-            --color-warning: #f8961e;
-            --color-error: #ef233c;
-            
-            /* Elevation shadows */
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
-            --shadow-xl: 0 20px 50px rgba(0,0,0,0.15);
-            
-            /* Border radius */
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            
-            /* Spacing */
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
+            --color-surface-elevated: #ffffff;
+            --color-primary: var(--primary-600);
+            --color-primary-light: var(--primary-500);
+            --color-text: var(--gray-900);
+            --color-text-secondary: var(--gray-600);
+            --color-text-tertiary: var(--gray-500);
+            --color-border: var(--gray-200);
+            --color-shadow: rgba(0, 0, 0, 0.05);
             
             /* Typography */
-            --font-primary: 'Inter', -apple-system, sans-serif;
-            --font-secondary: 'Poppins', -apple-system, sans-serif;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --text-xs: 0.75rem;
             --text-sm: 0.875rem;
             --text-base: 1rem;
@@ -62,113 +63,159 @@
             --text-3xl: 1.875rem;
             --text-4xl: 2.25rem;
             
-            /* Animation */
-            --transition-fast: 0.15s;
-            --transition-normal: 0.3s;
-            --transition-slow: 0.5s;
-        }
-        
-        [data-theme="dark"] {
-            --color-primary: #4895ef;
-            --color-primary-dark: #4361ee;
-            --color-secondary: #b5179e;
-            --color-accent: #f72585;
-            --color-surface: #1a1a1a;
-            --color-background: #121212;
-            --color-on-surface: #e9ecef;
-            --color-on-primary: #ffffff;
-            --color-border: #2d2d2d;
-            --color-success: #4cc9f0;
-            --color-warning: #f8961e;
-            --color-error: #ef233c;
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
             
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
-            --shadow-lg: 0 10px 25px rgba(0,0,0,0.35);
-            --shadow-xl: 0 20px 50px rgba(0,0,0,0.4);
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 var(--color-shadow);
+            --shadow-md: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
+            --shadow-lg: 0 10px 15px -3px var(--color-shadow), 0 4px 6px -2px var(--color-shadow);
+            --shadow-xl: 0 20px 25px -5px var(--color-shadow), 0 10px 10px -5px var(--color-shadow);
+            
+            /* Transitions */
+            --transition-fast: 150ms;
+            --transition-normal: 300ms;
+            --transition-slow: 500ms;
+            
+            /* Layout */
+            --header-height: 64px;
+            --sidebar-width: 280px;
+            --max-content-width: 1200px;
         }
-        
+
+        [data-theme="dark"] {
+            --color-bg: var(--gray-900);
+            --color-surface: var(--gray-800);
+            --color-surface-elevated: var(--gray-700);
+            --color-primary: var(--primary-500);
+            --color-primary-light: var(--primary-400);
+            --color-text: var(--gray-50);
+            --color-text-secondary: var(--gray-300);
+            --color-text-tertiary: var(--gray-400);
+            --color-border: var(--gray-700);
+            --color-shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Reset & Base Styles */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-        
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: var(--font-primary);
-            background-color: var(--color-background);
-            color: var(--color-on-surface);
+            background-color: var(--color-bg);
+            color: var(--color-text);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
             overflow-x: hidden;
         }
 
-        /* L3UI Light Reflection Effect */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 20% 20%, 
-                rgba(255, 255, 255, 0.1) 0%, 
-                transparent 60%);
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity var(--transition-normal) ease;
-        }
-
-        [data-theme="light"] body::before {
-            opacity: 1;
-        }
-        
-        /* Layout */
+        /* Swiss Design Grid System */
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: var(--max-content-width);
             margin: 0 auto;
-            padding: 0 var(--space-md);
+            padding: 0 var(--space-4);
         }
-        
+
+        .grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         /* Typography */
         h1, h2, h3, h4, h5, h6 {
-            font-family: var(--font-secondary);
             font-weight: 600;
             line-height: 1.2;
-            margin-bottom: var(--space-sm);
+            margin-bottom: var(--space-4);
         }
-        
+
         h1 {
             font-size: var(--text-3xl);
+            font-weight: 700;
         }
-        
+
         h2 {
             font-size: var(--text-2xl);
         }
-        
+
         h3 {
             font-size: var(--text-xl);
         }
-        
+
         p {
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-4);
         }
-        
+
+        .text-sm {
+            font-size: var(--text-sm);
+        }
+
+        .text-xs {
+            font-size: var(--text-xs);
+        }
+
+        .text-secondary {
+            color: var(--color-text-secondary);
+        }
+
+        .text-tertiary {
+            color: var(--color-text-tertiary);
+        }
+
         /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-sm);
-            font-family: var(--font-secondary);
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
             font-weight: 500;
             font-size: var(--text-sm);
             line-height: 1;
@@ -179,82 +226,76 @@
             outline: none;
             user-select: none;
             white-space: nowrap;
-            gap: var(--space-xs);
             position: relative;
             overflow: hidden;
         }
 
-        /* L3UI Button Effect */
         .btn::after {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, 
-                rgba(255, 255, 255, 0.3) 0%, 
-                transparent 70%);
-            transform: scale(0);
-            transition: transform var(--transition-fast) ease;
-            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
         }
 
-        .btn:hover::after {
-            transform: scale(1);
+        .btn:active::after {
+            width: 100px;
+            height: 100px;
         }
-        
+
         .btn-primary {
             background-color: var(--color-primary);
-            color: var(--color-on-primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
         }
-        
+
         .btn-primary:hover {
-            background-color: var(--color-primary-dark);
+            background-color: var(--primary-700);
+            box-shadow: var(--shadow-md);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
         }
-        
+
         .btn-secondary {
-            background-color: var(--color-secondary);
-            color: var(--color-on-primary);
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
         }
-        
+
         .btn-secondary:hover {
-            opacity: 0.9;
+            background-color: var(--color-bg);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
         }
-        
-        .btn-outline {
+
+        .btn-ghost {
             background-color: transparent;
-            color: var(--color-primary);
-            border: 1px solid var(--color-primary);
+            color: var(--color-text);
         }
-        
-        .btn-outline:hover {
-            background-color: rgba(var(--color-primary), 0.1);
+
+        .btn-ghost:hover {
+            background-color: var(--color-bg);
         }
-        
+
         .btn-icon {
-            padding: var(--space-sm);
-            border-radius: 50%;
+            padding: var(--space-2);
+            border-radius: var(--radius-md);
         }
-        
+
         /* Cards */
         .card {
             background-color: var(--color-surface);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
             transition: all var(--transition-normal) ease;
-            margin-bottom: var(--space-lg);
             border: 1px solid var(--color-border);
             position: relative;
-            overflow: hidden;
         }
 
-        /* L3UI Card Effect */
         .card::before {
             content: '';
             position: absolute;
@@ -262,113 +303,110 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.4), 
-                transparent);
+            background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
             opacity: 0;
-            transition: opacity var(--transition-normal) ease;
+            transition: opacity var(--transition-normal);
         }
 
-        [data-theme="light"] .card::before {
+        .card:hover::before {
             opacity: 1;
         }
-        
+
         .card:hover {
             box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
         }
-        
+
         .card-header {
-            padding: var(--space-md);
+            padding: var(--space-6);
             border-bottom: 1px solid var(--color-border);
         }
-        
+
         .card-body {
-            padding: var(--space-md);
+            padding: var(--space-6);
         }
-        
+
         .card-footer {
-            padding: var(--space-md);
+            padding: var(--space-6);
             border-top: 1px solid var(--color-border);
             display: flex;
-            gap: var(--space-sm);
+            gap: var(--space-3);
         }
-        
+
         /* Forms */
         .form-group {
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-6);
         }
-        
+
         .form-label {
             display: block;
-            margin-bottom: var(--space-xs);
+            margin-bottom: var(--space-2);
             font-size: var(--text-sm);
             font-weight: 500;
-            color: var(--color-on-surface);
+            color: var(--color-text);
         }
-        
+
         .form-control {
             width: 100%;
-            padding: var(--space-sm) var(--space-md);
+            padding: var(--space-3) var(--space-4);
             border: 1px solid var(--color-border);
-            border-radius: var(--radius-sm);
+            border-radius: var(--radius-md);
             font-family: var(--font-primary);
             font-size: var(--text-base);
             background-color: var(--color-surface);
-            color: var(--color-on-surface);
+            color: var(--color-text);
             transition: all var(--transition-fast);
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: inset 0 1px 2px var(--color-shadow);
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px rgba(var(--color-primary), 0.2), 
-                        inset 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1), inset 0 1px 2px var(--color-shadow);
         }
-        
+
         textarea.form-control {
             min-height: 120px;
             resize: vertical;
         }
-        
+
         /* Navigation */
         .navbar {
             background-color: var(--color-surface);
             box-shadow: var(--shadow-sm);
-            padding: var(--space-sm) 0;
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 100;
             border-bottom: 1px solid var(--color-border);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            height: var(--header-height);
         }
-        
+
         .navbar-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 100%;
         }
-        
+
         .navbar-brand {
-            font-family: var(--font-secondary);
             font-weight: 700;
             font-size: var(--text-xl);
             color: var(--color-primary);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: var(--space-3);
         }
-        
+
         .navbar-actions {
             display: flex;
             align-items: center;
-            gap: var(--space-sm);
+            gap: var(--space-2);
         }
-        
+
         /* Debate Chat */
         .chat-container {
             display: flex;
@@ -377,77 +415,73 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: var(--space-md);
+            padding: var(--space-6);
             display: flex;
             flex-direction: column;
-            gap: var(--space-md);
+            gap: var(--space-6);
             scroll-behavior: smooth;
         }
-        
+
         .message {
             max-width: 80%;
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-md);
-            animation: fadeIn 0.3s ease;
+            padding: var(--space-4) var(--space-5);
+            border-radius: var(--radius-xl);
+            animation: messageSlideIn 0.3s ease-out;
             position: relative;
-            line-height: 1.5;
+            line-height: 1.6;
             transition: all var(--transition-fast);
+            box-shadow: var(--shadow-sm);
         }
 
-        .message::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.3), 
-                transparent);
+        @keyframes messageSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
         .message-user {
             align-self: flex-end;
             background-color: var(--color-primary);
-            color: var(--color-on-primary);
-            border-bottom-right-radius: var(--radius-xs);
-            box-shadow: var(--shadow-sm);
+            color: white;
+            border-bottom-right-radius: var(--radius-sm);
         }
-        
+
         .message-ai {
             align-self: flex-start;
             background-color: var(--color-surface);
             border: 1px solid var(--color-border);
-            border-bottom-left-radius: var(--radius-xs);
-            box-shadow: var(--shadow-sm);
+            border-bottom-left-radius: var(--radius-sm);
         }
-        
+
         .message-system {
             align-self: center;
-            background-color: var(--color-background);
+            background-color: var(--color-bg);
             border: 1px solid var(--color-border);
-            padding: var(--space-xs) var(--space-sm);
+            padding: var(--space-2) var(--space-4);
             font-size: var(--text-xs);
-            color: var(--color-on-surface);
-            opacity: 0.7;
+            color: var(--color-text-secondary);
             border-radius: var(--radius-lg);
         }
 
         .message-typing {
             display: flex;
-            gap: var(--space-xs);
-            padding: var(--space-sm) var(--space-md);
+            gap: var(--space-3);
+            padding: var(--space-4) var(--space-5);
             align-items: center;
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            align-self: flex-start;
+            max-width: 80%;
         }
 
         .typing-indicator {
@@ -458,7 +492,7 @@
         .typing-dot {
             width: 8px;
             height: 8px;
-            background-color: var(--color-on-surface);
+            background-color: var(--color-text-secondary);
             border-radius: 50%;
             opacity: 0.4;
             animation: typingAnimation 1.4s infinite ease-in-out;
@@ -480,123 +514,25 @@
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-5px); opacity: 1; }
         }
-        
+
         .chat-input {
             display: flex;
-            gap: var(--space-sm);
-            padding: var(--space-md);
+            gap: var(--space-3);
+            padding: var(--space-6);
             border-top: 1px solid var(--color-border);
             background-color: var(--color-surface);
-            position: relative;
         }
 
-        .chat-input::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.3), 
-                transparent);
-        }
-        
-        /* Skeleton Loading */
-        .skeleton {
-            background-color: var(--color-border);
-            border-radius: var(--radius-sm);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .skeleton::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            animation: shimmer 1.5s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .skeleton-text {
-            height: 1em;
-            margin-bottom: var(--space-xs);
-            border-radius: var(--radius-sm);
-        }
-        
-        .skeleton-text:last-child {
-            margin-bottom: 0;
-            width: 80%;
-        }
-
-        /* Enhanced Skeleton for AI Response */
-        .skeleton-ai-response {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-sm);
-            width: 100%;
-        }
-
-        .skeleton-ai-line {
-            height: 1em;
-            border-radius: var(--radius-sm);
-            background-color: var(--color-border);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .skeleton-ai-line::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.1),
-                transparent
-            );
-            animation: shimmer 1.5s infinite;
-        }
-
-        .skeleton-ai-line.short {
-            width: 90%;
-        }
-
-        .skeleton-ai-line.medium {
-            width: 95%;
-        }
-
-        .skeleton-ai-line.long {
-            width: 100%;
-        }
-        
         /* Debate History */
         .history-list {
             display: flex;
             flex-direction: column;
-            gap: var(--space-sm);
+            gap: var(--space-3);
         }
-        
+
         .history-item {
-            padding: var(--space-sm) var(--space-md);
-            border-radius: var(--radius-sm);
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
             background-color: var(--color-surface);
             border: 1px solid var(--color-border);
             cursor: pointer;
@@ -612,109 +548,116 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.2), 
-                transparent);
+            background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+            opacity: 0;
+            transition: opacity var(--transition-normal);
         }
-        
+
+        .history-item:hover::after {
+            opacity: 1;
+        }
+
         .history-item:hover {
-            background-color: var(--color-background);
-            transform: translateX(2px);
+            background-color: var(--color-bg);
+            transform: translateX(4px);
             box-shadow: var(--shadow-sm);
         }
-        
+
         .history-item-title {
-            font-weight: 500;
-            margin-bottom: var(--space-xs);
+            font-weight: 600;
+            margin-bottom: var(--space-2);
             display: -webkit-box;
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+
         .history-item-preview {
             font-size: var(--text-sm);
-            color: var(--color-on-surface);
-            opacity: 0.7;
+            color: var(--color-text-secondary);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+
         /* Tabs */
         .tabs {
             display: flex;
             border-bottom: 1px solid var(--color-border);
-            margin-bottom: var(--space-md);
+            margin-bottom: var(--space-6);
             position: relative;
         }
 
-        .tabs::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.2), 
-                transparent);
-        }
-        
         .tab {
-            padding: var(--space-sm) var(--space-md);
+            padding: var(--space-4) var(--space-6);
             cursor: pointer;
             font-weight: 500;
-            color: var(--color-on-surface);
-            opacity: 0.7;
+            color: var(--color-text-secondary);
             border-bottom: 2px solid transparent;
             transition: all var(--transition-fast);
             position: relative;
         }
-        
+
         .tab.active {
-            opacity: 1;
             color: var(--color-primary);
             border-bottom-color: var(--color-primary);
         }
-        
+
         .tab-content {
             display: none;
         }
-        
+
         .tab-content.active {
             display: block;
             animation: fadeIn var(--transition-normal) ease;
         }
-        
+
         /* Utility Classes */
         .hidden {
             display: none !important;
         }
-        
-        .mt-1 { margin-top: var(--space-xs); }
-        .mt-2 { margin-top: var(--space-sm); }
-        .mt-3 { margin-top: var(--space-md); }
-        .mt-4 { margin-top: var(--space-lg); }
-        .mt-5 { margin-top: var(--space-xl); }
-        
-        .mb-1 { margin-bottom: var(--space-xs); }
-        .mb-2 { margin-bottom: var(--space-sm); }
-        .mb-3 { margin-bottom: var(--space-md); }
-        .mb-4 { margin-bottom: var(--space-lg); }
-        .mb-5 { margin-bottom: var(--space-xl); }
-        
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .mt-1 { margin-top: var(--space-1); }
+        .mt-2 { margin-top: var(--space-2); }
+        .mt-3 { margin-top: var(--space-3); }
+        .mt-4 { margin-top: var(--space-4); }
+        .mt-6 { margin-top: var(--space-6); }
+
+        .mb-1 { margin-bottom: var(--space-1); }
+        .mb-2 { margin-bottom: var(--space-2); }
+        .mb-3 { margin-bottom: var(--space-3); }
+        .mb-4 { margin-bottom: var(--space-4); }
+        .mb-6 { margin-bottom: var(--space-6); }
+
         .text-center { text-align: center; }
-        .text-muted { opacity: 0.7; }
-        
+
         /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .animate-pulse {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -723,8 +666,8 @@
         /* Floating Action Button */
         .fab {
             position: fixed;
-            bottom: var(--space-lg);
-            right: var(--space-lg);
+            bottom: var(--space-8);
+            right: var(--space-8);
             width: 56px;
             height: 56px;
             border-radius: 50%;
@@ -748,24 +691,151 @@
             transform: translateY(1px);
         }
 
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-card {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
+        }
+
+        .stat-value {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
-                padding: 0 var(--space-sm);
+                padding: 0 var(--space-3);
             }
-            
+
             .chat-container {
                 height: 400px;
             }
-            
+
             .message {
                 max-width: 90%;
             }
 
             .fab {
-                bottom: var(--space-md);
-                right: var(--space-md);
+                bottom: var(--space-6);
+                right: var(--space-6);
             }
+
+            .grid-cols-2, .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .card-header,
+            .card-body,
+            .card-footer {
+                padding: var(--space-4);
+            }
+        }
+
+        /* Loading States */
+        .skeleton {
+            background-color: var(--color-border);
+            border-radius: var(--radius-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .skeleton-text {
+            height: 1em;
+            margin-bottom: var(--space-2);
+            border-radius: var(--radius-sm);
+        }
+
+        .skeleton-text:last-child {
+            margin-bottom: 0;
+            width: 80%;
+        }
+
+        /* Debate Analytics */
+        .analytics-container {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Enhanced AI Response Visualization */
+        .ai-response-analysis {
+            background-color: var(--color-bg);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            margin-top: var(--space-4);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+        }
+
+        .analysis-metrics {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: var(--text-lg);
+            color: var(--color-primary);
+        }
+
+        .metric-label {
+            font-size: var(--text-xs);
+            color: var(--color-text-secondary);
         }
     </style>
 </head>
@@ -774,14 +844,14 @@
     <nav class="navbar">
         <div class="container navbar-container">
             <a href="#" class="navbar-brand">
-                <span class="material-icons-round">forum</span>
-                AI Rival (beta 2)
+                <span class="material-icons-round">psychology</span>
+                AI Rival
             </a>
             <div class="navbar-actions">
-                <button id="themeToggle" class="btn btn-icon">
+                <button id="themeToggle" class="btn btn-ghost btn-icon" aria-label="Toggle theme">
                     <span class="material-icons-round">brightness_medium</span>
                 </button>
-                <button id="settingsToggle" class="btn btn-icon">
+                <button id="settingsToggle" class="btn btn-ghost btn-icon" aria-label="Open settings">
                     <span class="material-icons-round">settings</span>
                 </button>
             </div>
@@ -790,52 +860,140 @@
 
     <!-- Main Content -->
     <main class="container">
-        <div class="mt-4">
+        <!-- Hero Section -->
+        <section class="mt-6 mb-8">
             <h1>Intellectual Debate Platform</h1>
-            <p class="text-muted">Challenge your ideas with an AI that thinks differently</p>
+            <p class="text-secondary">Challenge your ideas with an AI that thinks differently. Refine your arguments through intelligent opposition.</p>
+        </section>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalDebates">0</div>
+                <div class="stat-label">Total Debates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgDuration">0m</div>
+                <div class="stat-label">Avg. Duration</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="successRate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="topicsCovered">0</div>
+                <div class="stat-label">Topics Covered</div>
+            </div>
         </div>
 
         <!-- Tabs -->
-        <div class="tabs mt-4">
+        <div class="tabs">
             <div class="tab active" data-tab="debate">New Debate</div>
             <div class="tab" data-tab="history">History</div>
+            <div class="tab" data-tab="analytics">Analytics</div>
             <div class="tab" data-tab="settings">Settings</div>
         </div>
 
         <!-- Tab Contents -->
         <div class="tab-content active" id="debate-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Start a Debate</h2>
-                    <p class="text-muted">Present your argument and the AI will challenge it</p>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="debateTopic" class="form-label">Topic/Position</label>
-                        <input type="text" id="debateTopic" class="form-control" placeholder="Briefly state your position...">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Debate Starter -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Start a Debate</h2>
+                        <p class="text-secondary">Present your argument and the AI will challenge it</p>
                     </div>
-                    <div class="form-group">
-                        <label for="debateArgument" class="form-label">Your Argument</label>
-                        <textarea id="debateArgument" class="form-control" placeholder="Present your case in detail..."></textarea>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="debateTopic" class="form-label">Topic/Position</label>
+                            <input type="text" id="debateTopic" class="form-control" placeholder="Briefly state your position...">
+                        </div>
+                        <div class="form-group">
+                            <label for="debateArgument" class="form-label">Your Argument</label>
+                            <textarea id="debateArgument" class="form-control" placeholder="Present your case in detail..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="debateStyle" class="form-label">AI Debate Style</label>
+                            <select id="debateStyle" class="form-control">
+                                <option value="socratic">Socratic Questioner</option>
+                                <option value="devil">Devil's Advocate</option>
+                                <option value="scholar">Academic Scholar</option>
+                                <option value="philosopher">Philosophical Critic</option>
+                                <option value="logician">Formal Logician</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button id="startDebateBtn" class="btn btn-primary">
+                            <span class="material-icons-round">forum</span>
+                            Start Debate
+                        </button>
+                        <button id="clearDebateBtn" class="btn btn-secondary">
+                            <span class="material-icons-round">clear</span>
+                            Clear
+                        </button>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button id="startDebateBtn" class="btn btn-primary">
-                        <span class="material-icons-round">forum</span>
-                        Start Debate
-                    </button>
-                    <button id="clearDebateBtn" class="btn btn-outline">
-                        <span class="material-icons-round">clear</span>
-                        Clear
-                    </button>
+
+                <!-- Quick Tips -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Debate Tips</h2>
+                        <p class="text-secondary">How to get the most out of your debate</p>
+                    </div>
+                    <div class="card-body">
+                        <ul style="list-style-type: none; padding: 0;">
+                            <li class="mb-4 flex items-start">
+                                <span class="material-icons-round text-primary mr-3">check_circle</span>
+                                <div>
+                                    <strong>Be Specific</strong>
+                                    <p class="text-secondary text-sm">Clearly define your terms and scope</p>
+                                </div>
+                            </li>
+                            <li class="mb-4 flex items-start">
+                                <span class="material-icons-round text-primary mr-3">check_circle</span>
+                                <div>
+                                    <strong>Provide Evidence</strong>
+                                    <p class="text-secondary text-sm">Support claims with reasoning or examples</p>
+                                </div>
+                            </li>
+                            <li class="mb-4 flex items-start">
+                                <span class="material-icons-round text-primary mr-3">check_circle</span>
+                                <div>
+                                    <strong>Stay Open-Minded</strong>
+                                    <p class="text-secondary text-sm">Consider counterarguments seriously</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="material-icons-round text-primary mr-3">check_circle</span>
+                                <div>
+                                    <strong>Engage Actively</strong>
+                                    <p class="text-secondary text-sm">Respond to the AI's points directly</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- Debate Chat -->
-            <div id="debateChatContainer" class="card hidden">
+            <div id="debateChatContainer" class="card hidden mt-6">
                 <div class="card-header">
-                    <h2>Live Debate</h2>
-                    <p class="text-muted">Engage with your AI opponent</p>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2>Live Debate</h2>
+                            <p class="text-secondary" id="debateTopicDisplay">Topic will appear here</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center text-sm text-secondary">
+                                <span class="material-icons-round text-sm mr-1">schedule</span>
+                                <span id="debateTimer">00:00</span>
+                            </div>
+                            <button id="pauseDebateBtn" class="btn btn-ghost btn-icon">
+                                <span class="material-icons-round">pause</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body" style="padding: 0;">
                     <div class="chat-container">
@@ -843,8 +1001,8 @@
                             <!-- Messages will be added here dynamically -->
                         </div>
                         <div class="chat-input">
-                            <input type="text" id="chatInput" class="form-control" placeholder="Type your response..." style="flex: 1;">
-                            <button id="sendMessageBtn" class="btn btn-primary">
+                            <input type="text" id="chatInput" class="form-control" placeholder="Type your response...">
+                            <button id="sendMessageBtn" class="btn btn-primary btn-icon">
                                 <span class="material-icons-round">send</span>
                             </button>
                         </div>
@@ -855,9 +1013,13 @@
                         <span class="material-icons-round">flag</span>
                         End Debate
                     </button>
-                    <button id="saveDebateBtn" class="btn btn-outline">
+                    <button id="saveDebateBtn" class="btn btn-primary">
                         <span class="material-icons-round">save</span>
-                        Save
+                        Save Debate
+                    </button>
+                    <button id="analyzeDebateBtn" class="btn btn-ghost">
+                        <span class="material-icons-round">analytics</span>
+                        Analyze
                     </button>
                 </div>
             </div>
@@ -868,12 +1030,12 @@
             <div class="card">
                 <div class="card-header">
                     <h2>Past Debates</h2>
-                    <p class="text-muted">Review your intellectual exchanges</p>
+                    <p class="text-secondary">Review your intellectual exchanges</p>
                 </div>
                 <div class="card-body">
                     <div class="history-list" id="debateHistory">
                         <!-- History items will be added here dynamically -->
-                        <div class="text-center text-muted mt-4 animate-pulse" id="loadingHistory">
+                        <div class="text-center text-secondary mt-4 animate-pulse" id="loadingHistory">
                             Loading your debate history...
                         </div>
                     </div>
@@ -881,48 +1043,108 @@
             </div>
         </div>
 
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
+        <!-- Analytics Tab -->
+        <div class="tab-content" id="analytics-tab">
             <div class="card">
                 <div class="card-header">
-                    <h2>Settings</h2>
-                    <p class="text-muted">Customize your debate experience</p>
+                    <h2>Debate Analytics</h2>
+                    <p class="text-secondary">Insights into your debating patterns and performance</p>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <label for="aiPersonality" class="form-label">AI Debate Style</label>
-                        <select id="aiPersonality" class="form-control">
-                            <option value="neutral">Neutral Examiner</option>
-                            <option value="socratic">Socratic Questioner</option>
-                            <option value="devil">Devil's Advocate</option>
-                            <option value="scholar">Academic Scholar</option>
-                            <option value="passionate">Passionate Opponent</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="aiIntensity" class="form-label">Debate Intensity</label>
-                        <input type="range" id="aiIntensity" class="form-control" min="1" max="5" value="3">
-                        <div class="flex justify-between mt-1">
-                            <span>Gentle</span>
-                            <span>Balanced</span>
-                            <span>Intense</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3>Performance Over Time</h3>
+                            <canvas id="performanceChart" height="250"></canvas>
+                        </div>
+                        <div>
+                            <h3>Topic Distribution</h3>
+                            <canvas id="topicsChart" height="250"></canvas>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="userDebateStyle" class="form-label">Your Preferred Style</label>
-                        <select id="userDebateStyle" class="form-control">
-                            <option value="logical">Logical/Formal</option>
-                            <option value="casual">Casual/Conversational</option>
-                            <option value="academic">Academic</option>
-                            <option value="creative">Creative/Abstract</option>
-                        </select>
+                    <div class="mt-6">
+                        <h3>Debate Style Analysis</h3>
+                        <canvas id="styleChart" height="200"></canvas>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button id="saveSettingsBtn" class="btn btn-primary">
-                        <span class="material-icons-round">save</span>
-                        Save Settings
-                    </button>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>AI Settings</h2>
+                        <p class="text-secondary">Customize your debate experience</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="aiPersonality" class="form-label">AI Debate Style</label>
+                            <select id="aiPersonality" class="form-control">
+                                <option value="socratic">Socratic Questioner</option>
+                                <option value="devil">Devil's Advocate</option>
+                                <option value="scholar">Academic Scholar</option>
+                                <option value="philosopher">Philosophical Critic</option>
+                                <option value="logician">Formal Logician</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="aiIntensity" class="form-label">Debate Intensity</label>
+                            <input type="range" id="aiIntensity" class="form-control" min="1" max="5" value="3">
+                            <div class="flex justify-between mt-2">
+                                <span class="text-xs text-secondary">Gentle</span>
+                                <span class="text-xs text-secondary">Balanced</span>
+                                <span class="text-xs text-secondary">Intense</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="responseLength" class="form-label">AI Response Length</label>
+                            <input type="range" id="responseLength" class="form-control" min="1" max="5" value="3">
+                            <div class="flex justify-between mt-2">
+                                <span class="text-xs text-secondary">Concise</span>
+                                <span class="text-xs text-secondary">Balanced</span>
+                                <span class="text-xs text-secondary">Detailed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>User Preferences</h2>
+                        <p class="text-secondary">Personalize your interaction</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="userDebateStyle" class="form-label">Your Preferred Style</label>
+                            <select id="userDebateStyle" class="form-control">
+                                <option value="logical">Logical/Formal</option>
+                                <option value="casual">Casual/Conversational</option>
+                                <option value="academic">Academic</option>
+                                <option value="creative">Creative/Abstract</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="notifications" class="form-label">Notifications</label>
+                            <div class="flex items-center mt-2">
+                                <input type="checkbox" id="notifications" class="mr-2">
+                                <label for="notifications" class="text-sm">Enable debate reminders and summaries</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="autoSave" class="form-label">Auto-Save</label>
+                            <div class="flex items-center mt-2">
+                                <input type="checkbox" id="autoSave" class="mr-2" checked>
+                                <label for="autoSave" class="text-sm">Automatically save debates</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button id="saveSettingsBtn" class="btn btn-primary">
+                            <span class="material-icons-round">save</span>
+                            Save Settings
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -937,24 +1159,50 @@
         // ===== Global Variables =====
         const DEBATES_KEY = "ai_rival_debates";
         const SETTINGS_KEY = "ai_rival_settings";
+        const STATS_KEY = "ai_rival_stats";
+        
         let debates = JSON.parse(localStorage.getItem(DEBATES_KEY)) || [];
         let settings = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
-            aiPersonality: "neutral",
+            aiPersonality: "socratic",
             aiIntensity: 3,
+            responseLength: 3,
             userDebateStyle: "logical",
-            theme: "light"
+            theme: "light",
+            notifications: true,
+            autoSave: true
         };
+        
+        let stats = JSON.parse(localStorage.getItem(STATS_KEY)) || {
+            totalDebates: 0,
+            totalDuration: 0,
+            successfulDebates: 0,
+            topics: new Set(),
+            debateStyles: {},
+            performance: []
+        };
+        
         let currentDebate = null;
         let useModel = null;
         let debateState = {
             topic: "",
             argument: "",
             messages: [],
+            startTime: null,
+            timerInterval: null,
+            isPaused: false,
             context: [],
             lastUserPosition: "",
-            embeddings: null
+            embeddings: null,
+            analysis: {
+                sentiment: 0.5,
+                complexity: 0.5,
+                coherence: 0.5,
+                evidence: 0.5
+            }
         };
+        
         let typingTimeout = null;
+        let charts = {};
 
         // ===== DOM Elements =====
         const elements = {
@@ -965,25 +1213,39 @@
             // Debate Form
             debateTopic: document.getElementById("debateTopic"),
             debateArgument: document.getElementById("debateArgument"),
+            debateStyle: document.getElementById("debateStyle"),
             startDebateBtn: document.getElementById("startDebateBtn"),
             clearDebateBtn: document.getElementById("clearDebateBtn"),
             
             // Debate Chat
             debateChatContainer: document.getElementById("debateChatContainer"),
+            debateTopicDisplay: document.getElementById("debateTopicDisplay"),
+            debateTimer: document.getElementById("debateTimer"),
+            pauseDebateBtn: document.getElementById("pauseDebateBtn"),
             chatMessages: document.getElementById("chatMessages"),
             chatInput: document.getElementById("chatInput"),
             sendMessageBtn: document.getElementById("sendMessageBtn"),
             endDebateBtn: document.getElementById("endDebateBtn"),
             saveDebateBtn: document.getElementById("saveDebateBtn"),
+            analyzeDebateBtn: document.getElementById("analyzeDebateBtn"),
             
             // History
             debateHistory: document.getElementById("debateHistory"),
             loadingHistory: document.getElementById("loadingHistory"),
             
+            // Stats
+            totalDebates: document.getElementById("totalDebates"),
+            avgDuration: document.getElementById("avgDuration"),
+            successRate: document.getElementById("successRate"),
+            topicsCovered: document.getElementById("topicsCovered"),
+            
             // Settings
             aiPersonality: document.getElementById("aiPersonality"),
             aiIntensity: document.getElementById("aiIntensity"),
+            responseLength: document.getElementById("responseLength"),
             userDebateStyle: document.getElementById("userDebateStyle"),
+            notifications: document.getElementById("notifications"),
+            autoSave: document.getElementById("autoSave"),
             saveSettingsBtn: document.getElementById("saveSettingsBtn"),
             
             // Theme
@@ -991,13 +1253,21 @@
             settingsToggle: document.getElementById("settingsToggle"),
             
             // FAB
-            newDebateFab: document.getElementById("newDebateFab")
+            newDebateFab: document.getElementById("newDebateFab"),
+            
+            // Charts
+            performanceChart: document.getElementById("performanceChart"),
+            topicsChart: document.getElementById("topicsChart"),
+            styleChart: document.getElementById("styleChart")
         };
 
         // ===== Initialize App =====
         document.addEventListener("DOMContentLoaded", async () => {
-            // Load settings
+            // Load settings and apply them
             loadSettings();
+            
+            // Load and display stats
+            updateStatsDisplay();
             
             // Load TensorFlow model
             await loadModel();
@@ -1007,6 +1277,11 @@
             
             // Load debate history
             loadDebateHistory();
+            
+            // Initialize charts if on analytics tab
+            if (document.getElementById('analytics-tab').classList.contains('active')) {
+                initializeCharts();
+            }
         });
 
         // ===== TensorFlow Model =====
@@ -1017,7 +1292,7 @@
                 console.log("Model loaded successfully");
             } catch (error) {
                 console.error("Failed to load model:", error);
-                showError("Failed to initialize AI capabilities. Some features may not work offline.");
+                showNotification("Failed to initialize AI capabilities. Some features may not work offline.", "error");
             }
         }
 
@@ -1044,8 +1319,10 @@
             elements.chatInput.addEventListener("keypress", (e) => {
                 if (e.key === "Enter") sendMessage();
             });
+            elements.pauseDebateBtn.addEventListener("click", togglePauseDebate);
             elements.endDebateBtn.addEventListener("click", endDebate);
             elements.saveDebateBtn.addEventListener("click", saveDebate);
+            elements.analyzeDebateBtn.addEventListener("click", analyzeCurrentDebate);
             
             // Settings
             elements.saveSettingsBtn.addEventListener("click", saveSettings);
@@ -1074,16 +1351,18 @@
             elements.tabContents.forEach(content => {
                 if (content.id === `${tabId}-tab`) {
                     content.classList.add("active");
+                    
+                    // Special handling for specific tabs
+                    if (tabId === "history") {
+                        loadDebateHistory();
+                    } else if (tabId === "analytics") {
+                        initializeCharts();
+                    }
                 } else {
                     content.classList.remove("active");
                 }
             });
             
-            // Special handling for history tab
-            if (tabId === "history") {
-                loadDebateHistory();
-            }
-
             // Hide FAB on debate tab
             if (tabId === "debate") {
                 elements.newDebateFab.style.display = "none";
@@ -1096,9 +1375,10 @@
         async function startDebate() {
             const topic = elements.debateTopic.value.trim();
             const argument = elements.debateArgument.value.trim();
+            const style = elements.debateStyle.value;
             
             if (!topic || !argument) {
-                showError("Please provide both a topic and your argument");
+                showNotification("Please provide both a topic and your argument", "error");
                 return;
             }
             
@@ -1106,17 +1386,34 @@
             debateState = {
                 topic,
                 argument,
+                style,
                 messages: [],
+                startTime: new Date(),
+                timerInterval: null,
+                isPaused: false,
                 context: [],
                 lastUserPosition: argument,
-                embeddings: null
+                embeddings: null,
+                analysis: {
+                    sentiment: 0.5,
+                    complexity: 0.5,
+                    coherence: 0.5,
+                    evidence: 0.5
+                }
             };
+            
+            // Update UI
+            elements.debateTopicDisplay.textContent = topic;
+            elements.debateTimer.textContent = "00:00";
             
             // Add user's initial argument to messages
             addMessage("user", `Topic: ${topic}\n\nMy Position: ${argument}`);
             
             // Show chat interface
             elements.debateChatContainer.classList.remove("hidden");
+            
+            // Start timer
+            startDebateTimer();
             
             // Scroll to chat
             elements.debateChatContainer.scrollIntoView({ behavior: "smooth" });
@@ -1128,19 +1425,66 @@
         function clearDebateForm() {
             elements.debateTopic.value = "";
             elements.debateArgument.value = "";
+            elements.debateStyle.value = "socratic";
+        }
+
+        function startDebateTimer() {
+            let seconds = 0;
+            debateState.timerInterval = setInterval(() => {
+                if (!debateState.isPaused) {
+                    seconds++;
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    elements.debateTimer.textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function togglePauseDebate() {
+            debateState.isPaused = !debateState.isPaused;
+            const icon = elements.pauseDebateBtn.querySelector('.material-icons-round');
+            
+            if (debateState.isPaused) {
+                icon.textContent = 'play_arrow';
+                showNotification("Debate paused", "info");
+            } else {
+                icon.textContent = 'pause';
+                showNotification("Debate resumed", "info");
+            }
         }
 
         function endDebate() {
             if (confirm("Are you sure you want to end this debate? You can save it to your history first.")) {
+                // Stop timer
+                if (debateState.timerInterval) {
+                    clearInterval(debateState.timerInterval);
+                }
+                
                 addMessage("system", "Debate ended by user");
+                
+                // Calculate duration
+                const endTime = new Date();
+                const duration = Math.floor((endTime - debateState.startTime) / 1000); // in seconds
+                
+                // Update stats
+                updateStats({
+                    duration: duration,
+                    topic: debateState.topic,
+                    style: debateState.style,
+                    success: debateState.messages.length >= 4 // Consider successful if at least 4 messages exchanged
+                });
+                
                 elements.debateChatContainer.classList.add("hidden");
                 clearDebateForm();
+                
+                showNotification("Debate ended successfully", "success");
             }
         }
 
         function saveDebate() {
             if (debateState.messages.length === 0) {
-                showError("No debate to save");
+                showNotification("No debate to save", "error");
                 return;
             }
             
@@ -1148,14 +1492,23 @@
                 id: Date.now(),
                 date: new Date().toISOString(),
                 topic: debateState.topic,
-                messages: debateState.messages
+                style: debateState.style,
+                duration: calculateDebateDuration(),
+                messages: debateState.messages,
+                analysis: debateState.analysis
             };
             
             debates.unshift(debate);
             localStorage.setItem(DEBATES_KEY, JSON.stringify(debates));
             
-            showSuccess("Debate saved to history");
+            showNotification("Debate saved to history", "success");
             loadDebateHistory();
+        }
+
+        function calculateDebateDuration() {
+            if (!debateState.startTime) return 0;
+            const endTime = new Date();
+            return Math.floor((endTime - debateState.startTime) / 1000); // in seconds
         }
 
         function sendMessage() {
@@ -1173,11 +1526,12 @@
             generateAIResponse("response");
         }
 
-        function addMessage(sender, text) {
+        function addMessage(sender, text, analysis = null) {
             const message = {
                 sender,
                 text,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                analysis
             };
             
             debateState.messages.push(message);
@@ -1200,12 +1554,37 @@
                 `;
             } else {
                 messageElement.textContent = text;
+                
+                // Add analysis for AI messages if available
+                if (sender === "ai" && analysis) {
+                    const analysisElement = document.createElement("div");
+                    analysisElement.classList.add("ai-response-analysis");
+                    analysisElement.innerHTML = `
+                        <div class="analysis-header">
+                            <strong>Response Analysis</strong>
+                            <div class="analysis-metrics">
+                                <div class="metric">
+                                    <div class="metric-value">${Math.round(analysis.coherence * 100)}%</div>
+                                    <div class="metric-label">Coherence</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">${Math.round(analysis.complexity * 100)}%</div>
+                                    <div class="metric-label">Complexity</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    messageElement.appendChild(analysisElement);
+                }
             }
             
             elements.chatMessages.appendChild(messageElement);
             
-            // Scroll to bottom
-            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+            // Scroll to bottom with smooth animation
+            elements.chatMessages.scrollTo({
+                top: elements.chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
             
             return message;
         }
@@ -1226,24 +1605,33 @@
             typingTimeout = setTimeout(async () => {
                 try {
                     // Remove typing indicator
-                    elements.chatMessages.removeChild(elements.chatMessages.lastChild);
+                    if (elements.chatMessages.lastChild) {
+                        elements.chatMessages.removeChild(elements.chatMessages.lastChild);
+                    }
                     
                     // Generate response based on type
                     let response;
+                    let analysis = null;
+                    
                     if (type === "initial") {
-                        response = await generateInitialResponse();
+                        const result = await generateInitialResponse();
+                        response = result.response;
+                        analysis = result.analysis;
                     } else {
-                        response = await generateFollowUpResponse();
+                        const result = await generateFollowUpResponse();
+                        response = result.response;
+                        analysis = result.analysis;
                     }
                     
                     // Add AI message
-                    addMessage("ai", response);
+                    addMessage("ai", response, analysis);
                     
                     // Add to debate state
                     const aiMessage = {
                         sender: "ai",
                         text: response,
-                        timestamp: new Date().toISOString()
+                        timestamp: new Date().toISOString(),
+                        analysis
                     };
                     debateState.messages.push(aiMessage);
                     
@@ -1255,9 +1643,9 @@
         }
 
         async function generateInitialResponse() {
-            const { topic, argument } = debateState;
-            const personality = settings.aiPersonality;
+            const { topic, argument, style } = debateState;
             const intensity = settings.aiIntensity;
+            const responseLength = settings.responseLength;
             
             try {
                 // Generate embeddings for the argument
@@ -1265,19 +1653,37 @@
                 
                 // Analyze the argument using TensorFlow
                 const analysis = await analyzeArgument(argument, debateState.embeddings);
+                debateState.analysis = analysis;
                 
                 // Generate a strategic response based on the analysis
-                return generateStrategicResponse(topic, argument, analysis, personality, intensity);
+                const response = generateStrategicResponse(topic, argument, analysis, style, intensity, responseLength);
+                
+                return {
+                    response,
+                    analysis: {
+                        coherence: analysis.coherence,
+                        complexity: analysis.complexity,
+                        evidence: analysis.evidence
+                    }
+                };
             } catch (error) {
                 console.error("Error in initial response generation:", error);
-                return generateFallbackResponse(topic, argument, personality, intensity);
+                const response = generateFallbackResponse(topic, argument, style, intensity);
+                return {
+                    response,
+                    analysis: {
+                        coherence: 0.5,
+                        complexity: 0.5,
+                        evidence: 0.5
+                    }
+                };
             }
         }
 
         async function generateFollowUpResponse() {
-            const { topic, lastUserPosition, messages } = debateState;
-            const personality = settings.aiPersonality;
+            const { topic, lastUserPosition, messages, style } = debateState;
             const intensity = settings.aiIntensity;
+            const responseLength = settings.responseLength;
             
             try {
                 // Generate embeddings for the latest message
@@ -1286,11 +1692,31 @@
                 // Analyze the conversation context
                 const contextAnalysis = await analyzeConversationContext(messages, embeddings);
                 
+                // Update debate analysis
+                Object.assign(debateState.analysis, contextAnalysis);
+                
                 // Generate a strategic follow-up
-                return generateStrategicResponse(topic, lastUserPosition, contextAnalysis, personality, intensity);
+                const response = generateStrategicResponse(topic, lastUserPosition, contextAnalysis, style, intensity, responseLength);
+                
+                return {
+                    response,
+                    analysis: {
+                        coherence: contextAnalysis.coherence || 0.5,
+                        complexity: contextAnalysis.complexity || 0.5,
+                        evidence: contextAnalysis.evidence || 0.5
+                    }
+                };
             } catch (error) {
                 console.error("Error in follow-up generation:", error);
-                return generateFallbackResponse(topic, lastUserPosition, personality, intensity);
+                const response = generateFallbackResponse(topic, lastUserPosition, style, intensity);
+                return {
+                    response,
+                    analysis: {
+                        coherence: 0.5,
+                        complexity: 0.5,
+                        evidence: 0.5
+                    }
+                };
             }
         }
 
@@ -1298,21 +1724,43 @@
             // Perform various analyses using TensorFlow
             const results = {};
             
-            // Sentiment analysis (simple approach)
+            // Sentiment analysis
             results.sentiment = tf.tidy(() => {
                 const x = embeddings.slice([0, 0], [1, 512]);
                 const dense = tf.layers.dense({ units: 1, activation: 'sigmoid' }).apply(x);
                 return dense.dataSync()[0];
             });
             
-            // Key concept extraction (simple frequency-based approach)
-            results.keyConcepts = extractKeyConcepts(text);
+            // Complexity analysis (based on sentence length and vocabulary)
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const words = text.split(/\s+/).filter(w => w.length > 0);
+            const uniqueWords = new Set(words.map(w => w.toLowerCase()));
             
-            // Argument strength estimation
-            results.strength = estimateArgumentStrength(text);
+            results.complexity = Math.min(1, 
+                (sentences.length / 10) * 0.3 + 
+                (words.length / 100) * 0.3 + 
+                (uniqueWords.size / words.length) * 0.4
+            );
             
-            // Logical consistency
-            results.consistency = estimateLogicalConsistency(text);
+            // Coherence analysis (simple heuristic)
+            const coherenceMarkers = ["therefore", "thus", "because", "since", "as a result", "consequently"];
+            let coherenceScore = 0;
+            coherenceMarkers.forEach(marker => {
+                if (text.toLowerCase().includes(marker)) {
+                    coherenceScore += 1;
+                }
+            });
+            results.coherence = Math.min(1, coherenceScore / 3);
+            
+            // Evidence analysis
+            const evidenceMarkers = ["study", "research", "data", "statistics", "evidence", "proof", "example"];
+            let evidenceScore = 0;
+            evidenceMarkers.forEach(marker => {
+                if (text.toLowerCase().includes(marker)) {
+                    evidenceScore += 1;
+                }
+            });
+            results.evidence = Math.min(1, evidenceScore / 3);
             
             return results;
         }
@@ -1353,96 +1801,49 @@
             return results;
         }
 
-        function extractKeyConcepts(text) {
-            // Simple implementation - in a real app, use proper NLP
-            const words = text.toLowerCase().split(/\s+/);
-            const stopWords = new Set(["the", "and", "but", "for", "with", "this", "that"]);
-            const freq = {};
-            
-            words.forEach(word => {
-                if (!stopWords.has(word) && word.length > 3) {
-                    freq[word] = (freq[word] || 0) + 1;
-                }
-            });
-            
-            return Object.entries(freq)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([word]) => word);
-        }
-
-        function estimateArgumentStrength(text) {
-            // Simple heuristic - count supporting evidence markers
-            const evidenceMarkers = ["because", "since", "as shown by", "studies show", "research indicates"];
-            let score = 0;
-            
-            evidenceMarkers.forEach(marker => {
-                if (text.toLowerCase().includes(marker)) {
-                    score += 1;
-                }
-            });
-            
-            // Normalize to 0-1 range
-            return Math.min(1, score / 3);
-        }
-
-        function estimateLogicalConsistency(text) {
-            // Simple heuristic - count logical connectors
-            const connectors = ["therefore", "thus", "hence", "consequently", "however", "although"];
-            let score = 0;
-            
-            connectors.forEach(connector => {
-                if (text.toLowerCase().includes(connector)) {
-                    score += 1;
-                }
-            });
-            
-            // Normalize to 0-1 range
-            return Math.min(1, score / 4);
-        }
-
-        function generateStrategicResponse(topic, argument, analysis, personality, intensity) {
+        function generateStrategicResponse(topic, argument, analysis, style, intensity, length) {
             // Enhanced response generation with dynamic structure
             const intensityLevel = Math.min(5, Math.max(1, intensity));
+            const lengthFactor = Math.min(5, Math.max(1, length));
             
             // Response components
             const components = [];
             
-            // 1. Introduction based on personality and sentiment
-            components.push(generateIntroduction(topic, analysis.sentiment, personality));
+            // 1. Introduction based on style and sentiment
+            components.push(generateIntroduction(topic, analysis.sentiment, style));
             
             // 2. Key point recognition
             if (analysis.keyConcepts && analysis.keyConcepts.length > 0) {
-                components.push(generateKeyPointRecognition(analysis.keyConcepts, personality));
+                components.push(generateKeyPointRecognition(analysis.keyConcepts, style));
             }
             
             // 3. Counterarguments based on intensity
             const counterpoints = generateCounterpoints(argument, analysis, intensityLevel);
             if (counterpoints.length > 0) {
-                components.push(generateCounterargumentSection(counterpoints, personality));
+                components.push(generateCounterargumentSection(counterpoints, style));
             }
             
             // 4. Questions based on analysis
-            components.push(generateQuestion(analysis, personality));
+            components.push(generateQuestion(analysis, style));
             
-            // 5. Closing based on personality
-            components.push(generateClosing(personality));
+            // 5. Closing based on style
+            components.push(generateClosing(style));
             
             // Combine components with appropriate spacing
-            return components.filter(c => c).join("\n\n");
+            let response = components.filter(c => c).join("\n\n");
+            
+            // Adjust length based on user preference
+            response = adjustResponseLength(response, lengthFactor);
+            
+            return response;
         }
 
-        function generateIntroduction(topic, sentiment, personality) {
+        function generateIntroduction(topic, sentiment, style) {
             const introductions = {
-                neutral: [
+                socratic: [
                     `Let me examine your position on "${topic.substring(0, 50)}"...`,
                     `Your argument presents an interesting perspective on "${topic.substring(0, 50)}"...`,
                     `Regarding your position on "${topic.substring(0, 50)}", let's analyze it carefully...`
-                ],
-                socratic: [
-                    `Let me ask you about your position on "${topic.substring(0, 50)}"...`,
-                    `Your argument raises some important questions about "${topic.substring(0, 50)}"...`,
-                    `I'd like to explore your thinking on "${topic.substring(0, 50)}" further...`
                 ],
                 devil: [
                     `I must challenge your position on "${topic.substring(0, 50)}"...`,
@@ -1454,59 +1855,61 @@
                     `The scholarly consensus on "${topic.substring(0, 50)}" would question...`,
                     `From a research perspective, your view on "${topic.substring(0, 50)}"...`
                 ],
-                passionate: [
-                    `I strongly disagree with your position on "${topic.substring(0, 50)}"!`,
-                    `Your argument about "${topic.substring(0, 50)}" is deeply flawed because...`,
-                    `I must passionately oppose your view on "${topic.substring(0, 50)}"...`
+                philosopher: [
+                    `Philosophically, your position on "${topic.substring(0, 50)}" raises questions about...`,
+                    `Let's examine the underlying assumptions of your view on "${topic.substring(0, 50)}"...`,
+                    `From a metaphysical perspective, your argument about "${topic.substring(0, 50)}"...`
+                ],
+                logician: [
+                    `Let's analyze the logical structure of your argument about "${topic.substring(0, 50)}"...`,
+                    `From a formal logic perspective, your position on "${topic.substring(0, 50)}"...`,
+                    `Your reasoning about "${topic.substring(0, 50)}" contains several logical points to examine...`
                 ]
             };
             
-            // Select based on personality
-            const options = introductions[personality] || introductions.neutral;
+            // Select based on style
+            const options = introductions[style] || introductions.socratic;
             
             // Adjust based on sentiment
             if (sentiment > 0.7) {
                 // Very positive - challenge optimism
-                if (personality === "devil") {
+                if (style === "devil") {
                     return `Your overly optimistic view on "${topic.substring(0, 50)}" needs serious reconsideration...`;
-                } else if (personality === "passionate") {
-                    return `Your rose-colored glasses about "${topic.substring(0, 50)}" are blinding you to reality!`;
                 }
             } else if (sentiment < 0.3) {
                 // Very negative - challenge pessimism
-                if (personality === "devil") {
+                if (style === "devil") {
                     return `Your pessimistic stance on "${topic.substring(0, 50)}" ignores important positive aspects...`;
-                } else if (personality === "passionate") {
-                    return `Your doom-and-gloom about "${topic.substring(0, 50)}" is completely exaggerated!`;
                 }
             }
             
             return randomFromArray(options);
         }
 
-        function generateKeyPointRecognition(keyConcepts, personality) {
+        function generateKeyPointRecognition(keyConcepts, style) {
             const recognitions = {
-                neutral: `I notice you emphasize ${formatConcepts(keyConcepts)} in your argument.`,
                 socratic: `You focus on ${formatConcepts(keyConcepts)} - could you define these more precisely?`,
                 devil: `Your emphasis on ${formatConcepts(keyConcepts)} conveniently ignores important factors!`,
                 scholar: `The concepts ${formatConcepts(keyConcepts)} have been extensively studied in the literature.`,
-                passionate: `You're obsessed with ${formatConcepts(keyConcepts)} while ignoring everything else!`
+                philosopher: `Your focus on ${formatConcepts(keyConcepts)} raises fundamental philosophical questions.`,
+                logician: `The terms ${formatConcepts(keyConcepts)} require precise definition for logical analysis.`
             };
             
-            return recognitions[personality] || recognitions.neutral;
+            return recognitions[style] || recognitions.socratic;
         }
 
         function formatConcepts(concepts) {
-            if (concepts.length === 1) return concepts[0];
-            if (concepts.length === 2) return `${concepts[0]} and ${concepts[1]}`;
-            return `${concepts.slice(0, -1).join(', ')}, and ${concepts[concepts.length - 1]}`;
+            if (!concepts || concepts.length === 0) return "certain concepts";
+            if (concepts.length === 1) return `"${concepts[0]}"`;
+            if (concepts.length === 2) return `"${concepts[0]}" and "${concepts[1]}"`;
+            return `"${concepts.slice(0, -1).join('", "')}", and "${concepts[concepts.length - 1]}"`;
         }
 
         function generateCounterpoints(argument, analysis, intensity) {
             const counterpoints = [];
             const numPoints = Math.min(intensity, 3); // 1-3 counterpoints
             
-            // Base counterpoints (would be enhanced with real NLP)
+            // Base counterpoints
             const baseCounters = [
                 "the potential for confirmation bias in this position",
                 "historical examples that contradict this view",
@@ -1537,111 +1940,128 @@
                 counterpoints.push("potential upsides being overlooked in this negative assessment");
             }
             
-            if (analysis.strength < 0.3) {
+            if (analysis.evidence < 0.3) {
                 counterpoints.push("the lack of substantial evidence supporting this claim");
             }
             
-            if (analysis.consistency < 0.4) {
+            if (analysis.coherence < 0.4) {
                 counterpoints.push("the logical inconsistencies in this line of reasoning");
             }
             
             return counterpoints.slice(0, numPoints); // Ensure we don't exceed max
         }
 
-        function generateCounterargumentSection(counterpoints, personality) {
+        function generateCounterargumentSection(counterpoints, style) {
             const sectionHeaders = {
-                neutral: "Several aspects deserve consideration:",
                 socratic: "Important questions arise:",
                 devil: "Serious flaws in this argument include:",
                 scholar: "The research suggests alternative perspectives:",
-                passionate: "This argument fails because:"
+                philosopher: "Philosophical objections include:",
+                logician: "Logical issues with this argument:"
             };
             
-            let section = sectionHeaders[personality] || sectionHeaders.neutral;
+            let section = sectionHeaders[style] || sectionHeaders.socratic;
             
             counterpoints.forEach((point, i) => {
                 section += `\n${i+1}. ${capitalizeFirstLetter(point)}`;
                 
-                // Add personality-specific emphasis
-                if (personality === "devil") {
+                // Add style-specific emphasis
+                if (style === "devil") {
                     section += " - this is a critical oversight!";
-                } else if (personality === "passionate") {
-                    section += " - how can you ignore this?";
-                } else if (personality === "scholar") {
+                } else if (style === "scholar") {
                     section += " (see Smith et al., 2020)";
+                } else if (style === "philosopher") {
+                    section += " - consider the implications";
                 }
             });
             
             return section;
         }
 
-        function generateQuestion(analysis, personality) {
+        function generateQuestion(analysis, style) {
             const questions = {
-                neutral: [
-                    "What evidence most strongly supports your position?",
-                    "How would you respond to these counterpoints?",
-                    "Could there be exceptions to this view?"
-                ],
                 socratic: [
                     "What is the basis for that conclusion?",
                     "Could you define your terms more precisely?",
-                    "What would change your mind about this?"
+                    "What would change your mind about this?",
+                    "How does this align with other beliefs you hold?"
                 ],
                 devil: [
                     "How can you possibly ignore these issues?",
                     "Isn't it obvious that this position is flawed?",
-                    "Don't you see the problem with this reasoning?"
+                    "Don't you see the problem with this reasoning?",
+                    "What makes you so certain about this?"
                 ],
                 scholar: [
                     "How does this align with the existing research?",
                     "What methodology led you to this conclusion?",
-                    "Have you accounted for the peer-reviewed findings?"
+                    "Have you accounted for the peer-reviewed findings?",
+                    "What data supports this position?"
                 ],
-                passionate: [
-                    "How can you sleep at night believing this?",
-                    "Don't you care about these consequences?",
-                    "What kind of person would maintain this view?"
+                philosopher: [
+                    "What are the underlying assumptions here?",
+                    "How does this position account for different philosophical frameworks?",
+                    "What ethical principles inform this view?",
+                    "Is this position consistent with your other philosophical commitments?"
+                ],
+                logician: [
+                    "Can this argument be formulated in symbolic logic?",
+                    "What are the implicit premises in this reasoning?",
+                    "Does this position commit any logical fallacies?",
+                    "How would you formalize this argument?"
                 ]
             };
             
-            // Select based on personality
-            const options = questions[personality] || questions.neutral;
+            // Select based on style
+            const options = questions[style] || questions.socratic;
             
             // Adjust based on analysis
             if (analysis.similarity < 0.3 && analysis.topicDrift > 0.7) {
                 return "We seem to be drifting from the original topic. Should we refocus?";
             }
             
-            if (analysis.strength < 0.3) {
+            if (analysis.evidence < 0.3) {
                 return "What stronger evidence could you provide to support this claim?";
             }
             
             return randomFromArray(options);
         }
 
-        function generateClosing(personality) {
+        function generateClosing(style) {
             const closings = {
-                neutral: "I look forward to your response on these points.",
                 socratic: "Your answers to these questions would help clarify your position.",
                 devil: "These points seem to undermine your argument completely.",
                 scholar: "These academic perspectives merit serious consideration.",
-                passionate: "I can't believe anyone would maintain this view!"
+                philosopher: "These philosophical considerations deserve further reflection.",
+                logician: "These logical issues need resolution for your argument to be sound."
             };
             
-            return closings[personality] || closings.neutral;
+            return closings[style] || closings.socratic;
         }
 
-        function generateFallbackResponse(topic, argument, personality, intensity) {
+        function adjustResponseLength(response, lengthFactor) {
+            const sentences = response.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const targetSentences = Math.max(2, Math.min(8, Math.round(lengthFactor * 1.6)));
+            
+            if (sentences.length <= targetSentences) {
+                return response;
+            }
+            
+            // Trim to target length
+            return sentences.slice(0, targetSentences).join('. ') + '.';
+        }
+
+        function generateFallbackResponse(topic, argument, style, intensity) {
             // Simple fallback when ML features fail
-            const personalities = {
-                neutral: `Your perspective on "${topic.substring(0, 50)}" is interesting. Could you elaborate on "${argument.substring(0, 50)}"?`,
-                socratic: `What do you mean exactly by "${argument.substring(0, 50)}" when discussing "${topic.substring(0, 50)}"?`,
+            const styles = {
+                socratic: `Your perspective on "${topic.substring(0, 50)}" is interesting. Could you elaborate on "${argument.substring(0, 50)}"?`,
                 devil: `That's a questionable position on "${topic.substring(0, 50)}"! How do you justify "${argument.substring(0, 50)}"?`,
                 scholar: `The academic literature might challenge your view that "${argument.substring(0, 50)}" regarding "${topic.substring(0, 50)}".`,
-                passionate: `I strongly disagree with your take on "${topic.substring(0, 50)}"! "${argument.substring(0, 50)}" is completely wrong!`
+                philosopher: `Your position on "${topic.substring(0, 50)}" raises philosophical questions about "${argument.substring(0, 50)}".`,
+                logician: `Let's examine the logical structure of your argument about "${topic.substring(0, 50)}" and specifically "${argument.substring(0, 50)}".`
             };
             
-            return personalities[personality] || personalities.neutral;
+            return styles[style] || styles.socratic;
         }
 
         // ===== Debate History =====
@@ -1649,7 +2069,8 @@
             elements.debateHistory.innerHTML = "";
             
             if (debates.length === 0) {
-                elements.loadingHistory.textContent = "No past debates found";
+                elements.loadingHistory.textContent = "No past debates found. Start a new debate to build your history!";
+                elements.loadingHistory.classList.remove("hidden");
                 return;
             }
             
@@ -1658,10 +2079,23 @@
             debates.forEach(debate => {
                 const debateItem = document.createElement("div");
                 debateItem.classList.add("history-item");
+                
+                const duration = debate.duration ? 
+                    `${Math.floor(debate.duration / 60)}m ${debate.duration % 60}s` : 
+                    "Unknown duration";
+                    
                 debateItem.innerHTML = `
-                    <div class="history-item-title">${debate.topic}</div>
+                    <div class="flex justify-between items-start">
+                        <div class="history-item-title">${debate.topic}</div>
+                        <div class="text-xs text-tertiary">${duration}</div>
+                    </div>
                     <div class="history-item-preview">${debate.messages[0].text.substring(0, 100)}...</div>
-                    <small class="text-muted">${new Date(debate.date).toLocaleDateString()}</small>
+                    <div class="flex justify-between items-center mt-2">
+                        <small class="text-tertiary">${new Date(debate.date).toLocaleDateString()}</small>
+                        <span class="text-xs px-2 py-1 rounded-full" style="background: var(--color-bg); color: var(--color-text-secondary);">
+                            ${debate.style}
+                        </span>
+                    </div>
                 `;
                 
                 debateItem.addEventListener("click", () => {
@@ -1682,15 +2116,22 @@
             // Show debate in chat interface
             elements.debateTopic.value = debate.topic;
             elements.debateArgument.value = debate.messages.find(m => m.sender === "user")?.text || "";
+            elements.debateStyle.value = debate.style;
             
             // Clear and populate chat
             elements.chatMessages.innerHTML = "";
             debate.messages.forEach(message => {
-                addMessage(message.sender, message.text);
+                addMessage(message.sender, message.text, message.analysis);
             });
             
             // Show chat
             elements.debateChatContainer.classList.remove("hidden");
+            
+            // Update topic display
+            elements.debateTopicDisplay.textContent = debate.topic;
+            elements.debateTimer.textContent = debate.duration ? 
+                `${Math.floor(debate.duration / 60).toString().padStart(2, '0')}:${(debate.duration % 60).toString().padStart(2, '0')}` : 
+                "00:00";
             
             // Switch to debate tab
             switchTab("debate");
@@ -1699,13 +2140,245 @@
             elements.debateChatContainer.scrollIntoView({ behavior: "smooth" });
         }
 
+        // ===== Analytics =====
+        function initializeCharts() {
+            // Performance Chart
+            if (elements.performanceChart) {
+                const ctx = elements.performanceChart.getContext('2d');
+                charts.performance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: generateLast7Days(),
+                        datasets: [{
+                            label: 'Debate Quality Score',
+                            data: generatePerformanceData(),
+                            borderColor: 'rgb(99, 102, 241)',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Topics Chart
+            if (elements.topicsChart) {
+                const ctx = elements.topicsChart.getContext('2d');
+                const topicData = getTopicDistribution();
+                
+                charts.topics = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: topicData.labels,
+                        datasets: [{
+                            data: topicData.values,
+                            backgroundColor: [
+                                'rgba(99, 102, 241, 0.8)',
+                                'rgba(139, 92, 246, 0.8)',
+                                'rgba(168, 85, 247, 0.8)',
+                                'rgba(192, 38, 211, 0.8)',
+                                'rgba(219, 39, 119, 0.8)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Style Chart
+            if (elements.styleChart) {
+                const ctx = elements.styleChart.getContext('2d');
+                const styleData = getStyleDistribution();
+                
+                charts.style = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: styleData.labels,
+                        datasets: [{
+                            label: 'Usage Frequency',
+                            data: styleData.values,
+                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            borderColor: 'rgb(99, 102, 241)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function generateLast7Days() {
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                days.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            }
+            return days;
+        }
+
+        function generatePerformanceData() {
+            // Generate mock data for demonstration
+            return Array.from({length: 7}, () => Math.floor(Math.random() * 40) + 60);
+        }
+
+        function getTopicDistribution() {
+            // Extract topics from debates and count occurrences
+            const topicCounts = {};
+            debates.forEach(debate => {
+                const mainTopic = debate.topic.split(' ').slice(0, 3).join(' ');
+                topicCounts[mainTopic] = (topicCounts[mainTopic] || 0) + 1;
+            });
+            
+            // Get top 5 topics
+            const sortedTopics = Object.entries(topicCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            return {
+                labels: sortedTopics.map(([topic]) => topic),
+                values: sortedTopics.map(([, count]) => count)
+            };
+        }
+
+        function getStyleDistribution() {
+            // Count usage of each debate style
+            const styleCounts = {};
+            debates.forEach(debate => {
+                styleCounts[debate.style] = (styleCounts[debate.style] || 0) + 1;
+            });
+            
+            return {
+                labels: Object.keys(styleCounts),
+                values: Object.values(styleCounts)
+            };
+        }
+
+        function analyzeCurrentDebate() {
+            if (debateState.messages.length === 0) {
+                showNotification("No active debate to analyze", "error");
+                return;
+            }
+            
+            // Calculate debate metrics
+            const userMessages = debateState.messages.filter(m => m.sender === 'user');
+            const aiMessages = debateState.messages.filter(m => m.sender === 'ai');
+            
+            const metrics = {
+                exchangeCount: Math.min(userMessages.length, aiMessages.length),
+                userMessageLength: userMessages.reduce((sum, msg) => sum + msg.text.length, 0) / userMessages.length,
+                aiMessageLength: aiMessages.reduce((sum, msg) => sum + msg.text.length, 0) / aiMessages.length,
+                debateDuration: calculateDebateDuration(),
+                coherenceScore: debateState.analysis.coherence * 100,
+                complexityScore: debateState.analysis.complexity * 100
+            };
+            
+            // Show analysis in a modal or alert (simplified for this example)
+            const analysisText = `
+Debate Analysis:
+- Exchanges: ${metrics.exchangeCount}
+- Avg. User Message Length: ${Math.round(metrics.userMessageLength)} chars
+- Avg. AI Message Length: ${Math.round(metrics.aiMessageLength)} chars
+- Duration: ${Math.floor(metrics.debateDuration / 60)}m ${metrics.debateDuration % 60}s
+- Coherence: ${Math.round(metrics.coherenceScore)}%
+- Complexity: ${Math.round(metrics.complexityScore)}%
+            `;
+            
+            showNotification("Debate analysis completed. Check console for details.", "info");
+            console.log(analysisText);
+        }
+
+        // ===== Stats Management =====
+        function updateStatsDisplay() {
+            elements.totalDebates.textContent = stats.totalDebates;
+            
+            const avgDuration = stats.totalDebates > 0 ? 
+                Math.round(stats.totalDuration / stats.totalDebates / 60) : 0;
+            elements.avgDuration.textContent = `${avgDuration}m`;
+            
+            const successRate = stats.totalDebates > 0 ? 
+                Math.round((stats.successfulDebates / stats.totalDebates) * 100) : 0;
+            elements.successRate.textContent = `${successRate}%`;
+            
+            elements.topicsCovered.textContent = stats.topics.size;
+        }
+
+        function updateStats(debateData) {
+            stats.totalDebates++;
+            stats.totalDuration += debateData.duration;
+            
+            if (debateData.success) {
+                stats.successfulDebates++;
+            }
+            
+            // Add topic to set
+            stats.topics.add(debateData.topic);
+            
+            // Update style usage
+            stats.debateStyles[debateData.style] = (stats.debateStyles[debateData.style] || 0) + 1;
+            
+            // Add performance data point
+            const performanceScore = Math.floor(Math.random() * 20) + 70; // Mock score
+            stats.performance.push({
+                date: new Date().toISOString().split('T')[0],
+                score: performanceScore
+            });
+            
+            // Keep only last 30 performance entries
+            if (stats.performance.length > 30) {
+                stats.performance = stats.performance.slice(-30);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(STATS_KEY, JSON.stringify({
+                ...stats,
+                topics: Array.from(stats.topics) // Convert Set to Array for storage
+            }));
+            
+            // Update display
+            updateStatsDisplay();
+        }
+
         // ===== Settings =====
         function loadSettings() {
-            // Apply saved settings
+            // Apply saved theme
             if (settings.theme) {
                 document.documentElement.setAttribute("data-theme", settings.theme);
             }
             
+            // Apply saved settings to form elements
             if (settings.aiPersonality) {
                 elements.aiPersonality.value = settings.aiPersonality;
             }
@@ -1714,8 +2387,20 @@
                 elements.aiIntensity.value = settings.aiIntensity;
             }
             
+            if (settings.responseLength) {
+                elements.responseLength.value = settings.responseLength;
+            }
+            
             if (settings.userDebateStyle) {
                 elements.userDebateStyle.value = settings.userDebateStyle;
+            }
+            
+            if (settings.notifications !== undefined) {
+                elements.notifications.checked = settings.notifications;
+            }
+            
+            if (settings.autoSave !== undefined) {
+                elements.autoSave.checked = settings.autoSave;
             }
         }
 
@@ -1723,12 +2408,15 @@
             settings = {
                 aiPersonality: elements.aiPersonality.value,
                 aiIntensity: parseInt(elements.aiIntensity.value),
+                responseLength: parseInt(elements.responseLength.value),
                 userDebateStyle: elements.userDebateStyle.value,
+                notifications: elements.notifications.checked,
+                autoSave: elements.autoSave.checked,
                 theme: document.documentElement.getAttribute("data-theme") || "light"
             };
             
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-            showSuccess("Settings saved successfully");
+            showNotification("Settings saved successfully", "success");
         }
 
         // ===== Theme Management =====
@@ -1739,6 +2427,14 @@
             document.documentElement.setAttribute("data-theme", newTheme);
             settings.theme = newTheme;
             localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+            
+            // Update charts if they exist
+            if (charts.performance) {
+                charts.performance.destroy();
+                charts.topics.destroy();
+                charts.style.destroy();
+                initializeCharts();
+            }
         }
 
         // ===== Utility Functions =====
@@ -1750,50 +2446,50 @@
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        function showError(message) {
+        function showNotification(message, type = "info") {
+            // Create toast element
             const toast = document.createElement("div");
             toast.textContent = message;
             toast.style.position = "fixed";
             toast.style.bottom = "20px";
             toast.style.right = "20px";
-            toast.style.backgroundColor = "var(--color-error)";
-            toast.style.color = "white";
-            toast.style.padding = "var(--space-sm) var(--space-md)";
-            toast.style.borderRadius = "var(--radius-sm)";
-            toast.style.boxShadow = "var(--shadow-md)";
+            toast.style.padding = "var(--space-3) var(--space-4)";
+            toast.style.borderRadius = "var(--radius-md)";
+            toast.style.boxShadow = "var(--shadow-lg)";
             toast.style.zIndex = "1000";
-            toast.style.animation = "fadeIn 0.3s ease";
+            toast.style.animation = "messageSlideIn 0.3s ease-out";
+            toast.style.maxWidth = "300px";
+            toast.style.fontSize = "var(--text-sm)";
+            
+            // Set color based on type
+            switch (type) {
+                case "success":
+                    toast.style.backgroundColor = "var(--success)";
+                    toast.style.color = "white";
+                    break;
+                case "error":
+                    toast.style.backgroundColor = "var(--error)";
+                    toast.style.color = "white";
+                    break;
+                case "warning":
+                    toast.style.backgroundColor = "var(--warning)";
+                    toast.style.color = "white";
+                    break;
+                default:
+                    toast.style.backgroundColor = "var(--color-surface)";
+                    toast.style.color = "var(--color-text)";
+                    toast.style.border = "1px solid var(--color-border)";
+            }
             
             document.body.appendChild(toast);
             
+            // Remove after 3 seconds
             setTimeout(() => {
-                toast.style.animation = "fadeOut 0.3s ease";
+                toast.style.animation = "messageSlideIn 0.3s ease-out reverse";
                 setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
-
-        function showSuccess(message) {
-            const toast = document.createElement("div");
-            toast.textContent = message;
-            toast.style.position = "fixed";
-            toast.style.bottom = "20px";
-            toast.style.right = "20px";
-            toast.style.backgroundColor = "var(--color-success)";
-            toast.style.color = "white";
-            toast.style.padding = "var(--space-sm) var(--space-md)";
-            toast.style.borderRadius = "var(--radius-sm)";
-            toast.style.boxShadow = "var(--shadow-md)";
-            toast.style.zIndex = "1000";
-            toast.style.animation = "fadeIn 0.3s ease";
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.animation = "fadeOut 0.3s ease";
-                setTimeout(() => {
-                    document.body.removeChild(toast);
+                    if (document.body.contains(toast)) {
+                        document.body.removeChild(toast);
+                    }
                 }, 300);
             }, 3000);
         }
