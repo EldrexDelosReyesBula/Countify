@@ -393,16 +393,20 @@ class CountifyApp {
             <div class="drawer-section" style="text-decoration: none;">
                 <div class="drawer-section-title">ABOUT</div>
                 <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/about.html" target="_blank" rel="noopener noreferrer">
-                    <span class="material-icons drawer-item-icon">info</span>
+                    <span class="material-icons drawer-item-icon">domain</span>
                     <span>About countify+</span>
                 </a>
+                <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/faqs.html" target="_blank" rel="noopener noreferrer">
+                    <span class="material-icons drawer-item-icon">question_answer</span>
+                    <span>Support FAQs</span>
+                </a>
                 <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/privacy.html" target="_blank" rel="noopener noreferrer">
-                    <span class="material-icons drawer-item-icon">lock</span>
+                    <span class="material-icons drawer-item-icon">security</span>
                     <span>Privacy Policy</span>
                 </a>
 
                 <a style="text-decoration: none; color: var(--text-secondary);" class="drawer-item" href="/docs/terms.html" target="_blank" rel="noopener noreferrer">
-                    <span class="material-icons drawer-item-icon">description</span>
+                    <span class="material-icons drawer-item-icon">article</span>
                     <span>Terms of Service</span>
                 </a>
 
