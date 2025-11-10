@@ -1,150 +1,240 @@
+// Main App Class
+class CountifyApp {
+    constructor() {
+        this.state = {
+            activities: [],
+            currentActivityId: null,
+            isEditing: false,
+            pendingAction: null,
+            activeView: 'dashboard',
+            searchQuery: '',
+            selectedFolder: 'all',
+            theme: 'system',
+            font: 'Poppins',
+            textSize: 'normal',
+            isSearching: false,
+            showSearchResults: false,
+            voiceRecognition: null,
+            isVoiceModeActive: false,
+            isVoiceListening: false,
+            historyStack: {},
+            futureStack: {},
+            lastSaveTime: null,
+            autoSaveInterval: null,
+            visualizerInterval: null,
+            sharedText: null,
+            isFullscreenSearch: false,
+            lanlinkEnabled: false, // Disabled by default
+            intelligentPunctuation: true,
+            clipboardDetection: true, // New setting for clipboard detection
+            clipboardProcessedTexts: new Set() // Track processed clipboard content
+        };
 
-        // Main App Class
-        class CountifyApp {
-            constructor() {
-                this.state = {
-                    activities: [],
-                    currentActivityId: null,
-                    isEditing: false,
-                    pendingAction: null,
-                    activeView: 'dashboard',
-                    searchQuery: '',
-                    selectedFolder: 'all',
-                    theme: 'system',
-                    font: 'Poppins',
-                    textSize: 'normal',
-                    isSearching: false,
-                    showSearchResults: false,
-                    voiceRecognition: null,
-                    isVoiceModeActive: false,
-                    isVoiceListening: false,
-                    historyStack: {},
-                    futureStack: {},
-                    lastSaveTime: null,
-                    autoSaveInterval: null,
-                    visualizerInterval: null,
-                    sharedText: null,
-                    isFullscreenSearch: false,
-                    lanlinkEnabled: true,
-                    intelligentPunctuation: true
-                };
+        this.views = ['dashboard', 'today', 'yesterday', 'deleted', 'archived', 'history'];
+        this.init();
+    }
 
-                this.views = ['dashboard', 'today', 'yesterday', 'deleted', 'archived', 'history'];
-                this.init();
-            }
+    async init() {
+        this.renderAppShell();
+        this.setupEventListeners();
+        await this.loadSettings();
+        await this.loadActivities();
+        this.renderView();
+        this.watchSystemTheme();
+        this.setupRippleEffects();
+        this.checkForSharedText();
+        this.registerServiceWorker();
+        this.initializeHistoryStack();
+        this.startAutoSave();
+    }
 
-            async init() {
-                this.renderAppShell();
-                this.setupEventListeners();
-                await this.loadSettings();
-                await this.loadActivities();
-                this.renderView();
-                this.watchSystemTheme();
-                this.setupRippleEffects();
-                this.checkForSharedText();
-                this.registerServiceWorker();
-                this.initializeHistoryStack();
-                this.startAutoSave();
-            }
+    checkForSharedText() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedText = urlParams.get('sharedText');
 
-            checkForSharedText() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const sharedText = urlParams.get('sharedText');
+        if (sharedText) {
+            this.state.sharedText = decodeURIComponent(sharedText);
+            this.openEditorWithSharedText();
 
-                if (sharedText) {
-                    this.state.sharedText = decodeURIComponent(sharedText);
-                    this.openEditorWithSharedText();
+            const newUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        }
 
-                    const newUrl = window.location.origin + window.location.pathname;
-                    window.history.replaceState({}, document.title, newUrl);
-                }
+        if (this.state.clipboardDetection) {
+            this.checkClipboardContent();
+        }
+    }
 
-                this.checkClipboardContent();
-            }
-
-            async checkClipboardContent() {
-                try {
-                    if (navigator.clipboard && navigator.clipboard.readText) {
-                        const clipboardText = await navigator.clipboard.readText();
-                        if (clipboardText && clipboardText.trim().length > 10) {
-                            setTimeout(() => {
-                                this.showConfirmModal(
-                                    'Clipboard Content Detected',
-                                    'Would you like to create a new activity from your clipboard content?',
-                                    () => {
-                                        this.state.sharedText = clipboardText;
-                                        this.openEditorWithSharedText();
-                                    }
-                                );
-                            }, 1000);
-                        }
-                    }
-                } catch (error) {
-                    console.log('Clipboard access not available');
+    async checkClipboardContent() {
+        try {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                const clipboardText = await navigator.clipboard.readText();
+                if (this.shouldShowClipboardBanner(clipboardText)) {
+                    setTimeout(() => {
+                        this.showClipboardBanner(clipboardText);
+                    }, 1000);
                 }
             }
+        } catch (error) {
+            console.log('Clipboard access not available or denied');
+        }
+    }
 
-            openEditorWithSharedText() {
-                if (!this.state.sharedText) return;
+    shouldShowClipboardBanner(text) {
+        if (!text || !text.trim() || text.trim().length < 10) {
+            return false;
+        }
 
-                this.openEditor();
-                setTimeout(() => {
-                    const editor = document.getElementById('editorContent');
-                    if (editor) {
-                        editor.value = this.state.sharedText;
-                        this.updateTextAnalytics();
-                        this.pushToHistoryStack();
+        // Check if this text is already in activities
+        const isAlreadyAdded = this.state.activities.some(activity => 
+            activity.content.includes(text.trim()) || 
+            text.trim().includes(activity.content)
+        );
 
-                        const titleInput = document.getElementById('editorTitle');
-                        const firstLine = this.state.sharedText.split('\n')[0].substring(0, 50);
-                        if (titleInput && firstLine.trim()) {
-                            titleInput.value = firstLine + (firstLine.length === 50 ? '...' : '');
-                        }
-                    }
-                }, 100);
+        // Check if we've already processed this text
+        const textHash = this.hashString(text.trim());
+        if (this.state.clipboardProcessedTexts.has(textHash)) {
+            return false;
+        }
+
+        return !isAlreadyAdded;
+    }
+
+    hashString(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString(36);
+    }
+
+    showClipboardBanner(clipboardText) {
+        // Remove existing banner if any
+        const existingBanner = document.getElementById('clipboardBanner');
+        if (existingBanner) {
+            existingBanner.remove();
+        }
+
+        const banner = document.createElement('div');
+        banner.id = 'clipboardBanner';
+        banner.className = 'clipboard-banner glass';
+        banner.innerHTML = `
+            <div class="clipboard-banner-content">
+                <span class="material-icons">content_paste</span>
+                <div class="clipboard-banner-text">
+                    <strong>Clipboard content detected</strong>
+                    <span>Would you like to create a new activity?</span>
+                </div>
+            </div>
+            <div class="clipboard-banner-actions">
+                <button class="btn btn-outline btn-sm" id="clipboardDismiss">Dismiss</button>
+                <button class="btn btn-primary btn-sm" id="clipboardCreate">Create Activity</button>
+            </div>
+        `;
+
+        document.body.appendChild(banner);
+
+        // Animate in
+        setTimeout(() => banner.classList.add('visible'), 100);
+
+        // Event listeners
+        document.getElementById('clipboardCreate').addEventListener('click', () => {
+            this.state.sharedText = clipboardText;
+            this.openEditorWithSharedText();
+            this.markClipboardAsProcessed(clipboardText);
+            banner.remove();
+        });
+
+        document.getElementById('clipboardDismiss').addEventListener('click', () => {
+            this.markClipboardAsProcessed(clipboardText);
+            banner.remove();
+        });
+
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (document.body.contains(banner)) {
+                this.markClipboardAsProcessed(clipboardText);
+                banner.remove();
             }
+        }, 10000);
+    }
 
-            initializeHistoryStack() {
-                this.state.historyStack = {};
-                this.state.futureStack = {};
-            }
+    markClipboardAsProcessed(text) {
+        const textHash = this.hashString(text.trim());
+        this.state.clipboardProcessedTexts.add(textHash);
+        
+        // Clean up old hashes (keep only last 100)
+        if (this.state.clipboardProcessedTexts.size > 100) {
+            const array = Array.from(this.state.clipboardProcessedTexts);
+            this.state.clipboardProcessedTexts = new Set(array.slice(-50));
+        }
+    }
 
-            startAutoSave() {
-                if (this.state.autoSaveInterval) {
-                    clearInterval(this.state.autoSaveInterval);
+    openEditorWithSharedText() {
+        if (!this.state.sharedText) return;
+
+        this.openEditor();
+        setTimeout(() => {
+            const editor = document.getElementById('editorContent');
+            if (editor) {
+                editor.value = this.state.sharedText;
+                this.updateTextAnalytics();
+                this.pushToHistoryStack();
+
+                const titleInput = document.getElementById('editorTitle');
+                const firstLine = this.state.sharedText.split('\n')[0].substring(0, 50);
+                if (titleInput && firstLine.trim()) {
+                    titleInput.value = firstLine + (firstLine.length === 50 ? '...' : '');
                 }
 
-                this.state.autoSaveInterval = setInterval(() => {
-                    if (this.state.currentActivityId && document.getElementById('editorContent')) {
-                        this.saveActivity(true);
-                    }
-                }, 3000);
+                this.markClipboardAsProcessed(this.state.sharedText);
             }
+        }, 100);
+    }
 
-            showAutoSaveIndicator() {
-                const indicator = document.getElementById('autoSaveIndicator');
-                if (!indicator) return;
+    initializeHistoryStack() {
+        this.state.historyStack = {};
+        this.state.futureStack = {};
+    }
 
-                indicator.classList.add('visible');
-                setTimeout(() => {
-                    indicator.classList.remove('visible');
-                }, 2000);
+    startAutoSave() {
+        if (this.state.autoSaveInterval) {
+            clearInterval(this.state.autoSaveInterval);
+        }
+
+        this.state.autoSaveInterval = setInterval(() => {
+            if (this.state.currentActivityId && document.getElementById('editorContent')) {
+                this.saveActivity(true);
             }
+        }, 3000);
+    }
 
-            registerServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', () => {
-                        navigator.serviceWorker.register('/sw.js').then(registration => {
-                            console.log('ServiceWorker registration successful');
-                        }).catch(err => {
-                            console.log('ServiceWorker registration failed: ', err);
-                        });
-                    });
-                }
-            }
+    showAutoSaveIndicator() {
+        const indicator = document.getElementById('autoSaveIndicator');
+        if (!indicator) return;
 
-            renderAppShell() {
-                document.querySelector('.app').innerHTML = `
+        indicator.classList.add('visible');
+        setTimeout(() => {
+            indicator.classList.remove('visible');
+        }, 2000);
+    }
+
+    registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    }
+
+    renderAppShell() {
+        document.querySelector('.app').innerHTML = `
             <header class="header">
                 <button id="drawerToggle" class="btn-icon haptic-link" aria-label="Open menu" style="border: none;">
                     <span class="material-icons">menu</span>
@@ -213,12 +303,12 @@
 
             <div id="autoSaveIndicator" class="auto-save-indicator">Saved</div>
         `;
-            }
+    }
 
-            renderDrawerContent() {
-                const isDark = this.state.theme === 'dark' || (this.state.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    renderDrawerContent() {
+        const isDark = this.state.theme === 'dark' || (this.state.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-                return `
+        return `
             <div class="drawer-header">
                 <h2 class="drawer-title">Countify+</h2>
                 <button id="drawerClose" class="drawer-close" aria-label="Close menu">
@@ -275,6 +365,14 @@
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+                <div class="drawer-item" id="clipboardToggle">
+                    <span class="material-icons drawer-item-icon">content_paste</span>
+                    <span>Clipboard Detection</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="clipboardToggleCheckbox" ${this.state.clipboardDetection ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
                 <div class="drawer-item" id="lanlinkToggle">
                     <span class="material-icons drawer-item-icon">link</span>
                     <span>LanLink <span class="beta-badge">Beta</span></span>
@@ -321,10 +419,10 @@
                 </div>
             </div>
         `;
-            }
+    }
 
-            renderEditorContent() {
-                return `
+    renderEditorContent() {
+        return `
             <div class="editor-header">
                 <div class="editor-header-left">
                     <button id="editorBack" class="editor-back-btn" style="border: 2px solid #919191; border-radius: 20px;">
@@ -438,7 +536,7 @@
                     <span class="material-icons">text_format</span>
                     <span>Sentence case</span>
                 </div>
-                <div class="more-options-item" data-action="removeSpaces">
+                <div class="more-options-item" data-action="removeExtraSpaces">
                     <span class="material-icons">space_bar</span>
                     <span>Remove Extra Spaces</span>
                 </div>
@@ -468,10 +566,10 @@
                 </div>
             </div>
         `;
-            }
+    }
 
-            renderVoiceModeSheet() {
-                return `
+    renderVoiceModeSheet() {
+        return `
             <div class="voice-mode-sheet-content">
                 <div class="voice-mode-header">
                     <h3>Voice Mode</h3>
@@ -507,11 +605,11 @@
                 </div>
             </div>
         `;
-            }
+    }
 
-            renderModal(type) {
-                if (type === 'confirm') {
-                    return `
+    renderModal(type) {
+        if (type === 'confirm') {
+            return `
                 <div class="modal-content glass">
                     <h3 class="modal-title" id="confirmModalTitle">Confirm Action</h3>
                     <p class="modal-message" id="confirmModalMessage">Are you sure you want to perform this action?</p>
@@ -521,8 +619,8 @@
                     </div>
                 </div>
             `;
-                } else {
-                    return `
+        } else {
+            return `
                 <div class="modal-content glass">
                     <h3 class="modal-title" id="alertModalTitle">Alert</h3>
                     <p class="modal-message" id="alertModalMessage">This is an alert message.</p>
@@ -531,48 +629,48 @@
                     </div>
                 </div>
             `;
-                }
-            }
+        }
+    }
 
-            renderView() {
-                const mainContent = document.getElementById('mainContent');
-                if (!mainContent) return;
+    renderView() {
+        const mainContent = document.getElementById('mainContent');
+        if (!mainContent) return;
 
-                if (this.state.isSearching) {
-                    mainContent.innerHTML = this.renderSearchResults();
-                    return;
-                }
+        if (this.state.isSearching) {
+            mainContent.innerHTML = this.renderSearchResults();
+            return;
+        }
 
-                switch (this.state.activeView) {
-                    case 'dashboard':
-                        mainContent.innerHTML = this.renderDashboard();
-                        break;
-                    case 'today':
-                        mainContent.innerHTML = this.renderActivitiesView('today');
-                        break;
-                    case 'yesterday':
-                        mainContent.innerHTML = this.renderActivitiesView('yesterday');
-                        break;
-                    case 'deleted':
-                        mainContent.innerHTML = this.renderActivitiesView('deleted');
-                        break;
-                    case 'archived':
-                        mainContent.innerHTML = this.renderActivitiesView('archived');
-                        break;
-                    case 'history':
-                        mainContent.innerHTML = this.renderHistoryView();
-                        break;
-                    default:
-                        mainContent.innerHTML = this.renderDashboard();
-                }
-            }
+        switch (this.state.activeView) {
+            case 'dashboard':
+                mainContent.innerHTML = this.renderDashboard();
+                break;
+            case 'today':
+                mainContent.innerHTML = this.renderActivitiesView('today');
+                break;
+            case 'yesterday':
+                mainContent.innerHTML = this.renderActivitiesView('yesterday');
+                break;
+            case 'deleted':
+                mainContent.innerHTML = this.renderActivitiesView('deleted');
+                break;
+            case 'archived':
+                mainContent.innerHTML = this.renderActivitiesView('archived');
+                break;
+            case 'history':
+                mainContent.innerHTML = this.renderHistoryView();
+                break;
+            default:
+                mainContent.innerHTML = this.renderDashboard();
+        }
+    }
 
-            renderDashboard() {
-                const filteredActivities = this.filterActivities();
-                const activitiesToShow = filteredActivities.slice(0, 8);
+    renderDashboard() {
+        const filteredActivities = this.filterActivities();
+        const activitiesToShow = filteredActivities.slice(0, 8);
 
-                if (activitiesToShow.length === 0) {
-                    return `
+        if (activitiesToShow.length === 0) {
+            return `
                 <div class="dashboard-header">
                     <h2 class="page-title">Dashboard</h2>
                 </div>
@@ -588,18 +686,18 @@
                     </button>
                 </div>
             `;
-                }
+        }
 
-                let cardsHTML = '';
-                activitiesToShow.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+        let cardsHTML = '';
+        activitiesToShow.forEach((activity, index) => {
+            const previewText = activity.content.length > 100 ?
+                activity.content.substring(0, 100) + '...' :
+                activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+            const cardColorClass = `card-color-${(index % 5) + 1}`;
+            const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+            cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div class="activity-card-header">
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -611,9 +709,9 @@
                     </div>
                 </div>
             `;
-                });
+        });
 
-                return `
+        return `
             <div class="dashboard-header">
                 <h2 class="page-title">Dashboard</h2>
             </div>
@@ -621,56 +719,56 @@
                 ${cardsHTML}
             </div>
         `;
+    }
+
+    renderHistoryView() {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const recentActivities = this.state.activities.filter(activity => {
+            const activityDate = new Date(activity.updatedAt);
+            return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
+        });
+
+        const wordsByDate = {};
+        recentActivities.forEach(activity => {
+            const date = new Date(activity.updatedAt).toDateString();
+            if (!wordsByDate[date]) {
+                wordsByDate[date] = 0;
             }
+            wordsByDate[date] += this.countWords(activity.content);
+        });
 
-            renderHistoryView() {
-                const oneWeekAgo = new Date();
-                oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const dates = [];
+        const wordCounts = [];
+        const maxWords = Math.max(...Object.values(wordsByDate), 0) || 1;
 
-                const recentActivities = this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= oneWeekAgo && !activity.deleted && !activity.archived;
-                });
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toDateString();
+            dates.push(dateStr);
+            wordCounts.push(wordsByDate[dateStr] || 0);
+        }
 
-                const wordsByDate = {};
-                recentActivities.forEach(activity => {
-                    const date = new Date(activity.updatedAt).toDateString();
-                    if (!wordsByDate[date]) {
-                        wordsByDate[date] = 0;
-                    }
-                    wordsByDate[date] += this.countWords(activity.content);
-                });
-
-                const dates = [];
-                const wordCounts = [];
-                const maxWords = Math.max(...Object.values(wordsByDate), 0) || 1;
-
-                for (let i = 6; i >= 0; i--) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - i);
-                    const dateStr = date.toDateString();
-                    dates.push(dateStr);
-                    wordCounts.push(wordsByDate[dateStr] || 0);
-                }
-
-                let barsHTML = '';
-                dates.forEach((date, index) => {
-                    const height = (wordCounts[index] / maxWords) * 100;
-                    barsHTML += `
+        let barsHTML = '';
+        dates.forEach((date, index) => {
+            const height = (wordCounts[index] / maxWords) * 100;
+            barsHTML += `
                 <div class="history-bar" style="height: ${height}%" data-count="${wordCounts[index]} words">
                     <div class="history-date">${new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                 </div>
             `;
-                });
+        });
 
-                const totalActivities = this.state.activities.filter(a => !a.deleted && !a.archived).length;
-                const totalWords = this.getTotalWords();
-                const avgWordsPerActivity = totalActivities > 0 ? Math.round(totalWords / totalActivities) : 0;
-                const longestActivity = this.getLongestActivity();
-                const mostProductiveDay = this.getMostProductiveDay();
-                const writingStreak = this.getWritingStreak();
+        const totalActivities = this.state.activities.filter(a => !a.deleted && !a.archived).length;
+        const totalWords = this.getTotalWords();
+        const avgWordsPerActivity = totalActivities > 0 ? Math.round(totalWords / totalActivities) : 0;
+        const longestActivity = this.getLongestActivity();
+        const mostProductiveDay = this.getMostProductiveDay();
+        const writingStreak = this.getWritingStreak();
 
-                return `
+        return `
             <div class="history-container">
                 <h2 class="page-title">Writing History</h2>
                 
@@ -749,50 +847,50 @@
                 </div>
             </div>
         `;
+    }
+
+    renderActivitiesView(viewType) {
+        let title = '';
+        let activities = [];
+
+        switch (viewType) {
+            case 'today':
+                title = "Today's Activities";
+                activities = this.getTodaysActivities();
+                break;
+            case 'yesterday':
+                title = "Yesterday's Activities";
+                activities = this.getYesterdaysActivities();
+                break;
+            case 'deleted':
+                title = "Deleted Activities";
+                activities = this.state.activities.filter(a => a.deleted);
+                break;
+            case 'archived':
+                title = "Archived Activities";
+                activities = this.state.activities.filter(a => a.archived);
+                break;
+        }
+
+        if (activities.length === 0) {
+            let message = '';
+            let icon = 'info';
+
+            if (viewType === 'today') {
+                message = "You haven't created any activities today.";
+                icon = "today";
+            } else if (viewType === 'yesterday') {
+                message = "No activities were created yesterday.";
+                icon = "event";
+            } else if (viewType === 'deleted') {
+                message = "No activities in the trash.";
+                icon = "delete";
+            } else if (viewType === 'archived') {
+                message = "No archived activities.";
+                icon = "archive";
             }
 
-            renderActivitiesView(viewType) {
-                let title = '';
-                let activities = [];
-
-                switch (viewType) {
-                    case 'today':
-                        title = "Today's Activities";
-                        activities = this.getTodaysActivities();
-                        break;
-                    case 'yesterday':
-                        title = "Yesterday's Activities";
-                        activities = this.getYesterdaysActivities();
-                        break;
-                    case 'deleted':
-                        title = "Deleted Activities";
-                        activities = this.state.activities.filter(a => a.deleted);
-                        break;
-                    case 'archived':
-                        title = "Archived Activities";
-                        activities = this.state.activities.filter(a => a.archived);
-                        break;
-                }
-
-                if (activities.length === 0) {
-                    let message = '';
-                    let icon = 'info';
-
-                    if (viewType === 'today') {
-                        message = "You haven't created any activities today.";
-                        icon = "today";
-                    } else if (viewType === 'yesterday') {
-                        message = "No activities were created yesterday.";
-                        icon = "event";
-                    } else if (viewType === 'deleted') {
-                        message = "No activities in the trash.";
-                        icon = "delete";
-                    } else if (viewType === 'archived') {
-                        message = "No archived activities.";
-                        icon = "archive";
-                    }
-
-                    return `
+            return `
                 <h2 class="page-title">${title}</h2>
                 <div class="empty-state">
                     <div class="empty-state-icon">
@@ -808,18 +906,18 @@
                     ` : ''}
                 </div>
             `;
-                }
+        }
 
-                let cardsHTML = '';
-                activities.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+        let cardsHTML = '';
+        activities.forEach((activity, index) => {
+            const previewText = activity.content.length > 100 ?
+                activity.content.substring(0, 100) + '...' :
+                activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+            const cardColorClass = `card-color-${(index % 5) + 1}`;
+            const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+            cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div class="activity-card-header">
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -831,21 +929,21 @@
                     </div>
                 </div>
             `;
-                });
+        });
 
-                return `
+        return `
             <h2 class="page-title">${title}</h2>
             <div class="dashboard-grid">
                 ${cardsHTML}
             </div>
         `;
-            }
+    }
 
-            renderSearchResults() {
-                const filteredActivities = this.filterActivities();
+    renderSearchResults() {
+        const filteredActivities = this.filterActivities();
 
-                if (filteredActivities.length === 0) {
-                    return `
+        if (filteredActivities.length === 0) {
+            return `
                 <div class="search-results-header">
                     <h2 class="page-title">Search Results</h2>
                 </div>
@@ -857,18 +955,18 @@
                     <p class="empty-state-description">No activities match your search for "${this.state.searchQuery}"</p>
                 </div>
             `;
-                }
+        }
 
-                let cardsHTML = '';
-                filteredActivities.forEach((activity, index) => {
-                    const previewText = activity.content.length > 100 ?
-                        activity.content.substring(0, 100) + '...' :
-                        activity.content;
+        let cardsHTML = '';
+        filteredActivities.forEach((activity, index) => {
+            const previewText = activity.content.length > 100 ?
+                activity.content.substring(0, 100) + '...' :
+                activity.content;
 
-                    const cardColorClass = `card-color-${(index % 5) + 1}`;
-                    const animationDelay = `delay-${index * 100}`;
+            const cardColorClass = `card-color-${(index % 5) + 1}`;
+            const animationDelay = `delay-${index * 100}`;
 
-                    cardsHTML += `
+            cardsHTML += `
                 <div class="activity-card glass ${cardColorClass} animate-slide ${animationDelay}" data-id="${activity.id}" tabindex="0" aria-label="${activity.title}, ${this.countWords(activity.content)} words, last updated ${this.formatDate(activity.updatedAt)}">
                     <div class="activity-card-header">
                         <h3 class="activity-card-title">${activity.title}</h3>
@@ -880,9 +978,9 @@
                     </div>
                 </div>
             `;
-                });
+        });
 
-                return `
+        return `
             <div class="search-results-header">
                 <h2 class="page-title">Search Results</h2>
                 <div class="search-results-count">${filteredActivities.length} results for <span class="search-query">"${this.state.searchQuery}"</span></div>
@@ -891,389 +989,404 @@
                 ${cardsHTML}
             </div>
         `;
+    }
+
+    setupEventListeners() {
+        // Drawer toggle
+        document.getElementById('drawerToggle')?.addEventListener('click', () => this.toggleDrawer());
+        document.getElementById('drawerClose')?.addEventListener('click', () => this.toggleDrawer());
+        document.getElementById('drawerOverlay')?.addEventListener('click', () => this.toggleDrawer());
+
+        // Search functionality
+        document.getElementById('searchToggle')?.addEventListener('click', () => this.openFullscreenSearch());
+        document.getElementById('drawerSearchTrigger')?.addEventListener('click', () => {
+            this.openFullscreenSearch();
+            this.toggleDrawer();
+        });
+        document.getElementById('searchBack')?.addEventListener('click', () => this.closeFullscreenSearch());
+        document.getElementById('clearSearch')?.addEventListener('click', () => {
+            document.getElementById('fullscreenSearchInput').value = '';
+            this.state.searchQuery = '';
+            this.updateFullscreenSearch();
+        });
+
+        // Fullscreen search input
+        const fullscreenSearchInput = document.getElementById('fullscreenSearchInput');
+        fullscreenSearchInput?.addEventListener('input', (e) => {
+            this.state.searchQuery = e.target.value.toLowerCase();
+            this.updateFullscreenSearch();
+        });
+
+        fullscreenSearchInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeFullscreenSearch();
+            }
+        });
+
+        // Navigation items
+        document.getElementById('dashboardView')?.addEventListener('click', () => {
+            this.state.activeView = 'dashboard';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        document.getElementById('todaysActivities')?.addEventListener('click', () => {
+            this.state.activeView = 'today';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        document.getElementById('yesterdaysActivities')?.addEventListener('click', () => {
+            this.state.activeView = 'yesterday';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        document.getElementById('writingHistory')?.addEventListener('click', () => {
+            this.state.activeView = 'history';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        document.getElementById('deletedActivities')?.addEventListener('click', () => {
+            this.state.activeView = 'deleted';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        document.getElementById('archivedActivities')?.addEventListener('click', () => {
+            this.state.activeView = 'archived';
+            this.state.isSearching = false;
+            this.renderView();
+            this.updateActiveNav();
+            this.toggleDrawer();
+        });
+
+        // New activity
+        document.getElementById('newActivityBtn')?.addEventListener('click', () => this.openEditor());
+        document.getElementById('fab')?.addEventListener('click', () => this.openEditor());
+
+        // Editor events
+        document.getElementById('editorBack')?.addEventListener('click', () => {
+            this.closeEditor();
+        });
+
+        // More Options button
+        document.getElementById('editorMoreOptions')?.addEventListener('click', (e) => {
+            this.toggleMoreOptionsMenu(e);
+        });
+
+        // More Options menu items
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.more-options-item')) {
+                const action = e.target.closest('.more-options-item').dataset.action;
+                this.handleMoreOptionsAction(action);
+                this.hideMoreOptionsMenu();
+            }
+        });
+
+        // Editor enhancements
+        document.getElementById('editorStatsToggle')?.addEventListener('click', () => {
+            this.toggleEditorStats();
+        });
+
+        // Real-time updates for editor content
+        const editorContent = document.getElementById('editorContent');
+        if (editorContent) {
+            editorContent.addEventListener('input', () => {
+                this.updateTextAnalytics();
+                this.pushToHistoryStack();
+                this.autoFormatText();
+            });
+
+            editorContent.addEventListener('paste', (e) => {
+                const text = e.clipboardData.getData('text/plain');
+                e.preventDefault();
+
+                const start = editorContent.selectionStart;
+                const end = editorContent.selectionEnd;
+                editorContent.value = editorContent.value.substring(0, start) + text + editorContent.value.substring(end);
+
+                editorContent.selectionStart = editorContent.selectionEnd = start + text.length;
+
+                setTimeout(() => {
+                    this.updateTextAnalytics();
+                    this.pushToHistoryStack();
+                }, 10);
+            });
+        }
+
+        // Undo/Redo buttons
+        document.getElementById('undoBtn')?.addEventListener('click', () => this.undo());
+        document.getElementById('redoBtn')?.addEventListener('click', () => this.redo());
+
+        // Voice input
+        document.getElementById('voiceInputBtn')?.addEventListener('click', () => {
+            this.toggleVoiceMode();
+        });
+
+        // Voice mode controls
+        document.getElementById('voiceStart')?.addEventListener('click', () => this.startVoiceInput());
+        document.getElementById('voicePause')?.addEventListener('click', () => this.toggleVoicePause());
+        document.getElementById('voiceStop')?.addEventListener('click', () => this.stopVoiceInput());
+        document.getElementById('voiceSpace')?.addEventListener('click', () => this.insertSpace());
+        document.getElementById('closeVoiceMode')?.addEventListener('click', () => this.closeVoiceMode());
+
+        // Modal events
+        document.getElementById('confirmModalCancel')?.addEventListener('click', () => {
+            document.getElementById('confirmModal').classList.remove('modal-open');
+        });
+
+        document.getElementById('confirmModalConfirm')?.addEventListener('click', () => {
+            if (this.state.pendingAction) {
+                this.state.pendingAction();
+                this.state.pendingAction = null;
+            }
+            document.getElementById('confirmModal').classList.remove('modal-open');
+        });
+
+        document.getElementById('alertModalOk')?.addEventListener('click', () => {
+            document.getElementById('alertModal').classList.remove('modal-open');
+        });
+
+        // Settings toggles
+        document.getElementById('themeToggleCheckbox')?.addEventListener('change', (e) => {
+            this.state.theme = e.target.checked ? 'dark' : 'light';
+            this.applyTheme(this.state.theme);
+            this.saveSettings();
+        });
+
+        document.getElementById('clipboardToggleCheckbox')?.addEventListener('change', (e) => {
+            this.state.clipboardDetection = e.target.checked;
+            this.saveSettings();
+            
+            if (this.state.clipboardDetection) {
+                this.checkClipboardContent();
+            } else {
+                // Remove clipboard banner if visible
+                const banner = document.getElementById('clipboardBanner');
+                if (banner) {
+                    banner.remove();
+                }
+            }
+        });
+
+        document.getElementById('lanlinkToggleCheckbox')?.addEventListener('change', (e) => {
+            this.state.lanlinkEnabled = e.target.checked;
+            this.saveSettings();
+            this.updateMoreOptionsMenu();
+        });
+
+        document.getElementById('punctuationToggleCheckbox')?.addEventListener('change', (e) => {
+            this.state.intelligentPunctuation = e.target.checked;
+            this.saveSettings();
+        });
+
+        // Empty state buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'createFirstActivity' || e.target.closest('#createFirstActivity')) {
+                this.openEditor();
             }
 
-            setupEventListeners() {
-                // Drawer toggle
-                document.getElementById('drawerToggle')?.addEventListener('click', () => this.toggleDrawer());
-                document.getElementById('drawerClose')?.addEventListener('click', () => this.toggleDrawer());
-                document.getElementById('drawerOverlay')?.addEventListener('click', () => this.toggleDrawer());
+            if (e.target.id === 'createTodayActivity' || e.target.closest('#createTodayActivity')) {
+                this.openEditor();
+            }
+        });
 
-                // Search functionality
-                document.getElementById('searchToggle')?.addEventListener('click', () => this.openFullscreenSearch());
-                document.getElementById('drawerSearchTrigger')?.addEventListener('click', () => {
-                    this.openFullscreenSearch();
-                    this.toggleDrawer();
-                });
-                document.getElementById('searchBack')?.addEventListener('click', () => this.closeFullscreenSearch());
-                document.getElementById('clearSearch')?.addEventListener('click', () => {
-                    document.getElementById('fullscreenSearchInput').value = '';
-                    this.state.searchQuery = '';
-                    this.updateFullscreenSearch();
-                });
-
-                // Fullscreen search input
-                const fullscreenSearchInput = document.getElementById('fullscreenSearchInput');
-                fullscreenSearchInput?.addEventListener('input', (e) => {
-                    this.state.searchQuery = e.target.value.toLowerCase();
-                    this.updateFullscreenSearch();
-                });
-
-                fullscreenSearchInput?.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        this.closeFullscreenSearch();
-                    }
-                });
-
-                // Navigation items
-                document.getElementById('dashboardView')?.addEventListener('click', () => {
-                    this.state.activeView = 'dashboard';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                document.getElementById('todaysActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'today';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                document.getElementById('yesterdaysActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'yesterday';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                document.getElementById('writingHistory')?.addEventListener('click', () => {
-                    this.state.activeView = 'history';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                document.getElementById('deletedActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'deleted';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                document.getElementById('archivedActivities')?.addEventListener('click', () => {
-                    this.state.activeView = 'archived';
-                    this.state.isSearching = false;
-                    this.renderView();
-                    this.updateActiveNav();
-                    this.toggleDrawer();
-                });
-
-                // New activity
-                document.getElementById('newActivityBtn')?.addEventListener('click', () => this.openEditor());
-                document.getElementById('fab')?.addEventListener('click', () => this.openEditor());
-
-                // Editor events
-                document.getElementById('editorBack')?.addEventListener('click', () => {
-                    this.closeEditor();
-                });
-
-                // More Options button
-                document.getElementById('editorMoreOptions')?.addEventListener('click', (e) => {
-                    this.toggleMoreOptionsMenu(e);
-                });
-
-                // More Options menu items
-                document.addEventListener('click', (e) => {
-                    if (e.target.closest('.more-options-item')) {
-                        const action = e.target.closest('.more-options-item').dataset.action;
-                        this.handleMoreOptionsAction(action);
-                        this.hideMoreOptionsMenu();
-                    }
-                });
-
-                // Editor enhancements
-                document.getElementById('editorStatsToggle')?.addEventListener('click', () => {
-                    this.toggleEditorStats();
-                });
-
-                // Real-time updates for editor content
-                const editorContent = document.getElementById('editorContent');
-                if (editorContent) {
-                    editorContent.addEventListener('input', () => {
-                        this.updateTextAnalytics();
-                        this.pushToHistoryStack();
-                        this.autoFormatText();
-                    });
-
-                    editorContent.addEventListener('paste', (e) => {
-                        const text = e.clipboardData.getData('text/plain');
-                        e.preventDefault();
-
-                        const start = editorContent.selectionStart;
-                        const end = editorContent.selectionEnd;
-                        editorContent.value = editorContent.value.substring(0, start) + text + editorContent.value.substring(end);
-
-                        editorContent.selectionStart = editorContent.selectionEnd = start + text.length;
-
-                        setTimeout(() => {
-                            this.updateTextAnalytics();
-                            this.pushToHistoryStack();
-                        }, 10);
-                    });
-                }
-
-                // Undo/Redo buttons
-                document.getElementById('undoBtn')?.addEventListener('click', () => this.undo());
-                document.getElementById('redoBtn')?.addEventListener('click', () => this.redo());
-
-                // Voice input
-                document.getElementById('voiceInputBtn')?.addEventListener('click', () => {
-                    this.toggleVoiceMode();
-                });
-
-                // Voice mode controls
-                document.getElementById('voiceStart')?.addEventListener('click', () => this.startVoiceInput());
-                document.getElementById('voicePause')?.addEventListener('click', () => this.toggleVoicePause());
-                document.getElementById('voiceStop')?.addEventListener('click', () => this.stopVoiceInput());
-                document.getElementById('voiceSpace')?.addEventListener('click', () => this.insertSpace());
-                document.getElementById('closeVoiceMode')?.addEventListener('click', () => this.closeVoiceMode());
-
-                // Modal events
-                document.getElementById('confirmModalCancel')?.addEventListener('click', () => {
-                    document.getElementById('confirmModal').classList.remove('modal-open');
-                });
-
-                document.getElementById('confirmModalConfirm')?.addEventListener('click', () => {
-                    if (this.state.pendingAction) {
-                        this.state.pendingAction();
-                        this.state.pendingAction = null;
-                    }
-                    document.getElementById('confirmModal').classList.remove('modal-open');
-                });
-
-                document.getElementById('alertModalOk')?.addEventListener('click', () => {
-                    document.getElementById('alertModal').classList.remove('modal-open');
-                });
-
-                // Settings toggles
-                document.getElementById('themeToggleCheckbox')?.addEventListener('change', (e) => {
-                    this.state.theme = e.target.checked ? 'dark' : 'light';
-                    this.applyTheme(this.state.theme);
-                    this.saveSettings();
-                });
-
-                document.getElementById('lanlinkToggleCheckbox')?.addEventListener('change', (e) => {
-                    this.state.lanlinkEnabled = e.target.checked;
-                    this.saveSettings();
-                    this.updateMoreOptionsMenu();
-                });
-
-                document.getElementById('punctuationToggleCheckbox')?.addEventListener('change', (e) => {
-                    this.state.intelligentPunctuation = e.target.checked;
-                    this.saveSettings();
-                });
-
-                // Empty state buttons
-                document.addEventListener('click', (e) => {
-                    if (e.target.id === 'createFirstActivity' || e.target.closest('#createFirstActivity')) {
-                        this.openEditor();
-                    }
-
-                    if (e.target.id === 'createTodayActivity' || e.target.closest('#createTodayActivity')) {
-                        this.openEditor();
-                    }
-                });
-
-                // Activity card clicks
-                document.addEventListener('click', (e) => {
-                    const activityCard = e.target.closest('.activity-card, .search-result-card');
-                    if (activityCard) {
-                        const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
-                        if (activity) {
-                            if (activity.archived || activity.deleted) {
-                                this.showConfirmModal(
-                                    activity.archived ? 'Unarchive Activity' : 'Restore Activity',
-                                    `This activity is ${activity.archived ? 'archived' : 'deleted'}. Do you want to ${activity.archived ? 'unarchive' : 'restore'} it to edit?`,
-                                    () => {
-                                        if (activity.archived) {
-                                            activity.archived = false;
-                                        } else {
-                                            activity.deleted = false;
-                                        }
-                                        this.saveActivities();
-                                        this.openEditor(activity.id);
-                                        if (this.state.isFullscreenSearch) {
-                                            this.closeFullscreenSearch();
-                                        }
-                                    }
-                                );
-                            } else {
-                                this.openEditor(activityCard.dataset.id);
+        // Activity card clicks
+        document.addEventListener('click', (e) => {
+            const activityCard = e.target.closest('.activity-card, .search-result-card');
+            if (activityCard) {
+                const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
+                if (activity) {
+                    if (activity.archived || activity.deleted) {
+                        this.showConfirmModal(
+                            activity.archived ? 'Unarchive Activity' : 'Restore Activity',
+                            `This activity is ${activity.archived ? 'archived' : 'deleted'}. Do you want to ${activity.archived ? 'unarchive' : 'restore'} it to edit?`,
+                            () => {
+                                if (activity.archived) {
+                                    activity.archived = false;
+                                } else {
+                                    activity.deleted = false;
+                                }
+                                this.saveActivities();
+                                this.openEditor(activity.id);
                                 if (this.state.isFullscreenSearch) {
                                     this.closeFullscreenSearch();
                                 }
                             }
-                        }
-                    }
-                });
-
-                // Activity card keyboard navigation
-                document.addEventListener('keydown', (e) => {
-                    const activityCard = document.activeElement.closest('.activity-card');
-                    if (activityCard && (e.key === 'Enter' || e.key === ' ')) {
-                        e.preventDefault();
+                        );
+                    } else {
                         this.openEditor(activityCard.dataset.id);
-                    }
-                });
-
-                // Context menu for activity cards
-                document.addEventListener('contextmenu', (e) => {
-                    const activityCard = e.target.closest('.activity-card');
-                    if (activityCard) {
-                        e.preventDefault();
-                        const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
-                        if (activity) {
-                            this.showActivityOptions(activityCard.dataset.id, e.clientX, e.clientY);
-                        }
-                    }
-                });
-
-                // Close context menu on click outside
-                document.addEventListener('click', () => {
-                    this.hideContextMenu();
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey || e.metaKey) {
-                        if (e.key === 'z' && !e.shiftKey) {
-                            e.preventDefault();
-                            this.undo();
-                        } else if ((e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-                            e.preventDefault();
-                            this.redo();
-                        } else if (e.key === 's') {
-                            e.preventDefault();
-                            this.saveActivity(false, true);
-                        } else if (e.key === 'f') {
-                            e.preventDefault();
-                            this.openFullscreenSearch();
-                        } else if (e.key === 'b') {
-                            e.preventDefault();
-                            this.toggleEditorStats();
-                        }
-                    }
-
-                    if (e.key === 'Escape') {
                         if (this.state.isFullscreenSearch) {
                             this.closeFullscreenSearch();
-                        } else if (this.state.isVoiceModeActive) {
-                            this.closeVoiceMode();
-                        } else if (document.getElementById('editorContainer').classList.contains('editor-container-open')) {
-                            this.closeEditor();
-                        } else if (document.querySelector('#moreOptionsMenu.show')) {
-                            this.hideMoreOptionsMenu();
                         }
                     }
-                });
-
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth > 768) {
-                        document.getElementById('drawer').classList.remove('drawer-open');
-                        document.getElementById('drawerOverlay').classList.remove('drawer-overlay-visible');
-                    }
-                });
-
-                // Close voice mode when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (this.state.isVoiceModeActive &&
-                        !e.target.closest('#voiceModeSheet') &&
-                        !e.target.closest('#voiceInputBtn')) {
-                        this.closeVoiceMode();
-                    }
-                });
-
-                // Close more options menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('#editorMoreOptions') && !e.target.closest('#moreOptionsMenu')) {
-                        this.hideMoreOptionsMenu();
-                    }
-                });
-
-                // Handle URL hash changes
-                window.addEventListener('hashchange', () => {
-                    this.handleHashChange();
-                });
-
-                this.handleHashChange();
+                }
             }
+        });
 
-            handleHashChange() {
-                const hash = window.location.hash;
-                switch (hash) {
-                    case '#new':
-                        this.openEditor();
-                        break;
-                    case '#dashboard':
-                        this.state.activeView = 'dashboard';
-                        this.state.isSearching = false;
-                        this.renderView();
-                        this.updateActiveNav();
-                        break;
+        // Activity card keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const activityCard = document.activeElement.closest('.activity-card');
+            if (activityCard && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                this.openEditor(activityCard.dataset.id);
+            }
+        });
+
+        // Context menu for activity cards
+        document.addEventListener('contextmenu', (e) => {
+            const activityCard = e.target.closest('.activity-card');
+            if (activityCard) {
+                e.preventDefault();
+                const activity = this.state.activities.find(a => a.id === activityCard.dataset.id);
+                if (activity) {
+                    this.showActivityOptions(activityCard.dataset.id, e.clientX, e.clientY);
+                }
+            }
+        });
+
+        // Close context menu on click outside
+        document.addEventListener('click', () => {
+            this.hideContextMenu();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.undo();
+                } else if ((e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                    e.preventDefault();
+                    this.redo();
+                } else if (e.key === 's') {
+                    e.preventDefault();
+                    this.saveActivity(false, true);
+                } else if (e.key === 'f') {
+                    e.preventDefault();
+                    this.openFullscreenSearch();
+                } else if (e.key === 'b') {
+                    e.preventDefault();
+                    this.toggleEditorStats();
                 }
             }
 
-            updateActiveNav() {
-                document.querySelectorAll('.drawer-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-
-                const activeItem = document.getElementById(`${this.state.activeView}View`) ||
-                    document.getElementById(`${this.state.activeView}Activities`);
-                if (activeItem) {
-                    activeItem.classList.add('active');
+            if (e.key === 'Escape') {
+                if (this.state.isFullscreenSearch) {
+                    this.closeFullscreenSearch();
+                } else if (this.state.isVoiceModeActive) {
+                    this.closeVoiceMode();
+                } else if (document.getElementById('editorContainer').classList.contains('editor-container-open')) {
+                    this.closeEditor();
+                } else if (document.querySelector('#moreOptionsMenu.show')) {
+                    this.hideMoreOptionsMenu();
                 }
             }
+        });
 
-            openFullscreenSearch() {
-                this.state.isFullscreenSearch = true;
-                document.getElementById('fullscreenSearch').classList.add('open');
-                document.getElementById('fullscreenSearchInput').focus();
-                this.updateFullscreenSearch();
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                document.getElementById('drawer').classList.remove('drawer-open');
+                document.getElementById('drawerOverlay').classList.remove('drawer-overlay-visible');
             }
+        });
 
-            closeFullscreenSearch() {
-                this.state.isFullscreenSearch = false;
-                this.state.searchQuery = '';
-                document.getElementById('fullscreenSearch').classList.remove('open');
-                document.getElementById('fullscreenSearchInput').value = '';
+        // Close voice mode when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.state.isVoiceModeActive &&
+                !e.target.closest('#voiceModeSheet') &&
+                !e.target.closest('#voiceInputBtn')) {
+                this.closeVoiceMode();
             }
+        });
 
-            updateFullscreenSearch() {
-                const filteredActivities = this.filterActivities();
-                let searchResultsHTML = '';
+        // Close more options menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#editorMoreOptions') && !e.target.closest('#moreOptionsMenu')) {
+                this.hideMoreOptionsMenu();
+            }
+        });
 
-                if (filteredActivities.length === 0 && this.state.searchQuery) {
-                    searchResultsHTML = `
+        // Handle URL hash changes
+        window.addEventListener('hashchange', () => {
+            this.handleHashChange();
+        });
+
+        this.handleHashChange();
+    }
+
+    handleHashChange() {
+        const hash = window.location.hash;
+        switch (hash) {
+            case '#new':
+                this.openEditor();
+                break;
+            case '#dashboard':
+                this.state.activeView = 'dashboard';
+                this.state.isSearching = false;
+                this.renderView();
+                this.updateActiveNav();
+                break;
+        }
+    }
+
+    updateActiveNav() {
+        document.querySelectorAll('.drawer-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        const activeItem = document.getElementById(`${this.state.activeView}View`) ||
+            document.getElementById(`${this.state.activeView}Activities`);
+        if (activeItem) {
+            activeItem.classList.add('active');
+        }
+    }
+
+    openFullscreenSearch() {
+        this.state.isFullscreenSearch = true;
+        document.getElementById('fullscreenSearch').classList.add('open');
+        document.getElementById('fullscreenSearchInput').focus();
+        this.updateFullscreenSearch();
+    }
+
+    closeFullscreenSearch() {
+        this.state.isFullscreenSearch = false;
+        this.state.searchQuery = '';
+        document.getElementById('fullscreenSearch').classList.remove('open');
+        document.getElementById('fullscreenSearchInput').value = '';
+    }
+
+    updateFullscreenSearch() {
+        const filteredActivities = this.filterActivities();
+        let searchResultsHTML = '';
+
+        if (filteredActivities.length === 0 && this.state.searchQuery) {
+            searchResultsHTML = `
                 <div class="empty-search-state">
                     <span class="material-icons">search_off</span>
                     <p>No results found for "${this.state.searchQuery}"</p>
                 </div>
             `;
-                } else {
-                    filteredActivities.forEach(activity => {
-                        const previewText = activity.content.length > 150 ?
-                            activity.content.substring(0, 150) + '...' :
-                            activity.content;
+        } else {
+            filteredActivities.forEach(activity => {
+                const previewText = activity.content.length > 150 ?
+                    activity.content.substring(0, 150) + '...' :
+                    activity.content;
 
-                        searchResultsHTML += `
+                searchResultsHTML += `
                     <div class="search-result-card glass" data-id="${activity.id}">
                         <h4 class="search-result-title">${activity.title}</h4>
                         <p class="search-result-preview">${previewText}</p>
@@ -1283,39 +1396,39 @@
                         </div>
                     </div>
                 `;
-                    });
-                }
+            });
+        }
 
-                document.getElementById('fullscreenSearchResults').innerHTML = searchResultsHTML;
-            }
+        document.getElementById('fullscreenSearchResults').innerHTML = searchResultsHTML;
+    }
 
-            toggleEditorStats() {
-                const analytics = document.getElementById('editorAnalytics');
-                analytics.classList.toggle('collapsed');
-            }
+    toggleEditorStats() {
+        const analytics = document.getElementById('editorAnalytics');
+        analytics.classList.toggle('collapsed');
+    }
 
-            toggleMoreOptionsMenu(e) {
-                const menu = document.getElementById('moreOptionsMenu');
-                const rect = e.target.getBoundingClientRect();
+    toggleMoreOptionsMenu(e) {
+        const menu = document.getElementById('moreOptionsMenu');
+        const rect = e.target.getBoundingClientRect();
 
-                menu.style.left = `${rect.left}px`;
-                menu.style.top = `${rect.bottom + 5}px`;
-                menu.classList.toggle('show');
-            }
+        menu.style.left = `${rect.left}px`;
+        menu.style.top = `${rect.bottom + 5}px`;
+        menu.classList.toggle('show');
+    }
 
-            hideMoreOptionsMenu() {
-                document.getElementById('moreOptionsMenu').classList.remove('show');
-            }
+    hideMoreOptionsMenu() {
+        document.getElementById('moreOptionsMenu').classList.remove('show');
+    }
 
-            updateMoreOptionsMenu() {
-                const menu = document.getElementById('moreOptionsMenu');
-                if (menu) {
-                    menu.innerHTML = this.renderMoreOptionsContent();
-                }
-            }
+    updateMoreOptionsMenu() {
+        const menu = document.getElementById('moreOptionsMenu');
+        if (menu) {
+            menu.innerHTML = this.renderMoreOptionsContent();
+        }
+    }
 
-            renderMoreOptionsContent() {
-                return `
+    renderMoreOptionsContent() {
+        return `
             ${this.state.lanlinkEnabled ? `
             <div class="more-options-item" data-action="editInLanWord" style="background: linear-gradient(145deg, var(--primary-400), var(--primary-600)); color: white; font-weight: bold;">
                 <span class="material-icons">open_in_new</span>
@@ -1342,7 +1455,7 @@
                 <span class="material-icons">text_format</span>
                 <span>Sentence case</span>
             </div>
-            <div class="more-options-item" data-action="removeSpaces">
+            <div class="more-options-item" data-action="removeExtraSpaces">
                 <span class="material-icons">space_bar</span>
                 <span>Remove Extra Spaces</span>
             </div>
@@ -1371,1094 +1484,1076 @@
                 <span>Delete Activity</span>
             </div>
         `;
-            }
+    }
 
-            handleMoreOptionsAction(action) {
-                switch (action) {
-                    case 'editInLanWord':
-                        this.editInLanWord();
-                        break;
-                    case 'formatText':
-                        this.formatText();
-                        break;
-                    case 'uppercase':
-                        this.performTextAction('uppercase');
-                        break;
-                    case 'lowercase':
-                        this.performTextAction('lowercase');
-                        break;
-                    case 'titlecase':
-                        this.performTextAction('titlecase');
-                        break;
-                    case 'sentencecase':
-                        this.performTextAction('sentencecase');
-                        break;
-                    case 'removeSpaces':
-                        this.performTextAction('removeSpaces');
-                        break;
-                    case 'reverseText':
-                        this.performTextAction('reverseText');
-                        break;
-                    case 'exportText':
-                        this.exportText();
-                        break;
-                    case 'importText':
-                        this.importText();
-                        break;
-                    case 'duplicate':
-                        this.duplicateCurrentActivity();
-                        break;
-                    case 'clearText':
-                        this.showConfirmModal(
-                            'Clear Text',
-                            'Are you sure you want to clear all text? This action cannot be undone.',
-                            () => {
-                                document.getElementById('editorContent').value = '';
-                                this.updateTextAnalytics();
-                                this.pushToHistoryStack();
-                            }
-                        );
-                        break;
-                    case 'deleteActivity':
-                        this.showConfirmModal(
-                            'Delete Activity',
-                            'Are you sure you want to delete this activity? This action cannot be undone.',
-                            () => {
-                                this.deleteActivity(this.state.currentActivityId);
-                                this.closeEditor();
-                            }
-                        );
-                        break;
-                }
-            }
-
-            editInLanWord() {
-                const content = document.getElementById('editorContent').value;
-                const title = document.getElementById('editorTitle').value || 'Untitled';
-
-                if (!content.trim()) {
-                    this.showAlert('No Content', 'Please add some text before editing in LanWord.');
-                    return;
-                }
-
+    handleMoreOptionsAction(action) {
+        switch (action) {
+            case 'editInLanWord':
+                this.editInLanWord();
+                break;
+            case 'formatText':
+                this.formatText();
+                break;
+            case 'uppercase':
+                this.performTextAction('uppercase');
+                break;
+            case 'lowercase':
+                this.performTextAction('lowercase');
+                break;
+            case 'titlecase':
+                this.performTextAction('titlecase');
+                break;
+            case 'sentencecase':
+                this.performTextAction('sentencecase');
+                break;
+            case 'removeExtraSpaces':
+                this.performTextAction('removeExtraSpaces');
+                break;
+            case 'reverseText':
+                this.performTextAction('reverseText');
+                break;
+            case 'exportText':
+                this.exportText();
+                break;
+            case 'importText':
+                this.importText();
+                break;
+            case 'duplicate':
+                this.duplicateCurrentActivity();
+                break;
+            case 'clearText':
                 this.showConfirmModal(
-                    'Edit in LanWord',
-                    'Do you want to open this text in LanWord for editing?',
+                    'Clear Text',
+                    'Are you sure you want to clear all text? This action cannot be undone.',
                     () => {
-                        this.initiateLanLinkTransfer(content, title);
+                        document.getElementById('editorContent').value = '';
+                        this.updateTextAnalytics();
+                        this.pushToHistoryStack();
                     }
                 );
+                break;
+            case 'deleteActivity':
+                this.showConfirmModal(
+                    'Delete Activity',
+                    'Are you sure you want to delete this activity? This action cannot be undone.',
+                    () => {
+                        this.deleteActivity(this.state.currentActivityId);
+                        this.closeEditor();
+                    }
+                );
+                break;
+        }
+    }
+
+    editInLanWord() {
+        // Placeholder for LanLink functionality
+        // Developers can implement this in a separate file
+        this.showAlert('LanLink', 'LanLink functionality can be implemented separately. Check the documentation for integration details.');
+    }
+
+    performTextAction(action) {
+        const editor = document.getElementById('editorContent');
+        let text = editor.value;
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        const selectedText = text.substring(start, end);
+
+        let transformedText = selectedText;
+
+        switch (action) {
+            case 'uppercase':
+                transformedText = selectedText.toUpperCase();
+                break;
+            case 'lowercase':
+                transformedText = selectedText.toLowerCase();
+                break;
+            case 'titlecase':
+                transformedText = this.toTitleCase(selectedText);
+                break;
+            case 'sentencecase':
+                transformedText = this.toSentenceCase(selectedText);
+                break;
+            case 'removeExtraSpaces':
+                transformedText = selectedText.replace(/\s+/g, ' ').trim();
+                break;
+            case 'reverseText':
+                transformedText = selectedText.split('').reverse().join('');
+                break;
+        }
+
+        if (selectedText) {
+            editor.value = text.substring(0, start) + transformedText + text.substring(end);
+            editor.setSelectionRange(start, start + transformedText.length);
+        } else {
+            switch (action) {
+                case 'uppercase':
+                    editor.value = text.toUpperCase();
+                    break;
+                case 'lowercase':
+                    editor.value = text.toLowerCase();
+                    break;
+                case 'titlecase':
+                    editor.value = this.toTitleCase(text);
+                    break;
+                case 'sentencecase':
+                    editor.value = this.toSentenceCase(text);
+                    break;
+                case 'removeExtraSpaces':
+                    editor.value = text.replace(/\s+/g, ' ').trim();
+                    break;
+                case 'reverseText':
+                    editor.value = text.split('').reverse().join('');
+                    break;
             }
+        }
 
-            initiateLanLinkTransfer(content, title) {
-                // Generate unique share ID
-                const shareId = 'lanlink-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        this.updateTextAnalytics();
+        this.pushToHistoryStack();
+        editor.focus();
+    }
 
-                // Create transfer payload
-                const payload = {
-                    id: shareId,
-                    origin: 'countify+',
-                    content: content,
-                    title: title,
-                    timestamp: new Date().toISOString(),
-                    signature: this.generateSignature(content)
-                };
+    toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
 
-                // Store in localStorage
-                localStorage.setItem(`lanlink-${shareId}`, JSON.stringify(payload));
+    toSentenceCase(str) {
+        return str.replace(/.+?[\.\?\!](\s|$)/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
 
-                // Show processing animation
-                this.showLanLinkProcessing();
+    autoFormatText() {
+        if (!this.state.intelligentPunctuation) return;
 
-                // Redirect after delay
+        const editor = document.getElementById('editorContent');
+        const value = editor.value;
+
+        if (value.length > 1) {
+            const lastChar = value[value.length - 2];
+            const currentChar = value[value.length - 1];
+
+            // Auto-capitalize after sentence endings
+            if (['.', '!', '?'].includes(lastChar) && currentChar === ' ') {
                 setTimeout(() => {
-                    window.open(`https://lanword.landecs.org/new?share=${shareId}`, '_blank');
-
-                    // Cleanup after successful transfer
-                    setTimeout(() => {
-                        localStorage.removeItem(`lanlink-${shareId}`);
-                    }, 5000);
-                }, 1500);
+                    const pos = editor.selectionStart;
+                    if (pos < value.length && value[pos] === value[pos].toLowerCase()) {
+                        editor.value = value.substring(0, pos) + value[pos].toUpperCase() + value.substring(pos + 1);
+                        editor.setSelectionRange(pos + 1, pos + 1);
+                    }
+                }, 50);
             }
+        }
+    }
 
-            generateSignature(content) {
-                // Simple hash function for basic verification
-                let hash = 0;
-                for (let i = 0; i < content.length; i++) {
-                    const char = content.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash;
+    formatText() {
+        const editor = document.getElementById('editorContent');
+        let text = editor.value;
+
+        // Comprehensive text formatting
+        text = text
+            // Normalize line breaks
+            .replace(/\r\n/g, '\n')
+            .replace(/\n\s*\n\s*\n/g, '\n\n')
+            // Fix spacing around punctuation
+            .replace(/\s+\./g, '.')
+            .replace(/\s+,/g, ',')
+            .replace(/\s+:/g, ':')
+            .replace(/\s+;/g, ';')
+            .replace(/\s+!/g, '!')
+            .replace(/\s+\?/g, '?')
+            // Ensure space after sentence endings
+            .replace(/([.!?])([A-Z])/g, '$1 $2')
+            // Remove multiple spaces
+            .replace(/\s+/g, ' ')
+            // Trim and normalize
+            .trim();
+
+        editor.value = text;
+        this.updateTextAnalytics();
+        this.pushToHistoryStack();
+        this.showAutoSaveIndicator();
+    }
+
+    exportText() {
+        const title = document.getElementById('editorTitle').value || 'untitled';
+        const content = document.getElementById('editorContent').value;
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${title}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    importText() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.txt,.md';
+
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = event => {
+                const content = event.target.result;
+                document.getElementById('editorContent').value = content;
+                this.updateTextAnalytics();
+                this.pushToHistoryStack();
+
+                const titleInput = document.getElementById('editorTitle');
+                if (titleInput && file.name) {
+                    titleInput.value = file.name.replace(/\.[^/.]+$/, "");
                 }
-                return hash.toString(36);
-            }
+            };
 
-            showLanLinkProcessing() {
-                // Create processing overlay
-                const overlay = document.createElement('div');
-                overlay.className = 'lanlink-processing-overlay';
-                overlay.innerHTML = `
-            <div class="lanlink-processing-content glass">
-                <div class="processing-animation">
-                    <span class="material-icons">sync</span>
-                </div>
-                <h3>Processing...</h3>
-                <p>Preparing to open in LanWord</p>
-            </div>
-        `;
+            reader.readAsText(file);
+        };
 
-                document.body.appendChild(overlay);
+        input.click();
+    }
 
-                // Remove overlay after completion
-                setTimeout(() => {
-                    overlay.remove();
-                }, 2000);
-            }
+    duplicateCurrentActivity() {
+        if (!this.state.currentActivityId) return;
 
-            performTextAction(action) {
-                const editor = document.getElementById('editorContent');
-                let text = editor.value;
-                const start = editor.selectionStart;
-                const end = editor.selectionEnd;
-                const selectedText = text.substring(start, end);
+        const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
+        if (!activity) return;
 
-                let transformedText = selectedText;
+        const duplicate = {
+            ...activity,
+            id: this.generateId(),
+            title: `${activity.title} (Copy)`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
 
-                switch (action) {
-                    case 'uppercase':
-                        transformedText = selectedText.toUpperCase();
-                        break;
-                    case 'lowercase':
-                        transformedText = selectedText.toLowerCase();
-                        break;
-                    case 'titlecase':
-                        transformedText = this.toTitleCase(selectedText);
-                        break;
-                    case 'sentencecase':
-                        transformedText = this.toSentenceCase(selectedText);
-                        break;
-                    case 'removeSpaces':
-                        transformedText = selectedText.replace(/\s+/g, ' ').trim();
-                        break;
-                    case 'reverseText':
-                        transformedText = selectedText.split('').reverse().join('');
-                        break;
-                }
+        this.state.activities.unshift(duplicate);
+        this.saveActivities();
+        this.renderView();
+        this.showAutoSaveIndicator();
+    }
 
-                if (selectedText) {
-                    editor.value = text.substring(0, start) + transformedText + text.substring(end);
-                    editor.setSelectionRange(start, start + transformedText.length);
+    pushToHistoryStack() {
+        if (!this.state.currentActivityId) return;
+
+        const editorContent = document.getElementById('editorContent');
+        const editorTitle = document.getElementById('editorTitle');
+        if (!editorContent || !editorTitle) return;
+
+        const currentContent = editorContent.value;
+        const currentTitle = editorTitle.value;
+
+        if (!this.state.historyStack[this.state.currentActivityId]) {
+            this.state.historyStack[this.state.currentActivityId] = [];
+            this.state.futureStack[this.state.currentActivityId] = [];
+        }
+
+        const lastHistory = this.state.historyStack[this.state.currentActivityId][0];
+        if (lastHistory && lastHistory.content === currentContent && lastHistory.title === currentTitle) {
+            return;
+        }
+
+        this.state.historyStack[this.state.currentActivityId].unshift({
+            content: currentContent,
+            title: currentTitle,
+            timestamp: Date.now()
+        });
+
+        this.state.futureStack[this.state.currentActivityId] = [];
+
+        if (this.state.historyStack[this.state.currentActivityId].length > 50) {
+            this.state.historyStack[this.state.currentActivityId].pop();
+        }
+
+        this.updateUndoRedoButtons();
+    }
+
+    undo() {
+        if (!this.state.currentActivityId ||
+            !this.state.historyStack[this.state.currentActivityId] ||
+            this.state.historyStack[this.state.currentActivityId].length < 2) {
+            return;
+        }
+
+        const currentState = this.state.historyStack[this.state.currentActivityId].shift();
+        const previousState = this.state.historyStack[this.state.currentActivityId][0];
+
+        this.state.futureStack[this.state.currentActivityId].unshift(currentState);
+
+        document.getElementById('editorContent').value = previousState.content;
+        document.getElementById('editorTitle').value = previousState.title;
+        this.updateTextAnalytics();
+
+        this.updateUndoRedoButtons();
+    }
+
+    redo() {
+        if (!this.state.currentActivityId ||
+            !this.state.futureStack[this.state.currentActivityId] ||
+            this.state.futureStack[this.state.currentActivityId].length === 0) {
+            return;
+        }
+
+        const nextState = this.state.futureStack[this.state.currentActivityId].shift();
+
+        const currentContent = document.getElementById('editorContent').value;
+        const currentTitle = document.getElementById('editorTitle').value;
+        this.state.historyStack[this.state.currentActivityId].unshift({
+            content: currentContent,
+            title: currentTitle,
+            timestamp: Date.now()
+        });
+
+        document.getElementById('editorContent').value = nextState.content;
+        document.getElementById('editorTitle').value = nextState.title;
+        this.updateTextAnalytics();
+
+        this.updateUndoRedoButtons();
+    }
+
+    updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+
+        if (!this.state.currentActivityId || !undoBtn || !redoBtn) {
+            return;
+        }
+
+        const hasUndo = this.state.historyStack[this.state.currentActivityId] &&
+            this.state.historyStack[this.state.currentActivityId].length > 1;
+        const hasRedo = this.state.futureStack[this.state.currentActivityId] &&
+            this.state.futureStack[this.state.currentActivityId].length > 0;
+
+        undoBtn.disabled = !hasUndo;
+        redoBtn.disabled = !hasRedo;
+    }
+
+    toggleVoiceMode() {
+        if (!this.state.isVoiceModeActive) {
+            this.openVoiceMode();
+        } else {
+            this.closeVoiceMode();
+        }
+    }
+
+    openVoiceMode() {
+        this.state.isVoiceModeActive = true;
+        document.getElementById('voiceModeSheet').classList.add('open');
+        document.getElementById('voiceStart').focus();
+    }
+
+    closeVoiceMode() {
+        this.state.isVoiceModeActive = false;
+        document.getElementById('voiceModeSheet').classList.remove('open');
+        this.stopVoiceInput();
+    }
+
+    startVoiceInput() {
+        if (!('webkitSpeechRecognition' in window)) {
+            this.showAlert(
+                'Voice Input Error',
+                'Voice input is not supported in your browser.'
+            );
+            return;
+        }
+
+        if (this.state.voiceRecognition) {
+            return;
+        }
+
+        const recognition = new webkitSpeechRecognition();
+        this.state.voiceRecognition = recognition;
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onend = null;
+        recognition.onaudioend = null;
+        recognition.onsoundend = null;
+        recognition.onspeechend = null;
+
+        recognition.onstart = () => {
+            this.state.isVoiceListening = true;
+            document.getElementById('voiceStart').disabled = true;
+            document.getElementById('voicePause').disabled = false;
+            document.getElementById('voiceStop').disabled = false;
+            document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic_off</span>';
+            document.getElementById('voiceInputBtn').style.color = 'var(--error)';
+            this.startVoiceVisualizer();
+            this.triggerHapticFeedback('success');
+        };
+
+        recognition.onresult = (event) => {
+            let interimTranscript = '';
+            let finalTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
                 } else {
-                    switch (action) {
-                        case 'uppercase':
-                            editor.value = text.toUpperCase();
-                            break;
-                        case 'lowercase':
-                            editor.value = text.toLowerCase();
-                            break;
-                        case 'titlecase':
-                            editor.value = this.toTitleCase(text);
-                            break;
-                        case 'sentencecase':
-                            editor.value = this.toSentenceCase(text);
-                            break;
-                        case 'removeSpaces':
-                            editor.value = text.replace(/\s+/g, ' ').trim();
-                            break;
-                        case 'reverseText':
-                            editor.value = text.split('').reverse().join('');
-                            break;
-                    }
-                }
-
-                this.updateTextAnalytics();
-                this.pushToHistoryStack();
-                editor.focus();
-            }
-
-            toTitleCase(str) {
-                return str.replace(/\w\S*/g, function(txt) {
-                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                });
-            }
-
-            toSentenceCase(str) {
-                return str.replace(/.+?[\.\?\!](\s|$)/g, function(txt) {
-                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-                });
-            }
-
-            autoFormatText() {
-                const editor = document.getElementById('editorContent');
-                const value = editor.value;
-
-                if (value.length > 1) {
-                    const lastChar = value[value.length - 2];
-                    const currentChar = value[value.length - 1];
-
-                    if (['.', '!', '?'].includes(lastChar) && currentChar === ' ') {
-                        setTimeout(() => {
-                            const pos = editor.selectionStart;
-                            if (pos < value.length && value[pos] === value[pos].toLowerCase()) {
-                                editor.value = value.substring(0, pos) + value[pos].toUpperCase() + value.substring(pos + 1);
-                                editor.setSelectionRange(pos + 1, pos + 1);
-                            }
-                        }, 50);
-                    }
+                    interimTranscript += transcript;
                 }
             }
 
-            formatText() {
+            document.getElementById('voiceCaption').textContent = interimTranscript || finalTranscript;
+
+            if (finalTranscript) {
                 const editor = document.getElementById('editorContent');
-                let text = editor.value;
+                let processedText = finalTranscript;
 
-                text = text
-                    .replace(/\n\s*\n\s*\n/g, '\n\n')
-                    .replace(/\s+\./g, '.')
-                    .replace(/\s+,/g, ',')
-                    .replace(/\s+:/g, ':')
-                    .replace(/\s+;/g, ';')
-                    .replace(/([.!?])\s*(?=[A-Z])/g, '$1 ')
-                    .trim();
+                // Apply intelligent punctuation if enabled
+                if (this.state.intelligentPunctuation) {
+                    processedText = this.applyIntelligentPunctuation(processedText);
+                }
 
-                editor.value = text;
+                // Insert text at cursor position
+                this.insertTextAtCursor(processedText);
                 this.updateTextAnalytics();
                 this.pushToHistoryStack();
-                this.showAutoSaveIndicator();
             }
+        };
 
-            exportText() {
-                const title = document.getElementById('editorTitle').value || 'untitled';
-                const content = document.getElementById('editorContent').value;
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            this.stopVoiceInput();
+            this.triggerHapticFeedback('error');
+            this.showAlert(
+                'Voice Input Error',
+                `An error occurred: ${event.error}`
+            );
+        };
 
-                // Create file content
-                const fileContent = content;
-                const blob = new Blob([fileContent], {
-                    type: 'text/plain'
+        try {
+            recognition.start();
+        } catch (error) {
+            this.showAlert(
+                'Microphone Error',
+                'Microphone permission was denied. Please enable microphone access in your browser settings.'
+            );
+            this.triggerHapticFeedback('error');
+        }
+    }
+
+    insertTextAtCursor(text) {
+        const editor = document.getElementById('editorContent');
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        
+        // Insert text at cursor position with proper spacing
+        const before = editor.value.substring(0, start);
+        const after = editor.value.substring(end);
+        
+        // Add space before if needed
+        const spaceBefore = start > 0 && !before.endsWith(' ') && !before.endsWith('\n') ? ' ' : '';
+        
+        editor.value = before + spaceBefore + text + after;
+        editor.selectionStart = editor.selectionEnd = start + spaceBefore.length + text.length;
+        editor.focus();
+    }
+
+    applyIntelligentPunctuation(text) {
+        if (!this.state.intelligentPunctuation) return text;
+
+        let processed = text;
+
+        // Capitalize first letter of sentences
+        processed = processed.replace(/(^\s*|[.!?]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
+
+        // Add missing periods to complete sentences
+        if (processed.length > 10 && !/[.!?]$/.test(processed)) {
+            const words = processed.split(' ');
+            const lastWord = words[words.length - 1];
+            
+            // Simple heuristic for complete sentences
+            if (words.length > 3 && lastWord.length > 2 && !lastWord.includes(',') && !lastWord.includes(';')) {
+                processed += '.';
+            }
+        }
+
+        // Fix common punctuation issues
+        processed = processed
+            .replace(/\s+\./g, '.')
+            .replace(/\s+,/g, ',')
+            .replace(/\s+!/g, '!')
+            .replace(/\s+\?/g, '?');
+
+        return processed;
+    }
+
+    toggleVoicePause() {
+        if (!this.state.voiceRecognition) return;
+
+        const pauseBtn = document.getElementById('voicePause');
+        if (this.state.isVoiceListening) {
+            this.state.voiceRecognition.stop();
+            this.state.isVoiceListening = false;
+            pauseBtn.innerHTML = `<span class="material-icons">play_arrow</span> <span>Continue</span>`;
+            this.stopVoiceVisualizer();
+            this.triggerHapticFeedback('light');
+        } else {
+            this.state.voiceRecognition.start();
+            this.state.isVoiceListening = true;
+            pauseBtn.innerHTML = `<span class="material-icons">pause</span> <span>Pause</span>`;
+            this.startVoiceVisualizer();
+            this.triggerHapticFeedback('light');
+        }
+    }
+
+    stopVoiceInput() {
+        if (!this.state.voiceRecognition) return;
+
+        try {
+            this.state.voiceRecognition.stop();
+        } catch (e) {
+            console.log('Voice recognition already stopped');
+        }
+
+        this.state.voiceRecognition = null;
+        this.state.isVoiceListening = false;
+
+        document.getElementById('voiceStart').disabled = false;
+        document.getElementById('voicePause').disabled = true;
+        document.getElementById('voiceStop').disabled = true;
+        document.getElementById('voicePause').innerHTML = `<span class="material-icons">pause</span> <span>Pause</span>`;
+        document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic</span>';
+        document.getElementById('voiceInputBtn').style.color = '';
+        document.getElementById('voiceCaption').textContent = '';
+
+        this.stopVoiceVisualizer();
+        this.triggerHapticFeedback('success', 2);
+    }
+
+    insertSpace() {
+        this.insertTextAtCursor(' ');
+        this.triggerHapticFeedback('light');
+    }
+
+    triggerHapticFeedback(type = 'light', count = 1) {
+        if (!('vibrate' in navigator)) return;
+
+        try {
+            switch (type) {
+                case 'success':
+                    navigator.vibrate(50);
+                    break;
+                case 'error':
+                    navigator.vibrate([100, 50, 100]);
+                    break;
+                case 'light':
+                    navigator.vibrate(30);
+                    break;
+                default:
+                    navigator.vibrate(50 * count);
+            }
+        } catch (e) {
+            console.log('Haptic feedback not supported');
+        }
+    }
+
+    startVoiceVisualizer() {
+        this.stopVoiceVisualizer();
+
+        const visualizerBars = [
+            document.getElementById('voiceBar1'),
+            document.getElementById('voiceBar2'),
+            document.getElementById('voiceBar3'),
+            document.getElementById('voiceBar4'),
+            document.getElementById('voiceBar5')
+        ];
+
+        this.state.visualizerInterval = setInterval(() => {
+            visualizerBars.forEach(bar => {
+                const height = Math.floor(Math.random() * 30) + 5;
+                bar.style.height = `${height}px`;
+                bar.style.backgroundColor = `hsl(${Math.random() * 60 + 180}, 80%, 60%)`;
+            });
+        }, 100);
+    }
+
+    stopVoiceVisualizer() {
+        if (this.state.visualizerInterval) {
+            clearInterval(this.state.visualizerInterval);
+            this.state.visualizerInterval = null;
+
+            const visualizerBars = [
+                document.getElementById('voiceBar1'),
+                document.getElementById('voiceBar2'),
+                document.getElementById('voiceBar3'),
+                document.getElementById('voiceBar4'),
+                document.getElementById('voiceBar5')
+            ];
+
+            visualizerBars.forEach(bar => {
+                bar.style.height = '5px';
+                bar.style.backgroundColor = 'var(--primary)';
+            });
+        }
+    }
+
+    setupRippleEffects() {
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('.btn, .btn-icon, .activity-card, .fab');
+            if (target) {
+                const rect = target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                target.appendChild(ripple);
+
+                ripple.addEventListener('animationend', () => {
+                    ripple.remove();
                 });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${title}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+            }
+        });
+    }
+
+    toggleDrawer() {
+        document.getElementById('drawer')?.classList.toggle('drawer-open');
+        document.getElementById('drawerOverlay')?.classList.toggle('drawer-overlay-visible');
+    }
+
+    async loadSettings() {
+        try {
+            const settings = JSON.parse(localStorage.getItem('countify-settings')) || {};
+
+            if (settings.theme) {
+                this.state.theme = settings.theme;
+                this.applyTheme(settings.theme);
             }
 
-            importText() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.txt,.md';
+            if (settings.lanlinkEnabled !== undefined) {
+                this.state.lanlinkEnabled = settings.lanlinkEnabled;
+            }
 
-                input.onchange = e => {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
+            if (settings.intelligentPunctuation !== undefined) {
+                this.state.intelligentPunctuation = settings.intelligentPunctuation;
+            }
 
-                    reader.onload = event => {
-                        const content = event.target.result;
-                        document.getElementById('editorContent').value = content;
-                        this.updateTextAnalytics();
-                        this.pushToHistoryStack();
+            if (settings.clipboardDetection !== undefined) {
+                this.state.clipboardDetection = settings.clipboardDetection;
+            }
 
-                        const titleInput = document.getElementById('editorTitle');
-                        if (titleInput && file.name) {
-                            titleInput.value = file.name.replace(/\.[^/.]+$/, "");
-                        }
+            // Load processed clipboard texts
+            const processedTexts = localStorage.getItem('countify-clipboard-processed');
+            if (processedTexts) {
+                this.state.clipboardProcessedTexts = new Set(JSON.parse(processedTexts));
+            }
+        } catch (error) {
+            console.error('Error loading settings:', error);
+        }
+    }
+
+    async saveSettings() {
+        try {
+            const settings = {
+                theme: this.state.theme,
+                lanlinkEnabled: this.state.lanlinkEnabled,
+                intelligentPunctuation: this.state.intelligentPunctuation,
+                clipboardDetection: this.state.clipboardDetection
+            };
+
+            localStorage.setItem('countify-settings', JSON.stringify(settings));
+            
+            // Save processed clipboard texts
+            localStorage.setItem('countify-clipboard-processed', 
+                JSON.stringify(Array.from(this.state.clipboardProcessedTexts)));
+        } catch (error) {
+            console.error('Error saving settings:', error);
+        }
+    }
+
+    async loadActivities() {
+        try {
+            const activities = localStorage.getItem('countify-activities');
+            this.state.activities = activities ? JSON.parse(activities) || [] : [];
+        } catch (error) {
+            console.error('Error loading activities:', error);
+            this.state.activities = [];
+        }
+    }
+
+    async saveActivities() {
+        try {
+            localStorage.setItem('countify-activities', JSON.stringify(this.state.activities));
+        } catch (error) {
+            console.error('Error saving activities:', error);
+        }
+    }
+
+    applyTheme(theme) {
+        if (theme === 'system') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+        }
+
+        document.documentElement.setAttribute('data-theme', theme);
+    }
+
+    watchSystemTheme() {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', (e) => {
+            if (this.state.theme === 'system') {
+                this.applyTheme('system');
+            }
+        });
+    }
+
+    filterActivities() {
+        let filtered = [...this.state.activities].filter(a => !a.deleted && !a.archived);
+
+        if (this.state.searchQuery) {
+            filtered = filtered.filter(activity =>
+                activity.title.toLowerCase().includes(this.state.searchQuery) ||
+                activity.content.toLowerCase().includes(this.state.searchQuery)
+            );
+        }
+
+        if (this.state.selectedFolder !== 'all') {
+            filtered = filtered.filter(activity =>
+                activity.folder === this.state.selectedFolder
+            );
+        }
+
+        return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    }
+
+    getTodaysActivities() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return this.state.activities.filter(activity => {
+            const activityDate = new Date(activity.updatedAt);
+            return activityDate >= today && !activity.deleted && !activity.archived;
+        });
+    }
+
+    getYesterdaysActivities() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        return this.state.activities.filter(activity => {
+            const activityDate = new Date(activity.updatedAt);
+            return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
+        });
+    }
+
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+        if (diffInDays === 0) {
+            return 'Today';
+        } else if (diffInDays === 1) {
+            return 'Yesterday';
+        } else if (diffInDays < 7) {
+            return date.toLocaleDateString('en-US', {
+                weekday: 'short'
+            });
+        } else {
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+    }
+
+    countWords(text) {
+        if (!text || !text.trim()) return 0;
+        return text.trim().split(/\s+/).length;
+    }
+
+    countCharacters(text, includeSpaces = true) {
+        if (!text) return 0;
+        return includeSpaces ? text.length : text.replace(/\s+/g, '').length;
+    }
+
+    countSentences(text) {
+        if (!text || !text.trim()) return 0;
+        const sentences = text.split(/[.!?]+(?=\s|$)/);
+        return sentences.filter(s => s.trim().length > 0).length;
+    }
+
+    countParagraphs(text) {
+        if (!text || !text.trim()) return 0;
+        const paragraphs = text.split(/\n\s*\n+/);
+        return paragraphs.filter(p => p.trim().length > 0).length;
+    }
+
+    countUniqueWords(text) {
+        if (!text || !text.trim()) return 0;
+        const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+        const uniqueWords = new Set(words);
+        return uniqueWords.size;
+    }
+
+    calculateAverageWordLength(text) {
+        if (!text || !text.trim()) return 0;
+        const words = text.match(/\b\w+\b/g) || [];
+        if (words.length === 0) return 0;
+        const totalLength = words.reduce((sum, word) => sum + word.length, 0);
+        return (totalLength / words.length).toFixed(1);
+    }
+
+    calculateReadingTime(wordCount) {
+        const wordsPerMinute = 200;
+        const minutes = wordCount / wordsPerMinute;
+        return Math.ceil(minutes) || 0;
+    }
+
+    calculateSpeakingTime(wordCount) {
+        const wordsPerMinute = 150;
+        const minutes = wordCount / wordsPerMinute;
+        return Math.ceil(minutes) || 0;
+    }
+
+    updateTextAnalytics() {
+        const text = document.getElementById('editorContent')?.value || '';
+        const wordCount = this.countWords(text);
+
+        document.getElementById('wordCount').textContent = wordCount;
+        document.getElementById('charCount').textContent = this.countCharacters(text, true);
+        document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
+        document.getElementById('sentenceCount').textContent = this.countSentences(text);
+        document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
+        document.getElementById('wordFrequency').textContent = this.countUniqueWords(text);
+        document.getElementById('avgWordLength').textContent = this.calculateAverageWordLength(text);
+
+        document.getElementById('readingTime').textContent =
+            this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
+                ' min' : ' mins');
+
+        document.getElementById('speakingTime').textContent =
+            this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
+                ' min' : ' mins');
+    }
+
+    getTotalWords() {
+        return this.state.activities.reduce((sum, activity) => sum + this.countWords(activity.content), 0);
+    }
+
+    calculateTotalWritingTime() {
+        const totalWords = this.getTotalWords();
+        const minutes = Math.ceil(totalWords / 200);
+        return `${minutes} min`;
+    }
+
+    getLongestActivity() {
+        let longest = {
+            title: 'None',
+            words: 0
+        };
+        this.state.activities.forEach(activity => {
+            if (!activity.deleted && !activity.archived) {
+                const words = this.countWords(activity.content);
+                if (words > longest.words) {
+                    longest = {
+                        title: activity.title,
+                        words: words
                     };
-
-                    reader.readAsText(file);
-                };
-
-                input.click();
-            }
-
-            duplicateCurrentActivity() {
-                if (!this.state.currentActivityId) return;
-
-                const activity = this.state.activities.find(a => a.id === this.state.currentActivityId);
-                if (!activity) return;
-
-                const duplicate = {
-                    ...activity,
-                    id: this.generateId(),
-                    title: `${activity.title} (Copy)`,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-
-                this.state.activities.unshift(duplicate);
-                this.saveActivities();
-                this.renderView();
-                this.showAutoSaveIndicator();
-            }
-
-            pushToHistoryStack() {
-                if (!this.state.currentActivityId) return;
-
-                const editorContent = document.getElementById('editorContent');
-                const editorTitle = document.getElementById('editorTitle');
-                if (!editorContent || !editorTitle) return;
-
-                const currentContent = editorContent.value;
-                const currentTitle = editorTitle.value;
-
-                if (!this.state.historyStack[this.state.currentActivityId]) {
-                    this.state.historyStack[this.state.currentActivityId] = [];
-                    this.state.futureStack[this.state.currentActivityId] = [];
                 }
+            }
+        });
+        return longest;
+    }
 
-                const lastHistory = this.state.historyStack[this.state.currentActivityId][0];
-                if (lastHistory && lastHistory.content === currentContent && lastHistory.title === currentTitle) {
-                    return;
-                }
-
-                this.state.historyStack[this.state.currentActivityId].unshift({
-                    content: currentContent,
-                    title: currentTitle,
-                    timestamp: Date.now()
+    getMostProductiveDay() {
+        const wordsByDay = {};
+        this.state.activities.forEach(activity => {
+            if (!activity.deleted && !activity.archived) {
+                const day = new Date(activity.updatedAt).toLocaleDateString('en-US', {
+                    weekday: 'long'
                 });
-
-                this.state.futureStack[this.state.currentActivityId] = [];
-
-                if (this.state.historyStack[this.state.currentActivityId].length > 50) {
-                    this.state.historyStack[this.state.currentActivityId].pop();
-                }
-
-                this.updateUndoRedoButtons();
+                wordsByDay[day] = (wordsByDay[day] || 0) + this.countWords(activity.content);
             }
+        });
 
-            undo() {
-                if (!this.state.currentActivityId ||
-                    !this.state.historyStack[this.state.currentActivityId] ||
-                    this.state.historyStack[this.state.currentActivityId].length < 2) {
-                    return;
-                }
+        let maxDay = 'None';
+        let maxWords = 0;
 
-                const currentState = this.state.historyStack[this.state.currentActivityId].shift();
-                const previousState = this.state.historyStack[this.state.currentActivityId][0];
+        for (const day in wordsByDay) {
+            if (wordsByDay[day] > maxWords) {
+                maxWords = wordsByDay[day];
+                maxDay = day;
+            }
+        }
 
-                this.state.futureStack[this.state.currentActivityId].unshift(currentState);
+        return maxDay;
+    }
 
-                document.getElementById('editorContent').value = previousState.content;
-                document.getElementById('editorTitle').value = previousState.title;
+    getWritingStreak() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const hasToday = this.state.activities.some(activity => {
+            const activityDate = new Date(activity.updatedAt);
+            return activityDate >= today && !activity.deleted && !activity.archived;
+        });
+
+        const hasYesterday = this.state.activities.some(activity => {
+            const activityDate = new Date(activity.updatedAt);
+            return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
+        });
+
+        return hasToday && hasYesterday ? '2 days' : hasToday ? '1 day' : '0 days';
+    }
+
+    getWordsPerMinute() {
+        const totalWords = this.getTotalWords();
+        return Math.round(totalWords / 200);
+    }
+
+    async openEditor(activityId = null) {
+        if (activityId) {
+            const activity = this.state.activities.find(a => a.id === activityId);
+            if (activity) {
+                this.state.currentActivityId = activity.id;
+                document.getElementById('editorTitle').value = activity.title;
+                document.getElementById('editorContent').value = activity.content;
                 this.updateTextAnalytics();
-
-                this.updateUndoRedoButtons();
-            }
-
-            redo() {
-                if (!this.state.currentActivityId ||
-                    !this.state.futureStack[this.state.currentActivityId] ||
-                    this.state.futureStack[this.state.currentActivityId].length === 0) {
-                    return;
-                }
-
-                const nextState = this.state.futureStack[this.state.currentActivityId].shift();
-
-                const currentContent = document.getElementById('editorContent').value;
-                const currentTitle = document.getElementById('editorTitle').value;
-                this.state.historyStack[this.state.currentActivityId].unshift({
-                    content: currentContent,
-                    title: currentTitle,
-                    timestamp: Date.now()
-                });
-
-                document.getElementById('editorContent').value = nextState.content;
-                document.getElementById('editorTitle').value = nextState.title;
-                this.updateTextAnalytics();
-
-                this.updateUndoRedoButtons();
-            }
-
-            updateUndoRedoButtons() {
-                const undoBtn = document.getElementById('undoBtn');
-                const redoBtn = document.getElementById('redoBtn');
-
-                if (!this.state.currentActivityId || !undoBtn || !redoBtn) {
-                    return;
-                }
-
-                const hasUndo = this.state.historyStack[this.state.currentActivityId] &&
-                    this.state.historyStack[this.state.currentActivityId].length > 1;
-                const hasRedo = this.state.futureStack[this.state.currentActivityId] &&
-                    this.state.futureStack[this.state.currentActivityId].length > 0;
-
-                undoBtn.disabled = !hasUndo;
-                redoBtn.disabled = !hasRedo;
-            }
-
-            toggleVoiceMode() {
-                if (!this.state.isVoiceModeActive) {
-                    this.openVoiceMode();
-                } else {
-                    this.closeVoiceMode();
-                }
-            }
-
-            openVoiceMode() {
-                this.state.isVoiceModeActive = true;
-                document.getElementById('voiceModeSheet').classList.add('open');
-                document.getElementById('voiceStart').focus();
-            }
-
-            closeVoiceMode() {
-                this.state.isVoiceModeActive = false;
-                document.getElementById('voiceModeSheet').classList.remove('open');
-                this.stopVoiceInput();
-            }
-
-            startVoiceInput() {
-                if (!('webkitSpeechRecognition' in window)) {
-                    this.showAlert(
-                        'Voice Input Error',
-                        'Voice input is not supported in your browser.'
-                    );
-                    return;
-                }
-
-                if (this.state.voiceRecognition) {
-                    return;
-                }
-
-                const recognition = new webkitSpeechRecognition();
-                this.state.voiceRecognition = recognition;
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'en-US';
-
-                recognition.onend = null;
-                recognition.onaudioend = null;
-                recognition.onsoundend = null;
-                recognition.onspeechend = null;
-
-                recognition.onstart = () => {
-                    this.state.isVoiceListening = true;
-                    document.getElementById('voiceStart').disabled = true;
-                    document.getElementById('voicePause').disabled = false;
-                    document.getElementById('voiceStop').disabled = false;
-                    document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic_off</span>';
-                    document.getElementById('voiceInputBtn').style.color = 'var(--error)';
-                    this.startVoiceVisualizer();
-                    this.triggerHapticFeedback('success');
-                };
-
-                recognition.onresult = (event) => {
-                    let interimTranscript = '';
-                    let finalTranscript = '';
-
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript;
-                        } else {
-                            interimTranscript += transcript;
-                        }
-                    }
-
-                    document.getElementById('voiceCaption').textContent = interimTranscript || finalTranscript;
-
-                    if (finalTranscript) {
-                        const editor = document.getElementById('editorContent');
-                        let processedText = finalTranscript;
-
-                        // Apply intelligent punctuation if enabled
-                        if (this.state.intelligentPunctuation) {
-                            processedText = this.applyIntelligentPunctuation(processedText);
-                        }
-
-                        editor.value += (editor.value ? ' ' : '') + processedText;
-                        this.updateTextAnalytics();
-                        this.pushToHistoryStack();
-                    }
-                };
-
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error', event.error);
-                    this.stopVoiceInput();
-                    this.triggerHapticFeedback('error');
-                    this.showAlert(
-                        'Voice Input Error',
-                        `An error occurred: ${event.error}`
-                    );
-                };
-
-                try {
-                    recognition.start();
-                } catch (error) {
-                    this.showAlert(
-                        'Microphone Error',
-                        'Microphone permission was denied. Please enable microphone access in your browser settings.'
-                    );
-                    this.triggerHapticFeedback('error');
-                }
-            }
-
-            applyIntelligentPunctuation(text) {
-                if (!this.state.intelligentPunctuation) return text;
-
-                // Simple intelligent punctuation rules
-                let processed = text;
-
-                // Capitalize first letter of sentences
-                processed = processed.replace(/(^\s*|[.!?]\s+)([a-z])/g, (match, p1, p2) => p1 + p2.toUpperCase());
-
-                // Add periods after complete sentences (simple heuristic)
-                if (processed.length > 10 && !/[.!?]$/.test(processed)) {
-                    const lastWord = processed.split(' ').pop();
-                    if (lastWord.length > 3 && !lastWord.includes(',') && !lastWord.includes(';')) {
-                        processed += '.';
-                    }
-                }
-
-                return processed;
-            }
-
-            toggleVoicePause() {
-                if (!this.state.voiceRecognition) return;
-
-                const pauseBtn = document.getElementById('voicePause');
-                if (this.state.isVoiceListening) {
-                    this.state.voiceRecognition.stop();
-                    this.state.isVoiceListening = false;
-                    pauseBtn.innerHTML = `<span class="material-icons">play_arrow</span> <span>Continue</span>`;
-                    this.stopVoiceVisualizer();
-                    this.triggerHapticFeedback('light');
-                } else {
-                    this.state.voiceRecognition.start();
-                    this.state.isVoiceListening = true;
-                    pauseBtn.innerHTML = `<span class="material-icons">pause</span> <span>Pause</span>`;
-                    this.startVoiceVisualizer();
-                    this.triggerHapticFeedback('light');
-                }
-            }
-
-            stopVoiceInput() {
-                if (!this.state.voiceRecognition) return;
-
-                try {
-                    this.state.voiceRecognition.stop();
-                } catch (e) {
-                    console.log('Voice recognition already stopped');
-                }
-
-                this.state.voiceRecognition = null;
-                this.state.isVoiceListening = false;
-
-                document.getElementById('voiceStart').disabled = false;
-                document.getElementById('voicePause').disabled = true;
-                document.getElementById('voiceStop').disabled = true;
-                document.getElementById('voicePause').innerHTML = `<span class="material-icons">pause</span> <span>Pause</span>`;
-                document.getElementById('voiceInputBtn').innerHTML = '<span class="material-icons">mic</span>';
-                document.getElementById('voiceInputBtn').style.color = '';
-                document.getElementById('voiceCaption').textContent = '';
-
-                this.stopVoiceVisualizer();
-                this.triggerHapticFeedback('success', 2);
-            }
-
-            insertSpace() {
-                const editor = document.getElementById('editorContent');
-                editor.value += ' ';
-                editor.focus();
-                this.updateTextAnalytics();
-                this.pushToHistoryStack();
-                this.triggerHapticFeedback('light');
-            }
-
-            triggerHapticFeedback(type = 'light', count = 1) {
-                if (!('vibrate' in navigator)) return;
-
-                try {
-                    switch (type) {
-                        case 'success':
-                            navigator.vibrate(50);
-                            break;
-                        case 'error':
-                            navigator.vibrate([100, 50, 100]);
-                            break;
-                        case 'light':
-                            navigator.vibrate(30);
-                            break;
-                        default:
-                            navigator.vibrate(50 * count);
-                    }
-                } catch (e) {
-                    console.log('Haptic feedback not supported');
-                }
-            }
-
-            startVoiceVisualizer() {
-                this.stopVoiceVisualizer();
-
-                const visualizerBars = [
-                    document.getElementById('voiceBar1'),
-                    document.getElementById('voiceBar2'),
-                    document.getElementById('voiceBar3'),
-                    document.getElementById('voiceBar4'),
-                    document.getElementById('voiceBar5')
-                ];
-
-                this.state.visualizerInterval = setInterval(() => {
-                    visualizerBars.forEach(bar => {
-                        const height = Math.floor(Math.random() * 30) + 5;
-                        bar.style.height = `${height}px`;
-                        bar.style.backgroundColor = `hsl(${Math.random() * 60 + 180}, 80%, 60%)`;
-                    });
-                }, 100);
-            }
-
-            stopVoiceVisualizer() {
-                if (this.state.visualizerInterval) {
-                    clearInterval(this.state.visualizerInterval);
-                    this.state.visualizerInterval = null;
-
-                    const visualizerBars = [
-                        document.getElementById('voiceBar1'),
-                        document.getElementById('voiceBar2'),
-                        document.getElementById('voiceBar3'),
-                        document.getElementById('voiceBar4'),
-                        document.getElementById('voiceBar5')
-                    ];
-
-                    visualizerBars.forEach(bar => {
-                        bar.style.height = '5px';
-                        bar.style.backgroundColor = 'var(--primary)';
-                    });
-                }
-            }
-
-            setupRippleEffects() {
-                document.addEventListener('click', function(e) {
-                    const target = e.target.closest('.btn, .btn-icon, .activity-card, .fab');
-                    if (target) {
-                        const rect = target.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-
-                        const ripple = document.createElement('span');
-                        ripple.classList.add('ripple');
-                        ripple.style.left = `${x}px`;
-                        ripple.style.top = `${y}px`;
-
-                        target.appendChild(ripple);
-
-                        ripple.addEventListener('animationend', () => {
-                            ripple.remove();
-                        });
-                    }
-                });
-            }
-
-            toggleDrawer() {
-                document.getElementById('drawer')?.classList.toggle('drawer-open');
-                document.getElementById('drawerOverlay')?.classList.toggle('drawer-overlay-visible');
-            }
-
-            async loadSettings() {
-                try {
-                    const settings = JSON.parse(localStorage.getItem('countify-settings')) || {};
-
-                    if (settings.theme) {
-                        this.state.theme = settings.theme;
-                        this.applyTheme(settings.theme);
-                    }
-
-                    if (settings.lanlinkEnabled !== undefined) {
-                        this.state.lanlinkEnabled = settings.lanlinkEnabled;
-                    }
-
-                    if (settings.intelligentPunctuation !== undefined) {
-                        this.state.intelligentPunctuation = settings.intelligentPunctuation;
-                    }
-                } catch (error) {
-                    console.error('Error loading settings:', error);
-                }
-            }
-
-            async saveSettings() {
-                try {
-                    const settings = {
-                        theme: this.state.theme,
-                        lanlinkEnabled: this.state.lanlinkEnabled,
-                        intelligentPunctuation: this.state.intelligentPunctuation
-                    };
-
-                    localStorage.setItem('countify-settings', JSON.stringify(settings));
-                } catch (error) {
-                    console.error('Error saving settings:', error);
-                }
-            }
-
-            async loadActivities() {
-                try {
-                    const activities = localStorage.getItem('countify-activities');
-                    this.state.activities = activities ? JSON.parse(activities) || [] : [];
-                } catch (error) {
-                    console.error('Error loading activities:', error);
-                    this.state.activities = [];
-                }
-            }
-
-            async saveActivities() {
-                try {
-                    localStorage.setItem('countify-activities', JSON.stringify(this.state.activities));
-                } catch (error) {
-                    console.error('Error saving activities:', error);
-                }
-            }
-
-            applyTheme(theme) {
-                if (theme === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                    theme = prefersDark ? 'dark' : 'light';
-                }
-
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-
-            watchSystemTheme() {
-                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                mediaQuery.addEventListener('change', (e) => {
-                    if (this.state.theme === 'system') {
-                        this.applyTheme('system');
-                    }
-                });
-            }
-
-            filterActivities() {
-                let filtered = [...this.state.activities].filter(a => !a.deleted && !a.archived);
-
-                if (this.state.searchQuery) {
-                    filtered = filtered.filter(activity =>
-                        activity.title.toLowerCase().includes(this.state.searchQuery) ||
-                        activity.content.toLowerCase().includes(this.state.searchQuery)
-                    );
-                }
-
-                if (this.state.selectedFolder !== 'all') {
-                    filtered = filtered.filter(activity =>
-                        activity.folder === this.state.selectedFolder
-                    );
-                }
-
-                return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-            }
-
-            getTodaysActivities() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                return this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= today && !activity.deleted && !activity.archived;
-                });
-            }
-
-            getYesterdaysActivities() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                return this.state.activities.filter(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
-                });
-            }
-
-            formatDate(timestamp) {
-                const date = new Date(timestamp);
-                const now = new Date();
-                const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-
-                if (diffInDays === 0) {
-                    return 'Today';
-                } else if (diffInDays === 1) {
-                    return 'Yesterday';
-                } else if (diffInDays < 7) {
-                    return date.toLocaleDateString('en-US', {
-                        weekday: 'short'
-                    });
-                } else {
-                    return date.toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                    });
-                }
-            }
-
-            countWords(text) {
-                if (!text || !text.trim()) return 0;
-                return text.trim().split(/\s+/).length;
-            }
-
-            countCharacters(text, includeSpaces = true) {
-                if (!text) return 0;
-                return includeSpaces ? text.length : text.replace(/\s+/g, '').length;
-            }
-
-            countSentences(text) {
-                if (!text || !text.trim()) return 0;
-                const sentences = text.split(/[.!?]+(?=\s|$)/);
-                return sentences.filter(s => s.trim().length > 0).length;
-            }
-
-            countParagraphs(text) {
-                if (!text || !text.trim()) return 0;
-                const paragraphs = text.split(/\n\s*\n+/);
-                return paragraphs.filter(p => p.trim().length > 0).length;
-            }
-
-            countUniqueWords(text) {
-                if (!text || !text.trim()) return 0;
-                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-                const uniqueWords = new Set(words);
-                return uniqueWords.size;
-            }
-
-            calculateAverageWordLength(text) {
-                if (!text || !text.trim()) return 0;
-                const words = text.match(/\b\w+\b/g) || [];
-                if (words.length === 0) return 0;
-                const totalLength = words.reduce((sum, word) => sum + word.length, 0);
-                return (totalLength / words.length).toFixed(1);
-            }
-
-            calculateReadingTime(wordCount) {
-                const wordsPerMinute = 200;
-                const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
-            }
-
-            calculateSpeakingTime(wordCount) {
-                const wordsPerMinute = 150;
-                const minutes = wordCount / wordsPerMinute;
-                return Math.ceil(minutes) || 0;
-            }
-
-            updateTextAnalytics() {
-                const text = document.getElementById('editorContent')?.value || '';
-                const wordCount = this.countWords(text);
-
-                document.getElementById('wordCount').textContent = wordCount;
-                document.getElementById('charCount').textContent = this.countCharacters(text, true);
-                document.getElementById('charNoSpacesCount').textContent = this.countCharacters(text, false);
-                document.getElementById('sentenceCount').textContent = this.countSentences(text);
-                document.getElementById('paragraphCount').textContent = this.countParagraphs(text);
-                document.getElementById('wordFrequency').textContent = this.countUniqueWords(text);
-                document.getElementById('avgWordLength').textContent = this.calculateAverageWordLength(text);
-
-                document.getElementById('readingTime').textContent =
-                    this.calculateReadingTime(wordCount) + (this.calculateReadingTime(wordCount) === 1 ?
-                        ' min' : ' mins');
-
-                document.getElementById('speakingTime').textContent =
-                    this.calculateSpeakingTime(wordCount) + (this.calculateSpeakingTime(wordCount) === 1 ?
-                        ' min' : ' mins');
-            }
-
-            getTotalWords() {
-                return this.state.activities.reduce((sum, activity) => sum + this.countWords(activity.content), 0);
-            }
-
-            calculateTotalWritingTime() {
-                const totalWords = this.getTotalWords();
-                const minutes = Math.ceil(totalWords / 200);
-                return `${minutes} min`;
-            }
-
-            getLongestActivity() {
-                let longest = {
-                    title: 'None',
-                    words: 0
-                };
-                this.state.activities.forEach(activity => {
-                    if (!activity.deleted && !activity.archived) {
-                        const words = this.countWords(activity.content);
-                        if (words > longest.words) {
-                            longest = {
-                                title: activity.title,
-                                words: words
-                            };
-                        }
-                    }
-                });
-                return longest;
-            }
-
-            getMostProductiveDay() {
-                const wordsByDay = {};
-                this.state.activities.forEach(activity => {
-                    if (!activity.deleted && !activity.archived) {
-                        const day = new Date(activity.updatedAt).toLocaleDateString('en-US', {
-                            weekday: 'long'
-                        });
-                        wordsByDay[day] = (wordsByDay[day] || 0) + this.countWords(activity.content);
-                    }
-                });
-
-                let maxDay = 'None';
-                let maxWords = 0;
-
-                for (const day in wordsByDay) {
-                    if (wordsByDay[day] > maxWords) {
-                        maxWords = wordsByDay[day];
-                        maxDay = day;
-                    }
-                }
-
-                return maxDay;
-            }
-
-            getWritingStreak() {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                const hasToday = this.state.activities.some(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= today && !activity.deleted && !activity.archived;
-                });
-
-                const hasYesterday = this.state.activities.some(activity => {
-                    const activityDate = new Date(activity.updatedAt);
-                    return activityDate >= yesterday && activityDate < today && !activity.deleted && !activity.archived;
-                });
-
-                return hasToday && hasYesterday ? '2 days' : hasToday ? '1 day' : '0 days';
-            }
-
-            getWordsPerMinute() {
-                const totalWords = this.getTotalWords();
-                return Math.round(totalWords / 200);
-            }
-
-            async openEditor(activityId = null) {
-                if (activityId) {
-                    const activity = this.state.activities.find(a => a.id === activityId);
-                    if (activity) {
-                        this.state.currentActivityId = activity.id;
-                        document.getElementById('editorTitle').value = activity.title;
-                        document.getElementById('editorContent').value = activity.content;
-                        this.updateTextAnalytics();
-                        this.state.isEditing = true;
-
-                        if (!this.state.historyStack[activityId]) {
-                            this.state.historyStack[activityId] = [{
-                                content: activity.content,
-                                title: activity.title,
-                                timestamp: Date.now()
-                            }];
-                            this.state.futureStack[activityId] = [];
-                        }
-                    }
-                } else {
-                    this.state.currentActivityId = this.generateId();
-                    document.getElementById('editorTitle').value = this.generateDefaultTitle();
-                    document.getElementById('editorContent').value = '';
-                    this.updateTextAnalytics();
-                    this.state.isEditing = false;
-
-                    this.state.historyStack[this.state.currentActivityId] = [{
-                        content: '',
-                        title: this.generateDefaultTitle(),
+                this.state.isEditing = true;
+
+                if (!this.state.historyStack[activityId]) {
+                    this.state.historyStack[activityId] = [{
+                        content: activity.content,
+                        title: activity.title,
                         timestamp: Date.now()
                     }];
-                    this.state.futureStack[this.state.currentActivityId] = [];
+                    this.state.futureStack[activityId] = [];
                 }
-
-                document.getElementById('editorContainer').classList.add('editor-container-open');
-                document.getElementById('editorContent').focus();
-                this.updateUndoRedoButtons();
-
-                if (document.getElementById('drawer').classList.contains('drawer-open')) {
-                    this.toggleDrawer();
-                }
-
-                document.getElementById('fab').style.display = 'none';
-                this.closeVoiceMode();
-                this.closeFullscreenSearch();
             }
+        } else {
+            this.state.currentActivityId = this.generateId();
+            document.getElementById('editorTitle').value = this.generateDefaultTitle();
+            document.getElementById('editorContent').value = '';
+            this.updateTextAnalytics();
+            this.state.isEditing = false;
 
-            generateDefaultTitle() {
-                const now = new Date();
-                const hours = now.getHours();
+            this.state.historyStack[this.state.currentActivityId] = [{
+                content: '',
+                title: this.generateDefaultTitle(),
+                timestamp: Date.now()
+            }];
+            this.state.futureStack[this.state.currentActivityId] = [];
+        }
 
-                if (hours < 12) return 'Morning Activity';
-                if (hours < 17) return 'Afternoon Activity';
-                return 'Evening Activity';
-            }
+        document.getElementById('editorContainer').classList.add('editor-container-open');
+        document.getElementById('editorContent').focus();
+        this.updateUndoRedoButtons();
 
-            closeEditor() {
-                if (this.state.currentActivityId) {
-                    this.saveActivity(true);
-                }
+        if (document.getElementById('drawer').classList.contains('drawer-open')) {
+            this.toggleDrawer();
+        }
 
-                document.getElementById('editorContainer').classList.remove('editor-container-open');
-                this.state.currentActivityId = null;
-                this.renderView();
-                document.getElementById('fab').style.display = 'flex';
-                this.closeVoiceMode();
-            }
+        document.getElementById('fab').style.display = 'none';
+        this.closeVoiceMode();
+        this.closeFullscreenSearch();
+    }
 
-            async saveActivity(isAutoSave = false, showIndicator = false) {
-                const title = document.getElementById('editorTitle')?.value.trim() || this.generateDefaultTitle();
-                const content = document.getElementById('editorContent')?.value.trim() || '';
-                const wordCount = this.countWords(content);
-                const now = new Date().toISOString();
+    generateDefaultTitle() {
+        const now = new Date();
+        const hours = now.getHours();
 
-                if (this.state.isEditing) {
-                    this.state.activities = this.state.activities.map(activity => {
-                        if (activity.id === this.state.currentActivityId) {
-                            return {
-                                ...activity,
-                                title,
-                                content,
-                                wordCount,
-                                updatedAt: now
-                            };
-                        }
-                        return activity;
-                    });
-                } else {
-                    this.state.activities.unshift({
-                        id: this.state.currentActivityId,
+        if (hours < 12) return 'Morning Activity';
+        if (hours < 17) return 'Afternoon Activity';
+        return 'Evening Activity';
+    }
+
+    closeEditor() {
+        if (this.state.currentActivityId) {
+            this.saveActivity(true);
+        }
+
+        document.getElementById('editorContainer').classList.remove('editor-container-open');
+        this.state.currentActivityId = null;
+        this.renderView();
+        document.getElementById('fab').style.display = 'flex';
+        this.closeVoiceMode();
+    }
+
+    async saveActivity(isAutoSave = false, showIndicator = false) {
+        const title = document.getElementById('editorTitle')?.value.trim() || this.generateDefaultTitle();
+        const content = document.getElementById('editorContent')?.value.trim() || '';
+        const wordCount = this.countWords(content);
+        const now = new Date().toISOString();
+
+        if (this.state.isEditing) {
+            this.state.activities = this.state.activities.map(activity => {
+                if (activity.id === this.state.currentActivityId) {
+                    return {
+                        ...activity,
                         title,
                         content,
                         wordCount,
-                        createdAt: now,
-                        updatedAt: now,
-                        deleted: false,
-                        archived: false
-                    });
-                    this.state.isEditing = true;
+                        updatedAt: now
+                    };
                 }
+                return activity;
+            });
+        } else {
+            this.state.activities.unshift({
+                id: this.state.currentActivityId,
+                title,
+                content,
+                wordCount,
+                createdAt: now,
+                updatedAt: now,
+                deleted: false,
+                archived: false
+            });
+            this.state.isEditing = true;
+        }
 
-                await this.saveActivities();
+        await this.saveActivities();
 
-                if (showIndicator) {
-                    this.showAutoSaveIndicator();
-                }
-            }
+        if (showIndicator) {
+            this.showAutoSaveIndicator();
+        }
+    }
 
-            async deleteActivity(activityId) {
+    async deleteActivity(activityId) {
+        // Always show confirmation before deletion
+        this.showConfirmModal(
+            'Delete Activity',
+            'Are you sure you want to delete this activity? This action cannot be undone.',
+            async () => {
                 this.state.activities = this.state.activities.filter(activity => activity.id !== activityId);
                 await this.saveActivities();
                 this.renderView();
+                
+                if (this.state.currentActivityId === activityId) {
+                    this.closeEditor();
+                }
             }
+        );
+    }
 
-            showActivityOptions(activityId, x, y) {
-                const activity = this.state.activities.find(a => a.id === activityId);
-                if (!activity) return;
+    showActivityOptions(activityId, x, y) {
+        const activity = this.state.activities.find(a => a.id === activityId);
+        if (!activity) return;
 
-                const contextMenu = document.getElementById('contextMenu');
+        const contextMenu = document.getElementById('contextMenu');
 
-                let menuItems = '';
+        let menuItems = '';
 
-                if (activity.deleted) {
-                    menuItems = `
+        if (activity.deleted) {
+            menuItems = `
                 <div class="context-menu-item" data-action="restore" tabindex="0">
                     <span class="material-icons">restore</span>
                     <span>Restore</span>
@@ -2468,19 +2563,19 @@
                     <span>Delete Permanently</span>
                 </div>
             `;
-                } else if (activity.archived) {
-                    menuItems = `
+        } else if (activity.archived) {
+            menuItems = `
                 <div class="context-menu-item" data-action="unarchive" tabindex="0">
                     <span class="material-icons">unarchive</span>
                     <span>Unarchive</span>
                 </div>
                 <div class="context-menu-item danger" data-action="delete" tabindex="0">
                     <span class="material-icons">delete</span>
-                    <span>Delete</span>
+                    <span>Move to Trash</span>
                 </div>
             `;
-                } else {
-                    menuItems = `
+        } else {
+            menuItems = `
                 <div class="context-menu-item" data-action="edit" tabindex="0">
                     <span class="material-icons">edit</span>
                     <span>Edit</span>
@@ -2495,137 +2590,222 @@
                 </div>
                 <div class="context-menu-item danger" data-action="delete" tabindex="0">
                     <span class="material-icons">delete</span>
-                    <span>Delete</span>
+                    <span>Move to Trash</span>
                 </div>
             `;
+        }
+
+        contextMenu.innerHTML = menuItems;
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const menuWidth = 220;
+        const menuHeight = activity.deleted ? 144 : activity.archived ? 192 : 240;
+
+        const adjustedX = x + menuWidth > viewportWidth ? viewportWidth - menuWidth - 10 : x;
+        const adjustedY = y + menuHeight > viewportHeight ? viewportHeight - menuHeight - 10 : y;
+
+        contextMenu.style.left = `${adjustedX}px`;
+        contextMenu.style.top = `${adjustedY}px`;
+        contextMenu.classList.add('context-menu-open');
+
+        setTimeout(() => {
+            contextMenu.querySelector('.context-menu-item').focus();
+        }, 10);
+
+        contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
+            item.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const action = item.dataset.action;
+                this.handleContextMenuAction(action, activity);
+            });
+
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const action = item.dataset.action;
+                    this.handleContextMenuAction(action, activity);
                 }
+            });
+        });
+    }
 
-                contextMenu.innerHTML = menuItems;
-
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-                const menuWidth = 220;
-                const menuHeight = activity.deleted ? 144 : activity.archived ? 192 : 240;
-
-                const adjustedX = x + menuWidth > viewportWidth ? viewportWidth - menuWidth - 10 : x;
-                const adjustedY = y + menuHeight > viewportHeight ? viewportHeight - menuHeight - 10 : y;
-
-                contextMenu.style.left = `${adjustedX}px`;
-                contextMenu.style.top = `${adjustedY}px`;
-                contextMenu.classList.add('context-menu-open');
-
-                setTimeout(() => {
-                    contextMenu.querySelector('.context-menu-item').focus();
-                }, 10);
-
-                contextMenu.querySelectorAll('.context-menu-item').forEach(item => {
-                    item.addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        const action = item.dataset.action;
-                        this.handleContextMenuAction(action, activity);
-                    });
-
-                    item.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const action = item.dataset.action;
-                            this.handleContextMenuAction(action, activity);
-                        }
-                    });
-                });
-            }
-
-            handleContextMenuAction(action, activity) {
-                switch (action) {
-                    case 'edit':
-                        this.openEditor(activity.id);
-                        break;
-                    case 'archive':
-                        activity.archived = true;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'unarchive':
-                        activity.archived = false;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'restore':
-                        activity.deleted = false;
-                        this.saveActivities();
-                        this.renderView();
-                        break;
-                    case 'delete':
+    handleContextMenuAction(action, activity) {
+        switch (action) {
+            case 'edit':
+                this.openEditor(activity.id);
+                break;
+            case 'archive':
+                activity.archived = true;
+                this.saveActivities();
+                this.renderView();
+                break;
+            case 'unarchive':
+                activity.archived = false;
+                this.saveActivities();
+                this.renderView();
+                break;
+            case 'restore':
+                activity.deleted = false;
+                this.saveActivities();
+                this.renderView();
+                break;
+            case 'delete':
+                this.showConfirmModal(
+                    'Move to Trash',
+                    'Are you sure you want to move this activity to trash?',
+                    () => {
                         activity.deleted = true;
                         this.saveActivities();
                         this.renderView();
-                        break;
-                    case 'deletePermanently':
-                        this.showConfirmModal(
-                            'Delete Permanently',
-                            'Are you sure you want to permanently delete this activity? This cannot be undone.',
-                            async () => {
-                                this.state.activities = this.state.activities.filter(a => a.id !== activity.id);
-                                await this.saveActivities();
-                                this.renderView();
-                            }
-                        );
-                        break;
-                    case 'duplicate':
-                        this.duplicateActivity(activity);
-                        break;
-                }
-
-                this.hideContextMenu();
-            }
-
-            duplicateActivity(activity) {
-                const duplicate = {
-                    ...activity,
-                    id: this.generateId(),
-                    title: `${activity.title} (Copy)`,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-
-                this.state.activities.unshift(duplicate);
-                this.saveActivities();
-                this.renderView();
-                this.showAutoSaveIndicator();
-            }
-
-            hideContextMenu() {
-                document.getElementById('contextMenu').classList.remove('context-menu-open');
-            }
-
-            showConfirmModal(title, message, confirmAction) {
-                document.getElementById('confirmModalTitle').textContent = title;
-                document.getElementById('confirmModalMessage').textContent = message;
-                this.state.pendingAction = confirmAction;
-                document.getElementById('confirmModal').classList.add('modal-open');
-
-                setTimeout(() => {
-                    document.getElementById('confirmModalCancel').focus();
-                }, 100);
-            }
-
-            showAlert(title, message) {
-                document.getElementById('alertModalTitle').textContent = title;
-                document.getElementById('alertModalMessage').textContent = message;
-                document.getElementById('alertModal').classList.add('modal-open');
-
-                setTimeout(() => {
-                    document.getElementById('alertModalOk').focus();
-                }, 100);
-            }
-
-            generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
-            }
+                    }
+                );
+                break;
+            case 'deletePermanently':
+                this.showConfirmModal(
+                    'Delete Permanently',
+                    'Are you sure you want to permanently delete this activity? This cannot be undone.',
+                    async () => {
+                        this.state.activities = this.state.activities.filter(a => a.id !== activity.id);
+                        await this.saveActivities();
+                        this.renderView();
+                    }
+                );
+                break;
+            case 'duplicate':
+                this.duplicateActivity(activity);
+                break;
         }
 
-        // Initialize the app when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            const app = new CountifyApp();
-        });
+        this.hideContextMenu();
+    }
+
+    duplicateActivity(activity) {
+        const duplicate = {
+            ...activity,
+            id: this.generateId(),
+            title: `${activity.title} (Copy)`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        this.state.activities.unshift(duplicate);
+        this.saveActivities();
+        this.renderView();
+        this.showAutoSaveIndicator();
+    }
+
+    hideContextMenu() {
+        document.getElementById('contextMenu').classList.remove('context-menu-open');
+    }
+
+    showConfirmModal(title, message, confirmAction) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        this.state.pendingAction = confirmAction;
+        document.getElementById('confirmModal').classList.add('modal-open');
+
+        setTimeout(() => {
+            document.getElementById('confirmModalCancel').focus();
+        }, 100);
+    }
+
+    showAlert(title, message) {
+        document.getElementById('alertModalTitle').textContent = title;
+        document.getElementById('alertModalMessage').textContent = message;
+        document.getElementById('alertModal').classList.add('modal-open');
+
+        setTimeout(() => {
+            document.getElementById('alertModalOk').focus();
+        }, 100);
+    }
+
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+    }
+}
+
+// Initialize the app when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const app = new CountifyApp();
+});
+
+// Add CSS for clipboard banner
+const clipboardBannerStyles = `
+.clipboard-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.clipboard-banner.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.clipboard-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.clipboard-banner-content .material-icons {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.clipboard-banner-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.clipboard-banner-text strong {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.clipboard-banner-text span {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.clipboard-banner-actions {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 480px) {
+    .clipboard-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .clipboard-banner-actions {
+        justify-content: flex-end;
+    }
+}
+`;
+
+// Inject styles
+const styleSheet = document.createElement('style');
+styleSheet.textContent = clipboardBannerStyles;
+document.head.appendChild(styleSheet);
